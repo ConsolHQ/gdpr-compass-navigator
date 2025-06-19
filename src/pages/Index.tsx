@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import LoginForm from '@/components/auth/LoginForm';
 import SignUpForm from '@/components/auth/SignUpForm';
@@ -12,7 +11,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'partner' | 'company' | 'admin';
+  role: 'partner' | 'company';
   avatar?: string;
 }
 

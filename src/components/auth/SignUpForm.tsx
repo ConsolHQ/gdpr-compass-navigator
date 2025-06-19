@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -81,7 +80,7 @@ const SignUpForm = ({ onSignUp, onLogin, loading, error }: SignUpFormProps) => {
                 <div className="flex items-center space-x-2 border rounded-lg p-3 cursor-pointer hover:bg-slate-50">
                   <RadioGroupItem value="partner" id="partner" />
                   <Label htmlFor="partner" className="cursor-pointer flex items-center">
-                    <Users className="h-4 w-4 mr-2" />
+                    <User className="h-4 w-4 mr-2" />
                     Partner
                   </Label>
                 </div>
