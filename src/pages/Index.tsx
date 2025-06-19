@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import LoginForm from '@/components/auth/LoginForm';
 import SignUpForm from '@/components/auth/SignUpForm';
+import EmailVerification from '@/components/auth/EmailVerification';
 import OrganizationSetup from '@/components/onboarding/OrganizationSetup';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
@@ -22,13 +24,14 @@ interface Organization {
   country: string;
 }
 
-type AppState = 'login' | 'signup' | 'onboarding' | 'dashboard';
+type AppState = 'login' | 'signup' | 'verification' | 'onboarding' | 'dashboard';
 
 const Index = () => {
   const [appState, setAppState] = useState<AppState>('login');
   const [user, setUser] = useState<User | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [currentPath, setCurrentPath] = useState('/dashboard');
+  const [pendingUserData, setPendingUserData] = useState<any>(null);
 
   // Mock authentication
   const handleLogin = (email: string, password: string) => {
@@ -47,14 +50,28 @@ const Index = () => {
 
   const handleSignUp = (signUpData: any) => {
     console.log('Sign up attempt:', signUpData);
-    const mockUser: User = {
-      id: '1',
-      name: `${signUpData.firstName} ${signUpData.lastName}`,
-      email: signUpData.email,
-      role: signUpData.accountType,
-    };
-    setUser(mockUser);
-    setAppState('onboarding');
+    setPendingUserData(signUpData);
+    setAppState('verification');
+  };
+
+  const handleEmailVerification = (code: string) => {
+    console.log('Email verification with code:', code);
+    // Mock verification success
+    if (pendingUserData) {
+      const mockUser: User = {
+        id: '1',
+        name: `${pendingUserData.firstName} ${pendingUserData.lastName}`,
+        email: pendingUserData.email,
+        role: pendingUserData.accountType,
+      };
+      setUser(mockUser);
+      setAppState('onboarding');
+    }
+  };
+
+  const handleResendCode = () => {
+    console.log('Resending verification code to:', pendingUserData?.email);
+    // Mock resend code functionality
   };
 
   const handleOrganizationSetup = (orgData: any) => {
@@ -73,6 +90,7 @@ const Index = () => {
   const handleLogout = () => {
     setUser(null);
     setOrganization(null);
+    setPendingUserData(null);
     setCurrentPath('/');
     setAppState('login');
   };
@@ -103,6 +121,17 @@ const Index = () => {
       <SignUpForm
         onSignUp={handleSignUp}
         onLogin={() => setAppState('login')}
+      />
+    );
+  }
+
+  if (appState === 'verification') {
+    return (
+      <EmailVerification
+        email={pendingUserData?.email || ''}
+        onVerify={handleEmailVerification}
+        onResendCode={handleResendCode}
+        onBack={() => setAppState('signup')}
       />
     );
   }
