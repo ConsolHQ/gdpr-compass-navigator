@@ -1,9 +1,13 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Building, Users, AlertTriangle, TrendingUp, Plus, Eye } from 'lucide-react';
+import TaskManagement from '@/components/partner/TaskManagement';
+import ClientManagement from '@/components/partner/ClientManagement';
+import GDPRModules from '@/components/partner/GDPRModules';
 
 interface Company {
   id: string;
@@ -50,6 +54,8 @@ interface PartnerDashboardProps {
 }
 
 const PartnerDashboard = ({ onNavigateToCompany }: PartnerDashboardProps) => {
+  const [activeTab, setActiveTab] = useState('overview');
+
   const getHealthScoreColor = (score: number) => {
     if (score >= 90) return 'text-green-600 bg-green-100';
     if (score >= 75) return 'text-yellow-600 bg-yellow-100';
@@ -69,116 +75,138 @@ const PartnerDashboard = ({ onNavigateToCompany }: PartnerDashboardProps) => {
     <div className="p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Partner Dashboard</h1>
-        <p className="text-slate-600">Manage and monitor your client companies</p>
+        <p className="text-slate-600">Manage and monitor your client companies' GDPR compliance</p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Companies</CardTitle>
-            <Building className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">+2 from last month</p>
-          </CardContent>
-        </Card>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="tasks">Tasks</TabsTrigger>
+          <TabsTrigger value="clients">Clients</TabsTrigger>
+          <TabsTrigger value="modules">GDPR Modules</TabsTrigger>
+        </TabsList>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">143</div>
-            <p className="text-xs text-muted-foreground">+12% from last month</p>
-          </CardContent>
-        </Card>
+        <TabsContent value="overview" className="space-y-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Companies</CardTitle>
+                <Building className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">12</div>
+                <p className="text-xs text-muted-foreground">+2 from last month</p>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Critical Issues</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">7</div>
-            <p className="text-xs text-muted-foreground">Require immediate attention</p>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">143</div>
+                <p className="text-xs text-muted-foreground">+12% from last month</p>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Health Score</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">85%</div>
-            <p className="text-xs text-muted-foreground">+3% from last month</p>
-          </CardContent>
-        </Card>
-      </div>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Critical Issues</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-red-600">7</div>
+                <p className="text-xs text-muted-foreground">Require immediate attention</p>
+              </CardContent>
+            </Card>
 
-      {/* Companies List */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Companies</CardTitle>
-              <CardDescription>Manage your client companies and their compliance status</CardDescription>
-            </div>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Company
-            </Button>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Avg Health Score</CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">85%</div>
+                <p className="text-xs text-muted-foreground">+3% from last month</p>
+              </CardContent>
+            </Card>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {mockCompanies.map((company) => (
-              <div key={company.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Building className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-900">{company.name}</h3>
-                    <p className="text-sm text-slate-600">{company.industry}</p>
-                    <p className="text-xs text-slate-500">Last activity: {company.lastActivity}</p>
-                  </div>
+
+          {/* Recent Companies */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Recent Companies</CardTitle>
+                  <CardDescription>Latest activity from your client companies</CardDescription>
                 </div>
-                
-                <div className="flex items-center space-x-4">
-                  <div className="text-center">
-                    <div className={`text-sm font-medium px-2 py-1 rounded ${getHealthScoreColor(company.healthScore)}`}>
-                      {company.healthScore}%
-                    </div>
-                    <p className="text-xs text-slate-500 mt-1">Health Score</p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-slate-900">{company.activeIssues}</div>
-                    <p className="text-xs text-slate-500 mt-1">Issues</p>
-                  </div>
-                  
-                  <Badge className={getStatusBadge(company.status)}>
-                    {company.status}
-                  </Badge>
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onNavigateToCompany(company.id)}
-                  >
-                    <Eye className="mr-2 h-4 w-4" />
-                    View
-                  </Button>
-                </div>
+                <Button onClick={() => setActiveTab('clients')}>
+                  View All Clients
+                </Button>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {mockCompanies.map((company) => (
+                  <div key={company.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <Building className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-slate-900">{company.name}</h3>
+                        <p className="text-sm text-slate-600">{company.industry}</p>
+                        <p className="text-xs text-slate-500">Last activity: {company.lastActivity}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-4">
+                      <div className="text-center">
+                        <div className={`text-sm font-medium px-2 py-1 rounded ${getHealthScoreColor(company.healthScore)}`}>
+                          {company.healthScore}%
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1">Health Score</p>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="text-sm font-medium text-slate-900">{company.activeIssues}</div>
+                        <p className="text-xs text-slate-500 mt-1">Issues</p>
+                      </div>
+                      
+                      <Badge className={getStatusBadge(company.status)}>
+                        {company.status}
+                      </Badge>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onNavigateToCompany(company.id)}
+                      >
+                        <Eye className="mr-2 h-4 w-4" />
+                        View
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="tasks">
+          <TaskManagement />
+        </TabsContent>
+
+        <TabsContent value="clients">
+          <ClientManagement onViewClient={onNavigateToCompany} />
+        </TabsContent>
+
+        <TabsContent value="modules">
+          <GDPRModules />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
