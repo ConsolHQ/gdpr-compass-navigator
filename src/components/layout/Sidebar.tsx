@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -37,9 +36,6 @@ interface SidebarProps {
 
 const partnerMenuItems: SidebarItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/partner/dashboard' },
-  { id: 'companies', label: 'Companies', icon: Users, href: '/partner/companies' },
-  { id: 'users', label: 'User Management', icon: UserCheck, href: '/partner/users' },
-  { id: 'reports', label: 'Reports', icon: BarChart, href: '/partner/reports' },
   { id: 'settings', label: 'Settings', icon: Settings, href: '/partner/settings' },
 ];
 
@@ -61,6 +57,7 @@ const companyMenuItems: SidebarItem[] = [
       { id: 'data-dictionary', label: 'Data Dictionary', icon: Book, href: '/company/settings/data-dictionary' },
       { id: 'users', label: 'Users', icon: Users, href: '/company/settings/users' },
       { id: 'organisation', label: 'Organisation Setup', icon: Settings, href: '/company/settings/organisation' },
+      { id: 'reports', label: 'Reports', icon: BarChart, href: '/company/settings/reports' },
     ]
   },
 ];
