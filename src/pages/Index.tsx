@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import LoginForm from '@/components/auth/LoginForm';
 import SignUpForm from '@/components/auth/SignUpForm';
@@ -32,6 +31,12 @@ interface Organization {
   country: string;
 }
 
+interface CompanyAccess {
+  id: string;
+  name: string;
+  hasAccess: boolean;
+}
+
 type AppState = 'login' | 'signup' | 'verification' | 'onboarding' | 'dashboard';
 
 const Index = () => {
@@ -40,6 +45,10 @@ const Index = () => {
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [currentPath, setCurrentPath] = useState('/dashboard');
   const [pendingUserData, setPendingUserData] = useState<any>(null);
+  
+  // For partners: track which companies they have access to and current active company
+  const [partnerCompanies, setPartnerCompanies] = useState<CompanyAccess[]>([]);
+  const [activeCompany, setActiveCompany] = useState<CompanyAccess | null>(null);
 
   // Mock authentication
   const handleLogin = (email: string, password: string) => {
@@ -51,8 +60,23 @@ const Index = () => {
       email: email,
       role: email.includes('partner') ? 'partner' : 'company',
     };
+    
     setUser(mockUser);
-    setCurrentPath(mockUser.role === 'partner' ? '/partner/dashboard' : '/company/dashboard');
+    
+    if (mockUser.role === 'partner') {
+      // Mock companies the partner has access to
+      const mockCompanies: CompanyAccess[] = [
+        { id: '1', name: 'TechCorp Ltd', hasAccess: true },
+        { id: '2', name: 'DataFlow Inc', hasAccess: true },
+        { id: '3', name: 'SecureBank', hasAccess: false },
+        { id: '4', name: 'HealthSystem', hasAccess: true },
+      ];
+      setPartnerCompanies(mockCompanies);
+      setCurrentPath('/partner/dashboard');
+    } else {
+      setCurrentPath('/company/dashboard');
+    }
+    
     setAppState('dashboard');
   };
 
@@ -99,6 +123,8 @@ const Index = () => {
     setUser(null);
     setOrganization(null);
     setPendingUserData(null);
+    setPartnerCompanies([]);
+    setActiveCompany(null);
     setCurrentPath('/');
     setAppState('login');
   };
@@ -113,18 +139,37 @@ const Index = () => {
     setCurrentPath(`/partner/companies/${companyId}`);
   };
 
+  // Handle partner switching between company workspaces
+  const handleSwitchCompany = (company: CompanyAccess) => {
+    if (!company.hasAccess) {
+      console.log('Requesting access to company:', company.name);
+      // In real app, this would trigger an access request
+      return;
+    }
+    
+    setActiveCompany(company);
+    setCurrentPath('/company/dashboard');
+    console.log('Switched to company workspace:', company.name);
+  };
+
   // Function to render the correct screen based on currentPath
   const renderCurrentScreen = () => {
     if (!user) return null;
 
+    // If partner hasn't selected a company workspace yet, show partner dashboard
+    if (user.role === 'partner' && !activeCompany && currentPath.startsWith('/partner')) {
+      switch (currentPath) {
+        case '/partner/dashboard':
+          return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
+        case '/partner/settings':
+          return <PartnerSettings />;
+        default:
+          return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
+      }
+    }
+
+    // Company routes (used by both company users and partners in company workspace)
     switch (currentPath) {
-      // Partner routes
-      case '/partner/dashboard':
-        return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
-      case '/partner/settings':
-        return <PartnerSettings />;
-      
-      // Company routes
       case '/company/dashboard':
         return <CompanyDashboard onNavigate={handleNavigate} />;
       case '/company/ropa':
@@ -148,9 +193,13 @@ const Index = () => {
         return <CompanySettings />;
       
       default:
-        // Default to dashboard based on user role
+        // Default to dashboard based on user role and context
         if (user.role === 'partner') {
-          return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
+          if (activeCompany) {
+            return <CompanyDashboard onNavigate={handleNavigate} />;
+          } else {
+            return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
+          }
         } else {
           return <CompanyDashboard onNavigate={handleNavigate} />;
         }
@@ -205,11 +254,18 @@ const Index = () => {
           userRole={user.role}
           onNavigate={handleNavigate}
           currentPath={currentPath}
+          partnerCompanies={partnerCompanies}
+          activeCompany={activeCompany}
+          onSwitchCompany={handleSwitchCompany}
         />
       )}
       
       <div className="flex-1 flex flex-col">
-        <Header user={user || undefined} onLogout={handleLogout} />
+        <Header 
+          user={user || undefined} 
+          onLogout={handleLogout}
+          activeCompany={activeCompany}
+        />
         
         <main className="flex-1 overflow-auto">
           {renderCurrentScreen()}

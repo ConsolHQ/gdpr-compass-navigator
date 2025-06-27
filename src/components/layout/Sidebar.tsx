@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -17,6 +18,8 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
+  Building,
+  Unlock,
 } from 'lucide-react';
 
 interface SidebarItem {
@@ -28,10 +31,19 @@ interface SidebarItem {
   submenu?: SidebarItem[];
 }
 
+interface CompanyAccess {
+  id: string;
+  name: string;
+  hasAccess: boolean;
+}
+
 interface SidebarProps {
   userRole: 'partner' | 'company' | 'admin';
   onNavigate: (path: string) => void;
   currentPath: string;
+  partnerCompanies?: CompanyAccess[];
+  activeCompany?: CompanyAccess | null;
+  onSwitchCompany?: (company: CompanyAccess) => void;
 }
 
 const partnerMenuItems: SidebarItem[] = [
@@ -62,11 +74,21 @@ const companyMenuItems: SidebarItem[] = [
   },
 ];
 
-const Sidebar = ({ userRole, onNavigate, currentPath }: SidebarProps) => {
+const Sidebar = ({ 
+  userRole, 
+  onNavigate, 
+  currentPath, 
+  partnerCompanies = [], 
+  activeCompany, 
+  onSwitchCompany 
+}: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['settings']);
+  const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
   
-  const menuItems = userRole === 'partner' ? partnerMenuItems : companyMenuItems;
+  // Show company menu if user is a company user OR if partner has selected a company workspace
+  const showCompanyMenu = userRole === 'company' || (userRole === 'partner' && activeCompany);
+  const menuItems = showCompanyMenu ? companyMenuItems : partnerMenuItems;
 
   const toggleSubmenu = (menuId: string) => {
     setExpandedMenus(prev => 
@@ -129,9 +151,50 @@ const Sidebar = ({ userRole, onNavigate, currentPath }: SidebarProps) => {
       {/* Header */}
       <div className="p-4 border-b border-slate-700 flex items-center justify-between">
         {!isCollapsed && (
-          <h2 className="font-semibold text-lg">
-            {userRole === 'partner' ? 'Partner Portal' : 'Company Portal'}
-          </h2>
+          <div className="flex flex-col flex-1">
+            {userRole === 'partner' && activeCompany ? (
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowCompanyDropdown(!showCompanyDropdown)}
+                  className="w-full justify-between text-left hover:bg-slate-700 p-2"
+                >
+                  <div className="flex items-center">
+                    <Building className="h-4 w-4 mr-2" />
+                    <span className="font-semibold text-sm truncate">{activeCompany.name}</span>
+                  </div>
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+                
+                {showCompanyDropdown && (
+                  <div className="absolute top-full left-0 right-0 bg-slate-800 border border-slate-600 rounded-md mt-1 py-1 z-50">
+                    {partnerCompanies.map((company) => (
+                      <Button
+                        key={company.id}
+                        variant="ghost"
+                        onClick={() => {
+                          if (onSwitchCompany) onSwitchCompany(company);
+                          setShowCompanyDropdown(false);
+                        }}
+                        className="w-full justify-start text-left hover:bg-slate-700 px-3 py-2 text-sm"
+                        disabled={!company.hasAccess}
+                      >
+                        <div className="flex items-center w-full">
+                          <Building className="h-4 w-4 mr-2" />
+                          <span className="flex-1 truncate">{company.name}</span>
+                          {!company.hasAccess && <Unlock className="h-4 w-4 ml-2 text-gray-400" />}
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <h2 className="font-semibold text-lg">
+                {userRole === 'partner' ? 'Partner Portal' : 'Company Portal'}
+              </h2>
+            )}
+          </div>
         )}
         <Button
           variant="ghost"

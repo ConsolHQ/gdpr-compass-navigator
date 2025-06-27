@@ -1,76 +1,69 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Bell, User, Settings, LogOut } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { LogOut, Bell, Building } from 'lucide-react';
 
-interface HeaderProps {
-  user?: {
-    name: string;
-    email: string;
-    role: string;
-    avatar?: string;
-  };
-  onLogout?: () => void;
+interface CompanyAccess {
+  id: string;
+  name: string;
+  hasAccess: boolean;
 }
 
-const Header = ({ user, onLogout }: HeaderProps) => {
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'partner' | 'company';
+  avatar?: string;
+}
+
+interface HeaderProps {
+  user?: User;
+  onLogout: () => void;
+  activeCompany?: CompanyAccess | null;
+}
+
+const Header = ({ user, onLogout, activeCompany }: HeaderProps) => {
+  if (!user) return null;
+
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold text-blue-600">GDPR Compliance</h1>
+          <h1 className="text-xl font-semibold text-gray-900">
+            GDPR Compliance Platform
+          </h1>
+          {user.role === 'partner' && activeCompany && (
+            <div className="flex items-center text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+              <Building className="h-4 w-4 mr-2" />
+              <span>Working on: {activeCompany.name}</span>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center space-x-4">
-          {/* Notifications */}
-          <Button variant="ghost" size="sm" className="relative">
+          <Button variant="ghost" size="sm">
             <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-              3
-            </span>
           </Button>
+          
+          <div className="flex items-center space-x-3">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarFallback>
+                {user.name.split(' ').map(n => n[0]).join('')}
+              </AvatarFallback>
+            </Avatar>
+            
+            <div className="hidden md:block">
+              <div className="text-sm font-medium text-gray-900">{user.name}</div>
+              <div className="text-xs text-gray-500 capitalize">{user.role}</div>
+            </div>
+          </div>
 
-          {/* User Menu */}
-          {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <User className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <div className="text-left hidden md:block">
-                    <p className="text-sm font-medium">{user.name}</p>
-                    <p className="text-xs text-gray-500">{user.role}</p>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-white">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={onLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          <Button variant="ghost" size="sm" onClick={onLogout}>
+            <LogOut className="h-5 w-5" />
+          </Button>
         </div>
       </div>
     </header>
