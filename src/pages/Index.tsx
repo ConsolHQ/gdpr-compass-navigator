@@ -8,6 +8,14 @@ import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import PartnerDashboard from '@/components/dashboard/PartnerDashboard';
 import CompanyDashboard from '@/components/dashboard/CompanyDashboard';
+import ROPA from '@/components/company/ROPA';
+import DPIA from '@/components/company/DPIA';
+import DSR from '@/components/company/DSR';
+import DataBreaches from '@/components/company/DataBreaches';
+import ThirdParties from '@/components/company/ThirdParties';
+import DocumentLibrary from '@/components/company/DocumentLibrary';
+import CompanySettings from '@/components/company/settings/CompanySettings';
+import PartnerSettings from '@/components/partner/PartnerSettings';
 
 interface User {
   id: string;
@@ -105,6 +113,50 @@ const Index = () => {
     setCurrentPath(`/partner/companies/${companyId}`);
   };
 
+  // Function to render the correct screen based on currentPath
+  const renderCurrentScreen = () => {
+    if (!user) return null;
+
+    switch (currentPath) {
+      // Partner routes
+      case '/partner/dashboard':
+        return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
+      case '/partner/settings':
+        return <PartnerSettings />;
+      
+      // Company routes
+      case '/company/dashboard':
+        return <CompanyDashboard onNavigate={handleNavigate} />;
+      case '/company/ropa':
+        return <ROPA />;
+      case '/company/dpia':
+        return <DPIA />;
+      case '/company/dsr':
+        return <DSR />;
+      case '/company/breaches':
+        return <DataBreaches />;
+      case '/company/vendors':
+        return <ThirdParties />;
+      case '/company/documents':
+        return <DocumentLibrary />;
+      case '/company/settings':
+      case '/company/settings/metadata':
+      case '/company/settings/data-dictionary':
+      case '/company/settings/users':
+      case '/company/settings/organisation':
+      case '/company/settings/reports':
+        return <CompanySettings />;
+      
+      default:
+        // Default to dashboard based on user role
+        if (user.role === 'partner') {
+          return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
+        } else {
+          return <CompanyDashboard onNavigate={handleNavigate} />;
+        }
+    }
+  };
+
   // Auth states
   if (appState === 'login') {
     return (
@@ -160,11 +212,7 @@ const Index = () => {
         <Header user={user || undefined} onLogout={handleLogout} />
         
         <main className="flex-1 overflow-auto">
-          {user?.role === 'partner' ? (
-            <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />
-          ) : (
-            <CompanyDashboard onNavigate={handleNavigate} />
-          )}
+          {renderCurrentScreen()}
         </main>
       </div>
     </div>
