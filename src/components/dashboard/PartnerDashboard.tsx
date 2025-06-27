@@ -1,212 +1,120 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Building, Users, AlertTriangle, TrendingUp, Plus, Eye } from 'lucide-react';
-import TaskManagement from '@/components/partner/TaskManagement';
-import ClientManagement from '@/components/partner/ClientManagement';
-import GDPRModules from '@/components/partner/GDPRModules';
+import { Users, Building, AlertTriangle, CheckCircle, Plus, BarChart } from 'lucide-react';
 
-interface Company {
-  id: string;
-  name: string;
-  industry: string;
-  healthScore: number;
-  activeIssues: number;
-  lastActivity: string;
-  status: 'active' | 'inactive' | 'pending';
-}
+const PartnerDashboard = () => {
+  const stats = [
+    { label: 'Total Companies', value: '12', icon: Building, color: 'text-blue-600' },
+    { label: 'Active Users', value: '48', icon: Users, color: 'text-green-600' },
+    { label: 'Pending Tasks', value: '23', icon: AlertTriangle, color: 'text-orange-600' },
+    { label: 'Completed Tasks', value: '156', icon: CheckCircle, color: 'text-emerald-600' },
+  ];
 
-const mockCompanies: Company[] = [
-  {
-    id: '1',
-    name: 'ACME Corporation',
-    industry: 'Technology',
-    healthScore: 85,
-    activeIssues: 2,
-    lastActivity: '2 hours ago',
-    status: 'active',
-  },
-  {
-    id: '2',
-    name: 'Global Healthcare Inc',
-    industry: 'Healthcare',
-    healthScore: 92,
-    activeIssues: 0,
-    lastActivity: '1 day ago',
-    status: 'active',
-  },
-  {
-    id: '3',
-    name: 'FinTech Solutions',
-    industry: 'Finance',
-    healthScore: 78,
-    activeIssues: 5,
-    lastActivity: '3 hours ago',
-    status: 'active',
-  },
-];
+  const recentCompanies = [
+    { name: 'TechCorp Ltd', users: 8, status: 'Active', lastActivity: '2 hours ago' },
+    { name: 'DataFlow Inc', users: 12, status: 'Active', lastActivity: '5 hours ago' },
+    { name: 'SecureBank', users: 15, status: 'Setup', lastActivity: '1 day ago' },
+    { name: 'HealthSystem', users: 6, status: 'Active', lastActivity: '3 days ago' },
+  ];
 
-interface PartnerDashboardProps {
-  onNavigateToCompany: (companyId: string) => void;
-}
-
-const PartnerDashboard = ({ onNavigateToCompany }: PartnerDashboardProps) => {
-  const [activeTab, setActiveTab] = useState('overview');
-
-  const getHealthScoreColor = (score: number) => {
-    if (score >= 90) return 'text-green-600 bg-green-100';
-    if (score >= 75) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
-  };
-
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      active: 'bg-green-100 text-green-800',
-      inactive: 'bg-gray-100 text-gray-800',
-      pending: 'bg-yellow-100 text-yellow-800',
-    };
-    return variants[status as keyof typeof variants] || variants.pending;
-  };
+  const recentActivities = [
+    { company: 'TechCorp Ltd', action: 'ROPA updated', time: '30 min ago', type: 'update' },
+    { company: 'DataFlow Inc', action: 'New DPIA created', time: '2 hours ago', type: 'create' },
+    { company: 'SecureBank', action: 'User invited', time: '4 hours ago', type: 'invite' },
+    { company: 'HealthSystem', action: 'Data breach reported', time: '1 day ago', type: 'alert' },
+  ];
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900">Partner Dashboard</h1>
-        <p className="text-slate-600">Manage and monitor your client companies' GDPR compliance</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Partner Dashboard</h1>
+          <p className="text-gray-600 mt-2">Manage your client companies and GDPR compliance</p>
+        </div>
+        <Button>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Company
+        </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="tasks">Tasks</TabsTrigger>
-          <TabsTrigger value="clients">Clients</TabsTrigger>
-          <TabsTrigger value="modules">GDPR Modules</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Companies</CardTitle>
-                <Building className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">12</div>
-                <p className="text-xs text-muted-foreground">+2 from last month</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">143</div>
-                <p className="text-xs text-muted-foreground">+12% from last month</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Critical Issues</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-red-600">7</div>
-                <p className="text-xs text-muted-foreground">Require immediate attention</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Avg Health Score</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">85%</div>
-                <p className="text-xs text-muted-foreground">+3% from last month</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Recent Companies */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Recent Companies</CardTitle>
-                  <CardDescription>Latest activity from your client companies</CardDescription>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat) => {
+          const IconComponent = stat.icon;
+          return (
+            <Card key={stat.label}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardDescription>{stat.label}</CardDescription>
+                  <IconComponent className={`h-5 w-5 ${stat.color}`} />
                 </div>
-                <Button onClick={() => setActiveTab('clients')}>
-                  View All Clients
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {mockCompanies.map((company) => (
-                  <div key={company.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Building className="h-6 w-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-slate-900">{company.name}</h3>
-                        <p className="text-sm text-slate-600">{company.industry}</p>
-                        <p className="text-xs text-slate-500">Last activity: {company.lastActivity}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-4">
-                      <div className="text-center">
-                        <div className={`text-sm font-medium px-2 py-1 rounded ${getHealthScoreColor(company.healthScore)}`}>
-                          {company.healthScore}%
-                        </div>
-                        <p className="text-xs text-slate-500 mt-1">Health Score</p>
-                      </div>
-                      
-                      <div className="text-center">
-                        <div className="text-sm font-medium text-slate-900">{company.activeIssues}</div>
-                        <p className="text-xs text-slate-500 mt-1">Issues</p>
-                      </div>
-                      
-                      <Badge className={getStatusBadge(company.status)}>
-                        {company.status}
-                      </Badge>
-                      
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onNavigateToCompany(company.id)}
-                      >
-                        <Eye className="mr-2 h-4 w-4" />
-                        View
-                      </Button>
-                    </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stat.value}</div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Companies */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Companies</CardTitle>
+            <CardDescription>Latest company activities and status</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentCompanies.map((company) => (
+                <div key={company.name} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div>
+                    <h4 className="font-medium">{company.name}</h4>
+                    <p className="text-sm text-gray-600">{company.users} users • {company.lastActivity}</p>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                  <Badge variant={company.status === 'Active' ? 'default' : 'secondary'}>
+                    {company.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+            <Button variant="outline" className="w-full mt-4">
+              View All Companies
+            </Button>
+          </CardContent>
+        </Card>
 
-        <TabsContent value="tasks">
-          <TaskManagement />
-        </TabsContent>
-
-        <TabsContent value="clients">
-          <ClientManagement onViewClient={onNavigateToCompany} />
-        </TabsContent>
-
-        <TabsContent value="modules">
-          <GDPRModules />
-        </TabsContent>
-      </Tabs>
+        {/* Recent Activities */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activities</CardTitle>
+            <CardDescription>Latest actions across all companies</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentActivities.map((activity, index) => (
+                <div key={index} className="flex items-start space-x-3">
+                  <div className={`w-2 h-2 rounded-full mt-2 ${
+                    activity.type === 'alert' ? 'bg-red-500' : 
+                    activity.type === 'create' ? 'bg-green-500' : 'bg-blue-500'
+                  }`} />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{activity.company}</p>
+                    <p className="text-sm text-gray-600">{activity.action}</p>
+                    <p className="text-xs text-gray-500">{activity.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Button variant="outline" className="w-full mt-4">
+              View All Activities
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
