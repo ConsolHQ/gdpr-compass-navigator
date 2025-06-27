@@ -1,11 +1,14 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Users, Building, AlertTriangle, CheckCircle, Plus, BarChart } from 'lucide-react';
 
-const PartnerDashboard = () => {
+interface PartnerDashboardProps {
+  onNavigateToCompany?: (companyId: string) => void;
+}
+
+const PartnerDashboard = ({ onNavigateToCompany }: PartnerDashboardProps) => {
   const stats = [
     { label: 'Total Companies', value: '12', icon: Building, color: 'text-blue-600' },
     { label: 'Active Users', value: '48', icon: Users, color: 'text-green-600' },

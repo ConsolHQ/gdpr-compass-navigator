@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { FileText, Shield, Users, AlertTriangle, Clock, CheckCircle } from 'lucide-react';
 
-const CompanyDashboard = () => {
+interface CompanyDashboardProps {
+  onNavigate?: (path: string) => void;
+}
+
+const CompanyDashboard = ({ onNavigate }: CompanyDashboardProps) => {
   const complianceStats = [
     { label: 'ROPA Entries', value: '12', total: '15', progress: 80, icon: FileText },
     { label: 'DPIA Assessments', value: '8', total: '10', progress: 80, icon: Shield },
