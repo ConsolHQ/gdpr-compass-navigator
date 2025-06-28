@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -23,7 +22,7 @@ const ProjectedImpactStep: React.FC<ProjectedImpactStepProps> = ({ data, onUpdat
     }, 0);
 
     // EI Score (Ease of Identification)
-    const eiScore = data.identifiabilityLevel || 0.5;
+    const eiScore = Number(data.identifiabilityLevel) || 0.5;
 
     // CB Score (Circumstances of Breach)
     const cbScore = Object.values(data.circumstances || {}).reduce((sum: number, answer: any) => {
@@ -31,7 +30,7 @@ const ProjectedImpactStep: React.FC<ProjectedImpactStepProps> = ({ data, onUpdat
     }, 0);
 
     // Final calculation: Impact = DPC × EI + CB
-    const impact = (dpcScore * eiScore) + cbScore;
+    const impact = (Number(dpcScore) * Number(eiScore)) + Number(cbScore);
     return Math.min(impact, 3.0); // Cap at 3.0
   };
 
@@ -96,18 +95,18 @@ const ProjectedImpactStep: React.FC<ProjectedImpactStepProps> = ({ data, onUpdat
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">{data.autoScore.toFixed(2)}</div>
+              <div className="text-2xl font-bold text-blue-600">{(data.autoScore || 0).toFixed(2)}</div>
               <div className="text-sm text-gray-600">Calculated Score</div>
             </div>
             <div className="text-center p-4 border rounded-lg">
-              <div className={`text-2xl font-bold flex items-center justify-center space-x-2 ${getSeverityColor(data.severity).split(' ')[0]}`}>
-                {getSeverityIcon(data.severity)}
-                <span>{data.severity}</span>
+              <div className={`text-2xl font-bold flex items-center justify-center space-x-2 ${getSeverityColor(data.severity || 'Low').split(' ')[0]}`}>
+                {getSeverityIcon(data.severity || 'Low')}
+                <span>{data.severity || 'Low'}</span>
               </div>
               <div className="text-sm text-gray-600">Severity Level</div>
             </div>
             <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">{Math.round((data.autoScore / 3.0) * 100)}%</div>
+              <div className="text-2xl font-bold text-purple-600">{Math.round(((data.autoScore || 0) / 3.0) * 100)}%</div>
               <div className="text-sm text-gray-600">Risk Percentage</div>
             </div>
           </div>
@@ -118,17 +117,17 @@ const ProjectedImpactStep: React.FC<ProjectedImpactStepProps> = ({ data, onUpdat
               <div className="flex justify-between items-center">
                 <span className="text-sm">DPC (Data Processing Context)</span>
                 <span className="text-sm font-medium">
-                  {Object.values(data.dpcAnswers).filter((a: any) => a.answer).length} factors
+                  {Object.values(data.dpcAnswers || {}).filter((a: any) => a?.answer).length} factors
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm">EI (Ease of Identification)</span>
-                <span className="text-sm font-medium">{data.identifiabilityLevel}</span>
+                <span className="text-sm font-medium">{data.identifiabilityLevel || 0.5}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm">CB (Circumstances of Breach)</span>
                 <span className="text-sm font-medium">
-                  {Object.values(data.circumstances).filter((a: any) => a.answer).length} factors
+                  {Object.values(data.circumstances || {}).filter((a: any) => a?.answer).length} factors
                 </span>
               </div>
             </div>
@@ -162,7 +161,7 @@ const ProjectedImpactStep: React.FC<ProjectedImpactStepProps> = ({ data, onUpdat
               </p>
             </div>
             <Switch
-              checked={data.scoreAgreed}
+              checked={data.scoreAgreed || false}
               onCheckedChange={handleScoreAgreement}
             />
           </div>
@@ -176,7 +175,7 @@ const ProjectedImpactStep: React.FC<ProjectedImpactStepProps> = ({ data, onUpdat
                   min="0"
                   max="3"
                   step="0.1"
-                  value={data.manualScore}
+                  value={data.manualScore || 0}
                   onChange={(e) => onUpdate({ manualScore: parseFloat(e.target.value) || 0 })}
                   placeholder="Enter score (0.0 - 3.0)"
                 />
@@ -184,7 +183,7 @@ const ProjectedImpactStep: React.FC<ProjectedImpactStepProps> = ({ data, onUpdat
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Justification for Override</Label>
                 <Textarea
-                  value={data.scoreJustification}
+                  value={data.scoreJustification || ''}
                   onChange={(e) => onUpdate({ scoreJustification: e.target.value })}
                   placeholder="Explain why you disagree with the calculated score..."
                   rows={3}
@@ -206,7 +205,7 @@ const ProjectedImpactStep: React.FC<ProjectedImpactStepProps> = ({ data, onUpdat
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-2xl font-bold">{finalScore.toFixed(2)}</div>
+              <div className="text-2xl font-bold">{(finalScore || 0).toFixed(2)}</div>
               <div className="text-sm text-gray-600">Final Impact Score</div>
             </div>
             <Badge className={`${getSeverityColor(finalSeverity)} text-lg px-4 py-2`}>
@@ -214,7 +213,7 @@ const ProjectedImpactStep: React.FC<ProjectedImpactStepProps> = ({ data, onUpdat
             </Badge>
           </div>
           
-          <Progress value={(finalScore / 3.0) * 100} className="h-3" />
+          <Progress value={((finalScore || 0) / 3.0) * 100} className="h-3" />
           
           <div className="text-sm text-gray-700">
             <strong>Assessment:</strong> This incident is classified as <strong>{finalSeverity.toLowerCase()} risk</strong> based on 

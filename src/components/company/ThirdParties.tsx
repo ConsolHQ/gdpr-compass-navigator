@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Building, Plus, Search, FileText, AlertTriangle, CheckCircle, Clock, Eye, Edit, Link } from 'lucide-react';
 
 const ThirdParties = () => {
@@ -206,133 +206,88 @@ const ThirdParties = () => {
         </CardContent>
       </Card>
 
-      {/* Third Parties */}
-      <div className="space-y-4">
-        {filteredThirdParties.map((tp) => (
-          <Card key={tp.id}>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center space-x-3 mb-2">
-                    <CardTitle className="text-lg">{tp.name}</CardTitle>
+      {/* Third Parties Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Third Party Vendors</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Contract Status</TableHead>
+                <TableHead>Risk Level</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>DPA Signed</TableHead>
+                <TableHead>Data Types</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredThirdParties.map((tp) => (
+                <TableRow key={tp.id}>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">{tp.name}</div>
+                      <div className="text-sm text-gray-500">{tp.id}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell>{tp.category}</TableCell>
+                  <TableCell>
                     <Badge variant={getStatusColor(tp.status)}>{tp.status}</Badge>
+                  </TableCell>
+                  <TableCell>
                     <Badge variant={getContractStatusColor(tp.contractStatus)}>
                       {tp.contractStatus}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
                     <Badge variant={getRiskColor(tp.riskLevel)}>
-                      {tp.riskLevel} Risk
+                      {tp.riskLevel}
                     </Badge>
-                  </div>
-                  <CardDescription>{tp.category} • {tp.location}</CardDescription>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="sm">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Link className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="overview" className="w-full">
-                <TabsList>
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="data">Data Processing</TabsTrigger>
-                  <TabsTrigger value="contracts">Contracts</TabsTrigger>
-                  <TabsTrigger value="compliance">Compliance</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="overview" className="space-y-4">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Third Party ID</label>
-                      <p className="text-sm">{tp.id}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Type</label>
-                      <p className="text-sm">{tp.type}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Relationship</label>
-                      <p className="text-sm">{tp.relationship}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Contact</label>
-                      <p className="text-sm">{tp.contact}</p>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="data" className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Data Types Processed</label>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {tp.dataTypes.map((type, index) => (
-                        <Badge key={index} variant="outline">{type}</Badge>
+                  </TableCell>
+                  <TableCell>{tp.location}</TableCell>
+                  <TableCell>
+                    <Badge variant={tp.dpuSigned ? 'default' : 'destructive'}>
+                      {tp.dpuSigned ? 'Yes' : 'No'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {tp.dataTypes.slice(0, 2).map((type, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {type}
+                        </Badge>
                       ))}
+                      {tp.dataTypes.length > 2 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{tp.dataTypes.length - 2}
+                        </Badge>
+                      )}
                     </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Processing Purposes</label>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {tp.purposes.map((purpose, index) => (
-                        <Badge key={index} variant="secondary">{purpose}</Badge>
-                      ))}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-1">
+                      <Button variant="ghost" size="sm">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm">
+                        <Link className="h-4 w-4" />
+                      </Button>
                     </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="contracts" className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">DPA Signed</label>
-                      <Badge variant={tp.dpuSigned ? 'default' : 'destructive'}>
-                        {tp.dpuSigned ? 'Yes' : 'No'}
-                      </Badge>
-                    </div>
-                    {tp.dpuDate && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">DPA Date</label>
-                        <p className="text-sm">{tp.dpuDate}</p>
-                      </div>
-                    )}
-                    {tp.contractExpiry && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Contract Expiry</label>
-                        <p className="text-sm">{tp.contractExpiry}</p>
-                      </div>
-                    )}
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Last Review</label>
-                      <p className="text-sm">{tp.lastReview}</p>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="compliance" className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Risk Assessment</label>
-                      <Badge variant={getRiskColor(tp.riskLevel)}>
-                        {tp.riskLevel} Risk
-                      </Badge>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Data Location</label>
-                      <p className="text-sm">{tp.location}</p>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       {filteredThirdParties.length === 0 && (
         <Card>

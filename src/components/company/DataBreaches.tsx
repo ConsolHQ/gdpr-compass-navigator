@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertTriangle, Plus, Search, Clock, CheckCircle, Shield, Eye, Edit, FileText } from 'lucide-react';
 
 interface DataBreachesProps {
@@ -188,130 +188,94 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
         </CardContent>
       </Card>
 
-      {/* Breach Incidents */}
-      <div className="space-y-4">
-        {filteredBreaches.map((breach) => {
-          const StatusIcon = getStatusIcon(breach.status);
-          return (
-            <Card key={breach.id} className="border-l-4 border-l-red-500">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center space-x-3 mb-2">
-                      <CardTitle className="text-lg">{breach.title}</CardTitle>
-                      <Badge variant={getSeverityColor(breach.severity)}>
-                        {breach.severity} Severity
-                      </Badge>
+      {/* Breaches Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Breach Incidents</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Incident</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Severity</TableHead>
+                <TableHead>Affected Records</TableHead>
+                <TableHead>Discovered</TableHead>
+                <TableHead>Investigator</TableHead>
+                <TableHead>Authority Reported</TableHead>
+                <TableHead>Data Types</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredBreaches.map((breach) => {
+                const StatusIcon = getStatusIcon(breach.status);
+                return (
+                  <TableRow key={breach.id} className="border-l-4 border-l-red-500">
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{breach.title}</div>
+                        <div className="text-sm text-gray-500">{breach.id}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
                       <Badge variant={getStatusColor(breach.status)}>
                         <StatusIcon className="mr-1 h-3 w-3" />
                         {breach.status}
                       </Badge>
-                    </div>
-                    <CardDescription>{breach.description}</CardDescription>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <FileText className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="overview" className="w-full">
-                  <TabsList>
-                    <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="impact">Impact Assessment</TabsTrigger>
-                    <TabsTrigger value="response">Response Actions</TabsTrigger>
-                    <TabsTrigger value="reporting">Regulatory Reporting</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="overview" className="space-y-4">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Incident ID</label>
-                        <p className="text-sm">{breach.id}</p>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getSeverityColor(breach.severity)}>
+                        {breach.severity}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-semibold text-red-600">
+                        {breach.affectedRecords.toLocaleString()}
                       </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Discovered</label>
-                        <p className="text-sm">{breach.discoveredDate}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Reported</label>
-                        <p className="text-sm">{breach.reportedDate}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Investigator</label>
-                        <p className="text-sm">{breach.investigator}</p>
-                      </div>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="impact" className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Affected Records</label>
-                        <p className="text-lg font-semibold text-red-600">{breach.affectedRecords.toLocaleString()}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Risk Assessment</label>
-                        <p className="text-sm">{breach.riskAssessment}</p>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Data Types Affected</label>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {breach.dataTypes.map((type, index) => (
-                          <Badge key={index} variant="outline">{type}</Badge>
+                    </TableCell>
+                    <TableCell>{breach.discoveredDate}</TableCell>
+                    <TableCell>{breach.investigator}</TableCell>
+                    <TableCell>
+                      <Badge variant={breach.reportedToAuthority ? 'default' : 'destructive'}>
+                        {breach.reportedToAuthority ? 'Yes' : 'No'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {breach.dataTypes.slice(0, 2).map((type, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {type}
+                          </Badge>
                         ))}
+                        {breach.dataTypes.length > 2 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{breach.dataTypes.length - 2}
+                          </Badge>
+                        )}
                       </div>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="response" className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Containment Status</label>
-                        <Badge variant={breach.containmentStatus === 'Complete' ? 'default' : 'secondary'}>
-                          {breach.containmentStatus}
-                        </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-1">
+                        <Button variant="ghost" size="sm">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <FileText className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Data Subjects Notified</label>
-                        <Badge variant={breach.dataSubjectsNotified ? 'default' : 'destructive'}>
-                          {breach.dataSubjectsNotified ? 'Yes' : 'No'}
-                        </Badge>
-                      </div>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="reporting" className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Reported to Authority</label>
-                        <Badge variant={breach.reportedToAuthority ? 'default' : 'destructive'}>
-                          {breach.reportedToAuthority ? 'Yes' : 'No'}
-                        </Badge>
-                      </div>
-                      {breach.authorityReportDate && (
-                        <div>
-                          <label className="text-sm font-medium text-gray-600">Authority Report Date</label>
-                          <p className="text-sm">{breach.authorityReportDate}</p>
-                        </div>
-                      )}
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       {filteredBreaches.length === 0 && (
         <Card>

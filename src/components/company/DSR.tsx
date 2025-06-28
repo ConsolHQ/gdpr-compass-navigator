@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Users, Plus, Search, Clock, CheckCircle, AlertTriangle, Eye, MessageSquare, Download } from 'lucide-react';
 
 const DSR = () => {
@@ -201,100 +201,84 @@ const DSR = () => {
         </CardContent>
       </Card>
 
-      {/* DSR Requests */}
-      <div className="space-y-4">
-        {filteredRequests.map((request) => {
-          const StatusIcon = getStatusIcon(request.status);
-          return (
-            <Card key={request.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center space-x-3 mb-2">
-                      <CardTitle className="text-lg">{request.type}</CardTitle>
+      {/* DSR Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Data Subject Requests</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Request Type</TableHead>
+                <TableHead>Requester</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Priority</TableHead>
+                <TableHead>Due Date</TableHead>
+                <TableHead>Days Remaining</TableHead>
+                <TableHead>Assigned To</TableHead>
+                <TableHead>Legal Basis</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredRequests.map((request) => {
+                const StatusIcon = getStatusIcon(request.status);
+                return (
+                  <TableRow key={request.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{request.type}</div>
+                        <div className="text-sm text-gray-500">{request.id}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{request.subject}</div>
+                        <div className="text-sm text-gray-500">{request.requester}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
                       <Badge variant={getStatusColor(request.status)}>
                         <StatusIcon className="mr-1 h-3 w-3" />
                         {request.status}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
                       <Badge variant={getPriorityColor(request.priority)}>
                         {request.priority}
                       </Badge>
-                    </div>
-                    <CardDescription>{request.description}</CardDescription>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <MessageSquare className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="details" className="w-full">
-                  <TabsList>
-                    <TabsTrigger value="details">Details</TabsTrigger>
-                    <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                    <TabsTrigger value="documents">Documents</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="details" className="space-y-4">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">DSR ID</label>
-                        <p className="text-sm">{request.id}</p>
+                    </TableCell>
+                    <TableCell>{request.dueDate}</TableCell>
+                    <TableCell>
+                      <span className={request.daysRemaining < 7 ? 'text-red-600 font-medium' : ''}>
+                        {request.daysRemaining > 0 ? `${request.daysRemaining} days` : 'Overdue'}
+                      </span>
+                    </TableCell>
+                    <TableCell>{request.assignedTo}</TableCell>
+                    <TableCell>
+                      <div className="text-sm">{request.legalBasis}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-1">
+                        <Button variant="ghost" size="sm">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <MessageSquare className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Download className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Requester</label>
-                        <p className="text-sm">{request.requester}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Data Subject</label>
-                        <p className="text-sm">{request.subject}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Assigned To</label>
-                        <p className="text-sm">{request.assignedTo}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Submitted</label>
-                        <p className="text-sm">{request.submittedDate}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Due Date</label>
-                        <p className="text-sm">{request.dueDate}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Days Remaining</label>
-                        <p className={`text-sm ${request.daysRemaining < 7 ? 'text-red-600 font-medium' : ''}`}>
-                          {request.daysRemaining > 0 ? `${request.daysRemaining} days` : 'Overdue'}
-                        </p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-600">Legal Basis</label>
-                        <p className="text-sm">{request.legalBasis}</p>
-                      </div>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="timeline">
-                    <div className="text-sm text-gray-600">Timeline functionality coming soon...</div>
-                  </TabsContent>
-                  
-                  <TabsContent value="documents">
-                    <div className="text-sm text-gray-600">Document management coming soon...</div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       {filteredRequests.length === 0 && (
         <Card>

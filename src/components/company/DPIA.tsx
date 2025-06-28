@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Shield, Plus, Search, AlertTriangle, CheckCircle, Clock, Eye, Edit } from 'lucide-react';
 
 const DPIA = () => {
@@ -167,93 +168,86 @@ const DPIA = () => {
         </Card>
       </div>
 
-      {/* DPIA Assessments */}
-      <div className="space-y-4">
-        {filteredAssessments.map((assessment) => {
-          const StatusIcon = getStatusIcon(assessment.status);
-          return (
-            <Card key={assessment.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <CardTitle className="text-lg">{assessment.title}</CardTitle>
-                      <Badge variant={getRiskColor(assessment.riskLevel)}>
-                        {assessment.riskLevel} Risk
-                      </Badge>
+      {/* DPIA Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>DPIA Assessments</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Title</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Risk Level</TableHead>
+                <TableHead>Progress</TableHead>
+                <TableHead>Due Date</TableHead>
+                <TableHead>Assessor</TableHead>
+                <TableHead>Data Types</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredAssessments.map((assessment) => {
+                const StatusIcon = getStatusIcon(assessment.status);
+                return (
+                  <TableRow key={assessment.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{assessment.title}</div>
+                        <div className="text-sm text-gray-500">{assessment.id}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
                       <Badge variant={getStatusColor(assessment.status)}>
                         <StatusIcon className="mr-1 h-3 w-3" />
                         {assessment.status}
                       </Badge>
-                    </div>
-                    <CardDescription>{assessment.description}</CardDescription>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Progress */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Progress</span>
-                      <span className="text-sm text-gray-600">{assessment.progress}%</span>
-                    </div>
-                    <Progress value={assessment.progress} className="h-2" />
-                  </div>
-
-                  {/* Details Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">DPIA ID</label>
-                      <p className="text-sm">{assessment.id}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Due Date</label>
-                      <p className="text-sm">{assessment.dueDate}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Assessor</label>
-                      <p className="text-sm">{assessment.assessor}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Last Updated</label>
-                      <p className="text-sm">{assessment.lastUpdated}</p>
-                    </div>
-                  </div>
-
-                  {/* Data Types */}
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Data Types</label>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {assessment.dataTypes.map((type, index) => (
-                        <Badge key={index} variant="outline">{type}</Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Risks */}
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Identified Risks</label>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {assessment.risks.map((risk, index) => (
-                        <Badge key={index} variant="secondary">{risk}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getRiskColor(assessment.riskLevel)}>
+                        {assessment.riskLevel}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="text-sm">{assessment.progress}%</div>
+                        <Progress value={assessment.progress} className="h-2 w-16" />
+                      </div>
+                    </TableCell>
+                    <TableCell>{assessment.dueDate}</TableCell>
+                    <TableCell>{assessment.assessor}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {assessment.dataTypes.slice(0, 2).map((type, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {type}
+                          </Badge>
+                        ))}
+                        {assessment.dataTypes.length > 2 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{assessment.dataTypes.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-1">
+                        <Button variant="ghost" size="sm">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       {filteredAssessments.length === 0 && (
         <Card>
