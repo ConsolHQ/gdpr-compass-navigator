@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,13 +19,12 @@ import {
   AlertCircle,
   Clock
 } from 'lucide-react';
+import CreateROPA from './CreateROPA';
 
 const ROPA = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentView, setCurrentView] = useState('main');
-  const [selectedColumns, setSelectedColumns] = useState([
-    'name', 'progress', 'organizationalUnits', 'internalOwner', 'legalBasis', 'role', 'sensitiveData'
-  ]);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   
   const ropaEntries = [
     {
@@ -143,6 +141,10 @@ const ROPA = () => {
     { id: 'extended', label: 'Extended view' }
   ];
 
+  if (showCreateForm) {
+    return <CreateROPA onBack={() => setShowCreateForm(false)} />;
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -151,7 +153,10 @@ const ROPA = () => {
           <h1 className="text-3xl font-bold text-gray-900">Register of processing activities</h1>
           <p className="text-gray-600 mt-1">{filteredEntries.length} items</p>
         </div>
-        <Button className="bg-teal-600 hover:bg-teal-700">
+        <Button 
+          className="bg-teal-600 hover:bg-teal-700"
+          onClick={() => setShowCreateForm(true)}
+        >
           <Plus className="mr-2 h-4 w-4" />
           Create
         </Button>
@@ -294,7 +299,7 @@ const ROPA = () => {
             <FileText className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-4 text-lg font-medium">No ROPA entries found</h3>
             <p className="text-gray-600">Get started by creating your first ROPA entry.</p>
-            <Button className="mt-4">
+            <Button className="mt-4" onClick={() => setShowCreateForm(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Create ROPA Entry
             </Button>
