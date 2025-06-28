@@ -18,16 +18,16 @@ const ProjectedImpactStep: React.FC<ProjectedImpactStepProps> = ({ data, onUpdat
   // Calculate auto score based on previous steps
   const calculateAutoScore = () => {
     // DPC Score calculation
-    const dpcScore = Object.values(data.dpcAnswers).reduce((sum: number, answer: any) => {
-      return sum + (answer.answer ? 0.2 : 0); // Simplified scoring
+    const dpcScore = Object.values(data.dpcAnswers || {}).reduce((sum: number, answer: any) => {
+      return sum + (answer?.answer ? 0.2 : 0); // Simplified scoring
     }, 0);
 
     // EI Score (Ease of Identification)
     const eiScore = data.identifiabilityLevel || 0.5;
 
     // CB Score (Circumstances of Breach)
-    const cbScore = Object.values(data.circumstances).reduce((sum: number, answer: any) => {
-      return sum + (answer.answer ? 0.1 : 0); // Simplified scoring
+    const cbScore = Object.values(data.circumstances || {}).reduce((sum: number, answer: any) => {
+      return sum + (answer?.answer ? 0.1 : 0); // Simplified scoring
     }, 0);
 
     // Final calculation: Impact = DPC × EI + CB
