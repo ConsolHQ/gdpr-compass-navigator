@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import LoginForm from '@/components/auth/LoginForm';
 import SignUpForm from '@/components/auth/SignUpForm';
@@ -11,6 +12,7 @@ import ROPA from '@/components/company/ROPA';
 import DPIA from '@/components/company/DPIA';
 import DSR from '@/components/company/DSR';
 import DataBreaches from '@/components/company/DataBreaches';
+import IncidentReporting from '@/components/company/IncidentReporting';
 import ThirdParties from '@/components/company/ThirdParties';
 import DocumentLibrary from '@/components/company/DocumentLibrary';
 import CompanySettings from '@/components/company/settings/CompanySettings';
@@ -179,7 +181,9 @@ const Index = () => {
       case '/company/dsr':
         return <DSR />;
       case '/company/breaches':
-        return <DataBreaches />;
+        return <DataBreaches onNavigate={handleNavigate} />;
+      case '/company/breaches/report':
+        return <IncidentReporting />;
       case '/company/vendors':
         return <ThirdParties />;
       case '/company/documents':

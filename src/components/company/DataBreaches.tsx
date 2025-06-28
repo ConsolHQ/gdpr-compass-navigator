@@ -7,7 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertTriangle, Plus, Search, Clock, CheckCircle, Shield, Eye, Edit, FileText } from 'lucide-react';
 
-const DataBreaches = () => {
+interface DataBreachesProps {
+  onNavigate?: (path: string) => void;
+}
+
+const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
   const [searchTerm, setSearchTerm] = useState('');
   
   const breachIncidents = [
@@ -102,6 +106,12 @@ const DataBreaches = () => {
     resolved: breachIncidents.filter(b => b.status === 'Resolved').length,
   };
 
+  const handleReportBreach = () => {
+    if (onNavigate) {
+      onNavigate('/company/breaches/report');
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -109,7 +119,7 @@ const DataBreaches = () => {
           <h1 className="text-3xl font-bold text-gray-900">Data Breaches</h1>
           <p className="text-gray-600 mt-2">Manage and track data breach incidents and regulatory reporting</p>
         </div>
-        <Button className="bg-red-600 hover:bg-red-700">
+        <Button className="bg-red-600 hover:bg-red-700" onClick={handleReportBreach}>
           <Plus className="mr-2 h-4 w-4" />
           Report Breach
         </Button>
