@@ -30,21 +30,21 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
     department: '',
     role: '',
     jointControllers: 'No',
-    selectedControllers: [],
+    selectedControllers: [] as string[],
     purpose: '',
     legalBasis: '',
-    dataSubjectCategories: [],
-    personalDataCategories: [],
+    dataSubjectCategories: [] as string[],
+    personalDataCategories: [] as string[],
     specialCategoryData: 'No',
     specialCategoryDetails: '',
     specialCategoryGround: '',
     processingReason: '',
-    imSystems: [],
-    vendors: [],
-    internalRecipients: [],
-    externalRecipients: [],
+    imSystems: [] as string[],
+    vendors: [] as string[],
+    internalRecipients: [] as string[],
+    externalRecipients: [] as string[],
     internationalTransfers: 'No',
-    transferCountries: [],
+    transferCountries: [] as string[],
     retentionTime: '',
     retentionPeriod: '',
     retentionTrigger: '',
@@ -52,7 +52,7 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
     justificationType: 'Internal',
     justificationText: '',
     legislation: '',
-    securityMeasures: []
+    securityMeasures: [] as any[]
   });
 
   const [showNewDepartment, setShowNewDepartment] = useState(false);
@@ -71,12 +71,12 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
   const measureTypes = ['Managerial', 'Organisational', 'Technical'];
   const implementationStatus = ['Not Started', 'In Progress', 'Implemented', 'Archived'];
 
-  const handleArrayFieldChange = (field: string, value: string, checked: boolean) => {
+  const handleArrayFieldChange = (field: keyof typeof formData, value: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: checked 
-        ? [...prev[field], value]
-        : prev[field].filter(item => item !== value)
+        ? [...(prev[field] as string[]), value]
+        : (prev[field] as string[]).filter(item => item !== value)
     }));
   };
 
@@ -265,7 +265,7 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
                           <Checkbox
                             id={`vendor-${vendor}`}
                             checked={formData.selectedControllers.includes(vendor)}
-                            onCheckedChange={(checked) => handleArrayFieldChange('selectedControllers', vendor, checked)}
+                            onCheckedChange={(checked) => handleArrayFieldChange('selectedControllers', vendor, !!checked)}
                           />
                           <Label htmlFor={`vendor-${vendor}`}>{vendor}</Label>
                         </div>
@@ -278,7 +278,7 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
                           <Checkbox
                             id={`dept-${dept}`}
                             checked={formData.selectedControllers.includes(dept)}
-                            onCheckedChange={(checked) => handleArrayFieldChange('selectedControllers', dept, checked)}
+                            onCheckedChange={(checked) => handleArrayFieldChange('selectedControllers', dept, !!checked)}
                           />
                           <Label htmlFor={`dept-${dept}`}>{dept}</Label>
                         </div>
@@ -346,7 +346,7 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
                       <Checkbox
                         id={`subject-${type}`}
                         checked={formData.dataSubjectCategories.includes(type)}
-                        onCheckedChange={(checked) => handleArrayFieldChange('dataSubjectCategories', type, checked)}
+                        onCheckedChange={(checked) => handleArrayFieldChange('dataSubjectCategories', type, !!checked)}
                       />
                       <Label htmlFor={`subject-${type}`}>{type}</Label>
                     </div>
@@ -359,7 +359,7 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
                       <Checkbox
                         id={`data-${type}`}
                         checked={formData.personalDataCategories.includes(type)}
-                        onCheckedChange={(checked) => handleArrayFieldChange('personalDataCategories', type, checked)}
+                        onCheckedChange={(checked) => handleArrayFieldChange('personalDataCategories', type, !!checked)}
                       />
                       <Label htmlFor={`data-${type}`}>{type}</Label>
                     </div>
@@ -474,7 +474,7 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
                       <Checkbox
                         id={`internal-${dept}`}
                         checked={formData.internalRecipients.includes(dept)}
-                        onCheckedChange={(checked) => handleArrayFieldChange('internalRecipients', dept, checked)}
+                        onCheckedChange={(checked) => handleArrayFieldChange('internalRecipients', dept, !!checked)}
                       />
                       <Label htmlFor={`internal-${dept}`}>{dept}</Label>
                     </div>
@@ -487,7 +487,7 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
                       <Checkbox
                         id={`external-${vendor}`}
                         checked={formData.externalRecipients.includes(vendor)}
-                        onCheckedChange={(checked) => handleArrayFieldChange('externalRecipients', vendor, checked)}
+                        onCheckedChange={(checked) => handleArrayFieldChange('externalRecipients', vendor, !!checked)}
                       />
                       <Label htmlFor={`external-${vendor}`}>{vendor}</Label>
                     </div>
@@ -519,7 +519,7 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
                           <Checkbox
                             id={`country-${country}`}
                             checked={formData.transferCountries.includes(country)}
-                            onCheckedChange={(checked) => handleArrayFieldChange('transferCountries', country, checked)}
+                            onCheckedChange={(checked) => handleArrayFieldChange('transferCountries', country, !!checked)}
                           />
                           <Label htmlFor={`country-${country}`} className="text-sm">{country}</Label>
                         </div>

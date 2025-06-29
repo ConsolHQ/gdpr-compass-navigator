@@ -263,7 +263,7 @@ const ROPA = () => {
                   </TableCell>
                   <TableCell className="text-center">
                     {entry.specialCategory ? (
-                      <AlertCircle className="h-4 w-4 text-amber-500 mx-auto" title="Special category data processed" />
+                      <AlertCircle className="h-4 w-4 text-amber-500 mx-auto" />
                     ) : (
                       <span className="text-gray-400">—</span>
                     )}
