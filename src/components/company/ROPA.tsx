@@ -23,9 +23,9 @@ import {
   User,
   Shield,
   Columns,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
+  ChevronsUpDown,
+  ChevronUp,
+  ChevronDown,
   Download,
   Merge,
   BookmarkPlus,
@@ -344,10 +344,10 @@ const ROPA = () => {
   };
 
   const getSortIcon = (column: string) => {
-    if (sortColumn !== column) return <ArrowUpDown className="h-4 w-4" />;
-    if (sortDirection === 'asc') return <ArrowUp className="h-4 w-4" />;
-    if (sortDirection === 'desc') return <ArrowDown className="h-4 w-4" />;
-    return <ArrowUpDown className="h-4 w-4" />;
+    if (sortColumn !== column) return <ChevronsUpDown className="h-4 w-4" />;
+    if (sortDirection === 'asc') return <ChevronUp className="h-4 w-4" />;
+    if (sortDirection === 'desc') return <ChevronDown className="h-4 w-4" />;
+    return <ChevronsUpDown className="h-4 w-4" />;
   };
 
   if (showCreateForm) {
