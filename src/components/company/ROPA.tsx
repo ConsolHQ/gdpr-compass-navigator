@@ -34,6 +34,63 @@ import {
 } from 'lucide-react';
 import CreateROPA from './CreateROPA';
 
+const ROPATemplates = () => {
+  const templates = [
+    {
+      id: 'template-001',
+      name: 'Customer Data Processing',
+      description: 'Standard template for customer data management activities',
+      category: 'Customer Service',
+      usageCount: 15
+    },
+    {
+      id: 'template-002', 
+      name: 'Employee HR Template',
+      description: 'Template for HR-related data processing activities',
+      category: 'Human Resources',
+      usageCount: 8
+    },
+    {
+      id: 'template-003',
+      name: 'Marketing Analytics',
+      description: 'Template for marketing and analytics data processing',
+      category: 'Marketing',
+      usageCount: 12
+    }
+  ];
+
+  return (
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">ROPA Templates</h1>
+          <p className="text-gray-600 mt-1">Choose a template to get started quickly</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {templates.map((template) => (
+          <Card key={template.id} className="cursor-pointer hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="space-y-3">
+                <div className="flex items-start justify-between">
+                  <h3 className="font-semibold text-lg">{template.name}</h3>
+                  <Badge variant="outline">{template.category}</Badge>
+                </div>
+                <p className="text-gray-600 text-sm">{template.description}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">Used {template.usageCount} times</span>
+                  <Button size="sm">Use Template</Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 type SortDirection = 'asc' | 'desc' | null;
 type FilterValue = string | string[];
 
@@ -44,22 +101,26 @@ interface ColumnFilter {
 const ROPA = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [columnFilters, setColumnFilters] = useState<ColumnFilter>({});
-  const [visibleColumns, setVisibleColumns] = useState({
-    processingActivity: true,
-    department: true,
-    status: true,
-    role: true,
-    legalBasis: true,
-    dataSubjects: true,
-    specialCategory: true,
-    progress: true,
-    owner: true,
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    const saved = localStorage.getItem('ropa-visible-columns');
+    return saved ? JSON.parse(saved) : {
+      processingActivity: true,
+      department: true,
+      status: true,
+      role: true,
+      legalBasis: true,
+      dataSubjects: true,
+      specialCategory: true,
+      progress: true,
+      owner: true,
+    };
   });
   
   const ropaEntries = [
@@ -293,6 +354,19 @@ const ROPA = () => {
     return <CreateROPA onBack={() => setShowCreateForm(false)} />;
   }
 
+  if (showTemplates) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" onClick={() => setShowTemplates(false)}>
+            ← Back to ROPA
+          </Button>
+        </div>
+        <ROPATemplates />
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -301,13 +375,24 @@ const ROPA = () => {
           <h1 className="text-3xl font-bold text-gray-900">Register of Processing Activities</h1>
           <p className="text-gray-600 mt-1">{processedEntries.length} processing activities</p>
         </div>
-        <Button 
-          className="bg-teal-600 hover:bg-teal-700"
-          onClick={() => setShowCreateForm(true)}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Create New ROPA
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="bg-teal-600 hover:bg-teal-700">
+              <Plus className="mr-2 h-4 w-4" />
+              Create New ROPA
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setShowCreateForm(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create New
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowTemplates(true)}>
+              <FileText className="mr-2 h-4 w-4" />
+              Create from Template
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Toolbar */}
@@ -340,9 +425,11 @@ const ROPA = () => {
                     <Checkbox
                       id={column.key}
                       checked={visibleColumns[column.key as keyof typeof visibleColumns]}
-                      onCheckedChange={(checked) => 
-                        setVisibleColumns(prev => ({ ...prev, [column.key]: checked }))
-                      }
+                      onCheckedChange={(checked) => {
+                        const updated = { ...visibleColumns, [column.key]: checked };
+                        setVisibleColumns(updated);
+                        localStorage.setItem('ropa-visible-columns', JSON.stringify(updated));
+                      }}
                     />
                     <label htmlFor={column.key} className="text-sm">{column.label}</label>
                   </div>
