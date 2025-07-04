@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   Shield, 
@@ -43,8 +43,7 @@ const DPIA = () => {
     assessor: true,
     dataTypes: true,
   });
-  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
-  const [showFilters, setShowFilters] = useState<Record<string, boolean>>({});
+  const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>({});
   
   const dpiaAssessments = [
     {
@@ -92,11 +91,17 @@ const DPIA = () => {
     { key: 'title', label: 'Title', sortable: true },
     { key: 'status', label: 'Status', sortable: true },
     { key: 'riskLevel', label: 'Risk Level', sortable: true },
-    { key: 'progress', label: 'Progress', sortable: true },
-    { key: 'dueDate', label: 'Due Date', sortable: true },
     { key: 'assessor', label: 'Assessor', sortable: true },
-    { key: 'dataTypes', label: 'Data Types', sortable: false },
+    { key: 'dueDate', label: 'Due Date', sortable: true },
   ];
+
+  // Get unique values for filters
+  const getUniqueValues = (key: string) => {
+    return [...new Set(dpiaAssessments.map(assessment => {
+      const value = assessment[key as keyof typeof assessment];
+      return String(value);
+    }))];
+  };
 
   const processedAssessments = useMemo(() => {
     let filtered = dpiaAssessments.filter(assessment =>
@@ -106,11 +111,11 @@ const DPIA = () => {
     );
 
     // Apply column filters
-    Object.entries(columnFilters).forEach(([column, filterValue]) => {
-      if (filterValue) {
+    Object.entries(columnFilters).forEach(([column, filterValues]) => {
+      if (filterValues && filterValues.length > 0) {
         filtered = filtered.filter(assessment => {
-          const value = assessment[column as keyof typeof assessment];
-          return String(value).toLowerCase().includes(filterValue.toLowerCase());
+          const value = String(assessment[column as keyof typeof assessment]);
+          return filterValues.includes(value);
         });
       }
     });
@@ -173,18 +178,14 @@ const DPIA = () => {
     return <ChevronsUpDown className="h-4 w-4" />;
   };
 
-  const toggleFilter = (column: string) => {
-    setShowFilters(prev => ({ ...prev, [column]: !prev[column] }));
+  const clearAllFilters = () => {
+    setColumnFilters({});
+    setSearchTerm('');
   };
 
-  const handleFilterChange = (column: string, value: string) => {
-    setColumnFilters(prev => ({ ...prev, [column]: value }));
-  };
-
-  const clearFilter = (column: string) => {
-    setColumnFilters(prev => ({ ...prev, [column]: '' }));
-    setShowFilters(prev => ({ ...prev, [column]: false }));
-  };
+  const hasActiveFilters = Object.values(columnFilters).some(filter => 
+    filter && filter.length > 0
+  ) || searchTerm;
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -321,6 +322,14 @@ const DPIA = () => {
               </div>
             </PopoverContent>
           </Popover>
+
+          {/* Clear Filters */}
+          {hasActiveFilters && (
+            <Button variant="outline" size="sm" onClick={clearAllFilters}>
+              <X className="mr-2 h-4 w-4" />
+              Clear filters
+            </Button>
+          )}
         </div>
 
         {/* Bulk Actions */}
@@ -366,240 +375,203 @@ const DPIA = () => {
                 </TableHead>
                 {visibleColumns.title && (
                   <TableHead className="font-semibold">
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center space-x-2">
                       <Button
                         variant="ghost"
+                        size="sm"
                         onClick={() => handleSort('title')}
                         className="h-auto p-0 font-semibold"
                       >
                         Title
                         {getSortIcon('title')}
                       </Button>
-                      <Popover open={showFilters.title} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, title: open }))}>
-                        <PopoverTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('title')}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-auto p-1">
                             <Filter className="h-3 w-3" />
                           </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-56">
-                          <div className="space-y-2">
-                            <h4 className="font-medium">Filter Title</h4>
-                            <Input
-                              placeholder="Filter by title..."
-                              value={columnFilters.title || ''}
-                              onChange={(e) => handleFilterChange('title', e.target.value)}
-                            />
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => clearFilter('title')}
-                              className="w-full"
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {getUniqueValues('title').map(value => (
+                            <DropdownMenuCheckboxItem
+                              key={value}
+                              checked={(columnFilters.title || []).includes(value)}
+                              onCheckedChange={(checked) => {
+                                const current = columnFilters.title || [];
+                                if (checked) {
+                                  setColumnFilters(prev => ({ ...prev, title: [...current, value] }));
+                                } else {
+                                  setColumnFilters(prev => ({ ...prev, title: current.filter(v => v !== value) }));
+                                }
+                              }}
                             >
-                              Clear Filter
-                            </Button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
+                              {value}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableHead>
                 )}
                 {visibleColumns.status && (
                   <TableHead className="font-semibold">
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center space-x-2">
                       <Button
                         variant="ghost"
+                        size="sm"
                         onClick={() => handleSort('status')}
                         className="h-auto p-0 font-semibold"
                       >
                         Status
                         {getSortIcon('status')}
                       </Button>
-                      <Popover open={showFilters.status} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, status: open }))}>
-                        <PopoverTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('status')}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-auto p-1">
                             <Filter className="h-3 w-3" />
                           </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-56">
-                          <div className="space-y-2">
-                            <h4 className="font-medium">Filter Status</h4>
-                            <Input
-                              placeholder="Filter by status..."
-                              value={columnFilters.status || ''}
-                              onChange={(e) => handleFilterChange('status', e.target.value)}
-                            />
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => clearFilter('status')}
-                              className="w-full"
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {getUniqueValues('status').map(value => (
+                            <DropdownMenuCheckboxItem
+                              key={value}
+                              checked={(columnFilters.status || []).includes(value)}
+                              onCheckedChange={(checked) => {
+                                const current = columnFilters.status || [];
+                                if (checked) {
+                                  setColumnFilters(prev => ({ ...prev, status: [...current, value] }));
+                                } else {
+                                  setColumnFilters(prev => ({ ...prev, status: current.filter(v => v !== value) }));
+                                }
+                              }}
                             >
-                              Clear Filter
-                            </Button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
+                              {value}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableHead>
                 )}
                 {visibleColumns.riskLevel && (
                   <TableHead className="font-semibold">
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center space-x-2">
                       <Button
                         variant="ghost"
+                        size="sm"
                         onClick={() => handleSort('riskLevel')}
                         className="h-auto p-0 font-semibold"
                       >
                         Risk Level
                         {getSortIcon('riskLevel')}
                       </Button>
-                      <Popover open={showFilters.riskLevel} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, riskLevel: open }))}>
-                        <PopoverTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('riskLevel')}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-auto p-1">
                             <Filter className="h-3 w-3" />
                           </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-56">
-                          <div className="space-y-2">
-                            <h4 className="font-medium">Filter Risk Level</h4>
-                            <Input
-                              placeholder="Filter by risk level..."
-                              value={columnFilters.riskLevel || ''}
-                              onChange={(e) => handleFilterChange('riskLevel', e.target.value)}
-                            />
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => clearFilter('riskLevel')}
-                              className="w-full"
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {getUniqueValues('riskLevel').map(value => (
+                            <DropdownMenuCheckboxItem
+                              key={value}
+                              checked={(columnFilters.riskLevel || []).includes(value)}
+                              onCheckedChange={(checked) => {
+                                const current = columnFilters.riskLevel || [];
+                                if (checked) {
+                                  setColumnFilters(prev => ({ ...prev, riskLevel: [...current, value] }));
+                                } else {
+                                  setColumnFilters(prev => ({ ...prev, riskLevel: current.filter(v => v !== value) }));
+                                }
+                              }}
                             >
-                              Clear Filter
-                            </Button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  </TableHead>
-                )}
-                {visibleColumns.progress && (
-                  <TableHead className="font-semibold">
-                    <div className="flex items-center space-x-1">
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleSort('progress')}
-                        className="h-auto p-0 font-semibold"
-                      >
-                        Progress
-                        {getSortIcon('progress')}
-                      </Button>
-                      <Popover open={showFilters.progress} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, progress: open }))}>
-                        <PopoverTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('progress')}>
-                            <Filter className="h-3 w-3" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-56">
-                          <div className="space-y-2">
-                            <h4 className="font-medium">Filter Progress</h4>
-                            <Input
-                              placeholder="Filter by progress..."
-                              value={columnFilters.progress || ''}
-                              onChange={(e) => handleFilterChange('progress', e.target.value)}
-                            />
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => clearFilter('progress')}
-                              className="w-full"
-                            >
-                              Clear Filter
-                            </Button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  </TableHead>
-                )}
-                {visibleColumns.dueDate && (
-                  <TableHead className="font-semibold">
-                    <div className="flex items-center space-x-1">
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleSort('dueDate')}
-                        className="h-auto p-0 font-semibold"
-                      >
-                        Due Date
-                        {getSortIcon('dueDate')}
-                      </Button>
-                      <Popover open={showFilters.dueDate} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, dueDate: open }))}>
-                        <PopoverTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('dueDate')}>
-                            <Filter className="h-3 w-3" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-56">
-                          <div className="space-y-2">
-                            <h4 className="font-medium">Filter Due Date</h4>
-                            <Input
-                              placeholder="Filter by due date..."
-                              value={columnFilters.dueDate || ''}
-                              onChange={(e) => handleFilterChange('dueDate', e.target.value)}
-                            />
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => clearFilter('dueDate')}
-                              className="w-full"
-                            >
-                              Clear Filter
-                            </Button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
+                              {value}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableHead>
                 )}
                 {visibleColumns.assessor && (
                   <TableHead className="font-semibold">
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center space-x-2">
                       <Button
                         variant="ghost"
+                        size="sm"
                         onClick={() => handleSort('assessor')}
                         className="h-auto p-0 font-semibold"
                       >
                         Assessor
                         {getSortIcon('assessor')}
                       </Button>
-                      <Popover open={showFilters.assessor} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, assessor: open }))}>
-                        <PopoverTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('assessor')}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-auto p-1">
                             <Filter className="h-3 w-3" />
                           </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-56">
-                          <div className="space-y-2">
-                            <h4 className="font-medium">Filter Assessor</h4>
-                            <Input
-                              placeholder="Filter by assessor..."
-                              value={columnFilters.assessor || ''}
-                              onChange={(e) => handleFilterChange('assessor', e.target.value)}
-                            />
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => clearFilter('assessor')}
-                              className="w-full"
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {getUniqueValues('assessor').map(value => (
+                            <DropdownMenuCheckboxItem
+                              key={value}
+                              checked={(columnFilters.assessor || []).includes(value)}
+                              onCheckedChange={(checked) => {
+                                const current = columnFilters.assessor || [];
+                                if (checked) {
+                                  setColumnFilters(prev => ({ ...prev, assessor: [...current, value] }));
+                                } else {
+                                  setColumnFilters(prev => ({ ...prev, assessor: current.filter(v => v !== value) }));
+                                }
+                              }}
                             >
-                              Clear Filter
-                            </Button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
+                              {value}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableHead>
                 )}
-                {visibleColumns.dataTypes && (
-                  <TableHead className="font-semibold">Data Types</TableHead>
+                {visibleColumns.dueDate && (
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('dueDate')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Due Date
+                        {getSortIcon('dueDate')}
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-auto p-1">
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {getUniqueValues('dueDate').map(value => (
+                            <DropdownMenuCheckboxItem
+                              key={value}
+                              checked={(columnFilters.dueDate || []).includes(value)}
+                              onCheckedChange={(checked) => {
+                                const current = columnFilters.dueDate || [];
+                                if (checked) {
+                                  setColumnFilters(prev => ({ ...prev, dueDate: [...current, value] }));
+                                } else {
+                                  setColumnFilters(prev => ({ ...prev, dueDate: current.filter(v => v !== value) }));
+                                }
+                              }}
+                            >
+                              {value}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableHead>
                 )}
                 <TableHead className="font-semibold">Actions</TableHead>
               </TableRow>
@@ -638,35 +610,11 @@ const DPIA = () => {
                         </Badge>
                       </TableCell>
                     )}
-                    {visibleColumns.progress && (
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="text-sm">{assessment.progress}%</div>
-                          <Progress value={assessment.progress} className="h-2 w-16" />
-                        </div>
-                      </TableCell>
-                    )}
-                    {visibleColumns.dueDate && (
-                      <TableCell>{assessment.dueDate}</TableCell>
-                    )}
                     {visibleColumns.assessor && (
                       <TableCell>{assessment.assessor}</TableCell>
                     )}
-                    {visibleColumns.dataTypes && (
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {assessment.dataTypes.slice(0, 2).map((type, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {type}
-                            </Badge>
-                          ))}
-                          {assessment.dataTypes.length > 2 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{assessment.dataTypes.length - 2}
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
+                    {visibleColumns.dueDate && (
+                      <TableCell>{assessment.dueDate}</TableCell>
                     )}
                     <TableCell>
                       <div className="flex space-x-1">
