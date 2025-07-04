@@ -54,7 +54,16 @@ const partnerMenuItems: SidebarItem[] = [
 const companyMenuItems: SidebarItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/company/dashboard' },
   { id: 'ropa', label: 'ROPA', icon: FileText, href: '/company/ropa', badge: 2 },
-  { id: 'dpia', label: 'DPIA', icon: Shield, href: '/company/dpia', badge: 1 },
+  { 
+    id: 'assessments', 
+    label: 'Assessments', 
+    icon: Shield, 
+    href: '/company/assessments',
+    submenu: [
+      { id: 'lia', label: 'LIA', icon: Shield, href: '/company/assessments/lia' },
+      { id: 'dpia', label: 'DPIA', icon: Shield, href: '/company/assessments/dpia', badge: 1 },
+    ]
+  },
   { id: 'dsr', label: 'Data Subject Requests', icon: UserCheck, href: '/company/dsr', badge: 5 },
   { id: 'breaches', label: 'Data Breaches', icon: AlertTriangle, href: '/company/breaches' },
   { id: 'vendors', label: 'Third Parties', icon: Link, href: '/company/vendors' },

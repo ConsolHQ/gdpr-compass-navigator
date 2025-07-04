@@ -10,6 +10,7 @@ import PartnerDashboard from '@/components/dashboard/PartnerDashboard';
 import CompanyDashboard from '@/components/dashboard/CompanyDashboard';
 import ROPA from '@/components/company/ROPA';
 import DPIA from '@/components/company/DPIA';
+import LIA from '@/components/company/LIA';
 import DSR from '@/components/company/DSR';
 import DataBreaches from '@/components/company/DataBreaches';
 import IncidentReporting from '@/components/company/IncidentReporting';
@@ -182,8 +183,10 @@ const Index = () => {
         return { title: 'Dashboard', breadcrumbs: [] };
       case '/company/ropa':
         return { title: 'Register of Processing Activities', breadcrumbs: [] };
-      case '/company/dpia':
-        return { title: 'Data Protection Impact Assessments', breadcrumbs: [] };
+      case '/company/assessments/dpia':
+        return { title: 'Data Protection Impact Assessment', breadcrumbs: [{ label: 'Assessments', href: '/company/assessments' }, { label: 'DPIA' }] };
+      case '/company/assessments/lia':
+        return { title: 'Legitimate Interest Assessment', breadcrumbs: [{ label: 'Assessments', href: '/company/assessments' }, { label: 'LIA' }] };
       case '/company/dsr':
         return { title: 'Data Subject Requests', breadcrumbs: [] };
       case '/company/breaches':
@@ -239,8 +242,10 @@ const Index = () => {
         return <CompanyDashboard onNavigate={handleNavigate} />;
       case '/company/ropa':
         return <ROPA />;
-      case '/company/dpia':
+      case '/company/assessments/dpia':
         return <DPIA />;
+      case '/company/assessments/lia':
+        return <LIA />;
       case '/company/dsr':
         return <DSR />;
       case '/company/breaches':
