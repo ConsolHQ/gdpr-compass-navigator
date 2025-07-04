@@ -25,6 +25,7 @@ import PartnerSettings from '@/components/partner/PartnerSettings';
 import CreateDSR from '@/components/company/CreateDSR';
 import CreateThirdParty from '@/components/company/CreateThirdParty';
 import CreateDocument from '@/components/company/CreateDocument';
+import CreateLIA from '@/components/company/CreateLIA';
 
 interface User {
   id: string;
@@ -187,6 +188,8 @@ const Index = () => {
         return { title: 'Data Protection Impact Assessment', breadcrumbs: [{ label: 'Assessments', href: '/company/assessments' }, { label: 'DPIA' }] };
       case '/company/assessments/lia':
         return { title: 'Legitimate Interest Assessment', breadcrumbs: [{ label: 'Assessments', href: '/company/assessments' }, { label: 'LIA' }] };
+      case '/company/assessments/lia/new':
+        return { title: 'Create LIA', breadcrumbs: [{ label: 'Assessments', href: '/company/assessments' }, { label: 'LIA', href: '/company/assessments/lia' }, { label: 'Create' }] };
       case '/company/dsr':
         return { title: 'Data Subject Requests', breadcrumbs: [] };
       case '/company/breaches':
@@ -245,7 +248,9 @@ const Index = () => {
       case '/company/assessments/dpia':
         return <DPIA />;
       case '/company/assessments/lia':
-        return <LIA />;
+        return <LIA onNavigate={handleNavigate} />;
+      case '/company/assessments/lia/new':
+        return <CreateLIA onBack={() => handleNavigate('/company/assessments/lia')} />;
       case '/company/dsr':
         return <DSR />;
       case '/company/breaches':
