@@ -115,13 +115,7 @@ const LIA = ({ onNavigate }: LIAProps) => {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Legitimate Interest Assessment</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage and track legitimate interest assessments for data processing activities
-          </p>
-        </div>
+      <div className="flex justify-end items-center">
         <Button onClick={() => onNavigate?.('/company/assessments/lia/new')} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           New LIA
