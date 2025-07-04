@@ -43,6 +43,8 @@ const DPIA = () => {
     assessor: true,
     dataTypes: true,
   });
+  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+  const [showFilters, setShowFilters] = useState<Record<string, boolean>>({});
   
   const dpiaAssessments = [
     {
@@ -103,6 +105,16 @@ const DPIA = () => {
       assessment.assessor.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Apply column filters
+    Object.entries(columnFilters).forEach(([column, filterValue]) => {
+      if (filterValue) {
+        filtered = filtered.filter(assessment => {
+          const value = assessment[column as keyof typeof assessment];
+          return String(value).toLowerCase().includes(filterValue.toLowerCase());
+        });
+      }
+    });
+
     if (sortColumn && sortDirection) {
       filtered.sort((a, b) => {
         let aValue = a[sortColumn as keyof typeof a];
@@ -126,7 +138,7 @@ const DPIA = () => {
     }
 
     return filtered;
-  }, [dpiaAssessments, searchTerm, sortColumn, sortDirection]);
+  }, [dpiaAssessments, searchTerm, sortColumn, sortDirection, columnFilters]);
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -159,6 +171,19 @@ const DPIA = () => {
     if (sortDirection === 'asc') return <ChevronUp className="h-4 w-4" />;
     if (sortDirection === 'desc') return <ChevronDown className="h-4 w-4" />;
     return <ChevronsUpDown className="h-4 w-4" />;
+  };
+
+  const toggleFilter = (column: string) => {
+    setShowFilters(prev => ({ ...prev, [column]: !prev[column] }));
+  };
+
+  const handleFilterChange = (column: string, value: string) => {
+    setColumnFilters(prev => ({ ...prev, [column]: value }));
+  };
+
+  const clearFilter = (column: string) => {
+    setColumnFilters(prev => ({ ...prev, [column]: '' }));
+    setShowFilters(prev => ({ ...prev, [column]: false }));
   };
 
   const getRiskColor = (risk: string) => {
@@ -350,9 +375,31 @@ const DPIA = () => {
                         Title
                         {getSortIcon('title')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.title} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, title: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('title')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Title</h4>
+                            <Input
+                              placeholder="Filter by title..."
+                              value={columnFilters.title || ''}
+                              onChange={(e) => handleFilterChange('title', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('title')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -367,9 +414,31 @@ const DPIA = () => {
                         Status
                         {getSortIcon('status')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.status} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, status: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('status')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Status</h4>
+                            <Input
+                              placeholder="Filter by status..."
+                              value={columnFilters.status || ''}
+                              onChange={(e) => handleFilterChange('status', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('status')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -384,9 +453,31 @@ const DPIA = () => {
                         Risk Level
                         {getSortIcon('riskLevel')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.riskLevel} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, riskLevel: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('riskLevel')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Risk Level</h4>
+                            <Input
+                              placeholder="Filter by risk level..."
+                              value={columnFilters.riskLevel || ''}
+                              onChange={(e) => handleFilterChange('riskLevel', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('riskLevel')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -401,9 +492,31 @@ const DPIA = () => {
                         Progress
                         {getSortIcon('progress')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.progress} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, progress: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('progress')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Progress</h4>
+                            <Input
+                              placeholder="Filter by progress..."
+                              value={columnFilters.progress || ''}
+                              onChange={(e) => handleFilterChange('progress', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('progress')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -418,9 +531,31 @@ const DPIA = () => {
                         Due Date
                         {getSortIcon('dueDate')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.dueDate} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, dueDate: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('dueDate')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Due Date</h4>
+                            <Input
+                              placeholder="Filter by due date..."
+                              value={columnFilters.dueDate || ''}
+                              onChange={(e) => handleFilterChange('dueDate', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('dueDate')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -435,9 +570,31 @@ const DPIA = () => {
                         Assessor
                         {getSortIcon('assessor')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.assessor} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, assessor: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('assessor')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Assessor</h4>
+                            <Input
+                              placeholder="Filter by assessor..."
+                              value={columnFilters.assessor || ''}
+                              onChange={(e) => handleFilterChange('assessor', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('assessor')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}

@@ -46,6 +46,8 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
     investigator: true,
     reportedToAuthority: true,
   });
+  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+  const [showFilters, setShowFilters] = useState<Record<string, boolean>>({});
   
   const breachIncidents = [
     {
@@ -118,6 +120,16 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
       breach.investigator.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Apply column filters
+    Object.entries(columnFilters).forEach(([column, filterValue]) => {
+      if (filterValue) {
+        filtered = filtered.filter(breach => {
+          const value = breach[column as keyof typeof breach];
+          return String(value).toLowerCase().includes(filterValue.toLowerCase());
+        });
+      }
+    });
+
     if (sortColumn && sortDirection) {
       filtered.sort((a, b) => {
         let aValue = a[sortColumn as keyof typeof a];
@@ -141,7 +153,7 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
     }
 
     return filtered;
-  }, [breachIncidents, searchTerm, sortColumn, sortDirection]);
+  }, [breachIncidents, searchTerm, sortColumn, sortDirection, columnFilters]);
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -174,6 +186,19 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
     if (sortDirection === 'asc') return <ChevronUp className="h-4 w-4" />;
     if (sortDirection === 'desc') return <ChevronDown className="h-4 w-4" />;
     return <ChevronsUpDown className="h-4 w-4" />;
+  };
+
+  const toggleFilter = (column: string) => {
+    setShowFilters(prev => ({ ...prev, [column]: !prev[column] }));
+  };
+
+  const handleFilterChange = (column: string, value: string) => {
+    setColumnFilters(prev => ({ ...prev, [column]: value }));
+  };
+
+  const clearFilter = (column: string) => {
+    setColumnFilters(prev => ({ ...prev, [column]: '' }));
+    setShowFilters(prev => ({ ...prev, [column]: false }));
   };
 
   const getSeverityColor = (severity: string) => {
@@ -366,9 +391,31 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
                         Incident Title
                         {getSortIcon('title')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.title} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, title: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('title')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Title</h4>
+                            <Input
+                              placeholder="Filter by title..."
+                              value={columnFilters.title || ''}
+                              onChange={(e) => handleFilterChange('title', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('title')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -383,9 +430,31 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
                         Severity
                         {getSortIcon('severity')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.severity} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, severity: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('severity')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Severity</h4>
+                            <Input
+                              placeholder="Filter by severity..."
+                              value={columnFilters.severity || ''}
+                              onChange={(e) => handleFilterChange('severity', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('severity')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -400,9 +469,31 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
                         Status
                         {getSortIcon('status')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.status} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, status: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('status')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Status</h4>
+                            <Input
+                              placeholder="Filter by status..."
+                              value={columnFilters.status || ''}
+                              onChange={(e) => handleFilterChange('status', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('status')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -417,9 +508,31 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
                         Affected Records
                         {getSortIcon('affectedRecords')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.affectedRecords} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, affectedRecords: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('affectedRecords')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Affected Records</h4>
+                            <Input
+                              placeholder="Filter by records count..."
+                              value={columnFilters.affectedRecords || ''}
+                              onChange={(e) => handleFilterChange('affectedRecords', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('affectedRecords')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -434,9 +547,31 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
                         Reported Date
                         {getSortIcon('reportedDate')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.reportedDate} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, reportedDate: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('reportedDate')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Reported Date</h4>
+                            <Input
+                              placeholder="Filter by date..."
+                              value={columnFilters.reportedDate || ''}
+                              onChange={(e) => handleFilterChange('reportedDate', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('reportedDate')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -451,9 +586,31 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
                         Investigator
                         {getSortIcon('investigator')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.investigator} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, investigator: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('investigator')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Investigator</h4>
+                            <Input
+                              placeholder="Filter by investigator..."
+                              value={columnFilters.investigator || ''}
+                              onChange={(e) => handleFilterChange('investigator', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('investigator')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}

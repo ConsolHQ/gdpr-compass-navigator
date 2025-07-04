@@ -47,6 +47,8 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
     location: true,
     dpuSigned: true,
   });
+  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+  const [showFilters, setShowFilters] = useState<Record<string, boolean>>({});
   
   const thirdParties = [
     {
@@ -144,6 +146,16 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
       tp.location.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Apply column filters
+    Object.entries(columnFilters).forEach(([column, filterValue]) => {
+      if (filterValue) {
+        filtered = filtered.filter(tp => {
+          const value = tp[column as keyof typeof tp];
+          return String(value).toLowerCase().includes(filterValue.toLowerCase());
+        });
+      }
+    });
+
     if (sortColumn && sortDirection) {
       filtered.sort((a, b) => {
         let aValue = a[sortColumn as keyof typeof a];
@@ -159,7 +171,7 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
     }
 
     return filtered;
-  }, [thirdParties, searchTerm, sortColumn, sortDirection]);
+  }, [thirdParties, searchTerm, sortColumn, sortDirection, columnFilters]);
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -192,6 +204,19 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
     if (sortDirection === 'asc') return <ChevronUp className="h-4 w-4" />;
     if (sortDirection === 'desc') return <ChevronDown className="h-4 w-4" />;
     return <ChevronsUpDown className="h-4 w-4" />;
+  };
+
+  const toggleFilter = (column: string) => {
+    setShowFilters(prev => ({ ...prev, [column]: !prev[column] }));
+  };
+
+  const handleFilterChange = (column: string, value: string) => {
+    setColumnFilters(prev => ({ ...prev, [column]: value }));
+  };
+
+  const clearFilter = (column: string) => {
+    setColumnFilters(prev => ({ ...prev, [column]: '' }));
+    setShowFilters(prev => ({ ...prev, [column]: false }));
   };
 
   const getStatusColor = (status: string) => {

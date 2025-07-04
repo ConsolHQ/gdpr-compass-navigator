@@ -47,6 +47,8 @@ const DSR = ({ onNavigate }: DSRProps) => {
     assignedTo: true,
     legalBasis: true,
   });
+  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+  const [showFilters, setShowFilters] = useState<Record<string, boolean>>({});
   
   const dsrRequests = [
     {
@@ -140,6 +142,16 @@ const DSR = ({ onNavigate }: DSRProps) => {
       request.assignedTo.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Apply column filters
+    Object.entries(columnFilters).forEach(([column, filterValue]) => {
+      if (filterValue) {
+        filtered = filtered.filter(request => {
+          const value = request[column as keyof typeof request];
+          return String(value).toLowerCase().includes(filterValue.toLowerCase());
+        });
+      }
+    });
+
     if (sortColumn && sortDirection) {
       filtered.sort((a, b) => {
         let aValue = a[sortColumn as keyof typeof a];
@@ -163,7 +175,7 @@ const DSR = ({ onNavigate }: DSRProps) => {
     }
 
     return filtered;
-  }, [dsrRequests, searchTerm, sortColumn, sortDirection]);
+  }, [dsrRequests, searchTerm, sortColumn, sortDirection, columnFilters]);
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -196,6 +208,19 @@ const DSR = ({ onNavigate }: DSRProps) => {
     if (sortDirection === 'asc') return <ChevronUp className="h-4 w-4" />;
     if (sortDirection === 'desc') return <ChevronDown className="h-4 w-4" />;
     return <ChevronsUpDown className="h-4 w-4" />;
+  };
+
+  const toggleFilter = (column: string) => {
+    setShowFilters(prev => ({ ...prev, [column]: !prev[column] }));
+  };
+
+  const handleFilterChange = (column: string, value: string) => {
+    setColumnFilters(prev => ({ ...prev, [column]: value }));
+  };
+
+  const clearFilter = (column: string) => {
+    setColumnFilters(prev => ({ ...prev, [column]: '' }));
+    setShowFilters(prev => ({ ...prev, [column]: false }));
   };
 
   const getStatusColor = (status: string) => {
@@ -389,9 +414,31 @@ const DSR = ({ onNavigate }: DSRProps) => {
                         Request Type
                         {getSortIcon('type')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.type} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, type: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('type')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Request Type</h4>
+                            <Input
+                              placeholder="Filter by type..."
+                              value={columnFilters.type || ''}
+                              onChange={(e) => handleFilterChange('type', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('type')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -406,9 +453,31 @@ const DSR = ({ onNavigate }: DSRProps) => {
                         Requester
                         {getSortIcon('requester')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.requester} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, requester: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('requester')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Requester</h4>
+                            <Input
+                              placeholder="Filter by requester..."
+                              value={columnFilters.requester || ''}
+                              onChange={(e) => handleFilterChange('requester', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('requester')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -423,9 +492,31 @@ const DSR = ({ onNavigate }: DSRProps) => {
                         Status
                         {getSortIcon('status')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.status} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, status: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('status')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Status</h4>
+                            <Input
+                              placeholder="Filter by status..."
+                              value={columnFilters.status || ''}
+                              onChange={(e) => handleFilterChange('status', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('status')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -440,9 +531,31 @@ const DSR = ({ onNavigate }: DSRProps) => {
                         Priority
                         {getSortIcon('priority')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.priority} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, priority: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('priority')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Priority</h4>
+                            <Input
+                              placeholder="Filter by priority..."
+                              value={columnFilters.priority || ''}
+                              onChange={(e) => handleFilterChange('priority', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('priority')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -457,9 +570,31 @@ const DSR = ({ onNavigate }: DSRProps) => {
                         Due Date
                         {getSortIcon('dueDate')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.dueDate} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, dueDate: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('dueDate')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Due Date</h4>
+                            <Input
+                              placeholder="Filter by due date..."
+                              value={columnFilters.dueDate || ''}
+                              onChange={(e) => handleFilterChange('dueDate', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('dueDate')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -474,9 +609,31 @@ const DSR = ({ onNavigate }: DSRProps) => {
                         Days Remaining
                         {getSortIcon('daysRemaining')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.daysRemaining} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, daysRemaining: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('daysRemaining')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Days Remaining</h4>
+                            <Input
+                              placeholder="Filter by days remaining..."
+                              value={columnFilters.daysRemaining || ''}
+                              onChange={(e) => handleFilterChange('daysRemaining', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('daysRemaining')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
@@ -491,9 +648,31 @@ const DSR = ({ onNavigate }: DSRProps) => {
                         Assigned To
                         {getSortIcon('assignedTo')}
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <Filter className="h-3 w-3" />
-                      </Button>
+                      <Popover open={showFilters.assignedTo} onOpenChange={(open) => setShowFilters(prev => ({ ...prev, assignedTo: open }))}>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => toggleFilter('assignedTo')}>
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Filter Assigned To</h4>
+                            <Input
+                              placeholder="Filter by assignee..."
+                              value={columnFilters.assignedTo || ''}
+                              onChange={(e) => handleFilterChange('assignedTo', e.target.value)}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearFilter('assignedTo')}
+                              className="w-full"
+                            >
+                              Clear Filter
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </TableHead>
                 )}
