@@ -15,7 +15,11 @@ import DataBreaches from '@/components/company/DataBreaches';
 import IncidentReporting from '@/components/company/IncidentReporting';
 import ThirdParties from '@/components/company/ThirdParties';
 import DocumentLibrary from '@/components/company/DocumentLibrary';
-import CompanySettings from '@/components/company/settings/CompanySettings';
+import OrganizationSettings from '@/components/company/settings/OrganizationSettings';
+import UserManagement from '@/components/company/settings/UserManagement';
+import MetadataSettings from '@/components/company/settings/MetadataSettings';
+import DataDictionary from '@/components/company/settings/DataDictionary';
+import ReportsSettings from '@/components/company/settings/ReportsSettings';
 import PartnerSettings from '@/components/partner/PartnerSettings';
 
 interface User {
@@ -238,13 +242,16 @@ const Index = () => {
         return <ThirdParties />;
       case '/company/documents':
         return <DocumentLibrary />;
-      case '/company/settings':
       case '/company/settings/metadata':
+        return <MetadataSettings />;
       case '/company/settings/data-dictionary':
+        return <DataDictionary />;
       case '/company/settings/users':
+        return <UserManagement />;
       case '/company/settings/organisation':
+        return <OrganizationSettings />;
       case '/company/settings/reports':
-        return <CompanySettings />;
+        return <ReportsSettings />;
       
       default:
         // Default to dashboard based on user role and context
