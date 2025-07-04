@@ -149,10 +149,7 @@ const DocumentLibrary = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Document Library</h1>
-          <p className="text-gray-600 mt-2">Centralized repository for GDPR compliance documents</p>
-        </div>
+        <div></div>
         <div className="flex space-x-2">
           <Button variant="outline">
             <Upload className="mr-2 h-4 w-4" />

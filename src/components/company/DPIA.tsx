@@ -89,10 +89,7 @@ const DPIA = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Data Protection Impact Assessments</h1>
-          <p className="text-gray-600 mt-2">Assess and mitigate privacy risks for high-risk processing activities</p>
-        </div>
+        <div></div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
           New DPIA

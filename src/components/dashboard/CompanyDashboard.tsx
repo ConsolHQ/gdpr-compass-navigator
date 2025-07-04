@@ -29,10 +29,6 @@ const CompanyDashboard = ({ onNavigate }: CompanyDashboardProps) => {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Company Dashboard</h1>
-          <p className="text-gray-600 mt-2">GDPR Compliance Overview</p>
-        </div>
         <div className="flex items-center space-x-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">{complianceScore}%</div>
