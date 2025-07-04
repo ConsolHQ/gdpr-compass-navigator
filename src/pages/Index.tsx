@@ -242,7 +242,7 @@ const Index = () => {
       case '/company/dpia':
         return <DPIA />;
       case '/company/dsr':
-        return <DSR onNavigate={handleNavigate} />;
+        return <DSR />;
       case '/company/breaches':
         return <DataBreaches onNavigate={handleNavigate} />;
       case '/company/breaches/report':

@@ -136,8 +136,8 @@ const DSR = () => {
         let bValue = b[sortColumn as keyof typeof b];
         
         if (sortColumn === 'submissionDate' || sortColumn === 'dueDate') {
-          aValue = new Date(aValue as string).getTime();
-          bValue = new Date(bValue as string).getTime();
+          aValue = new Date(aValue as string).getTime().toString();
+          bValue = new Date(bValue as string).getTime().toString();
         } else {
           aValue = String(aValue).toLowerCase();
           bValue = String(bValue).toLowerCase();
