@@ -154,6 +154,56 @@ const Index = () => {
     console.log('Switched to company workspace:', company.name);
   };
 
+  // Get page title and breadcrumbs based on current path
+  const getPageInfo = () => {
+    const pathSegments = currentPath.split('/').filter(Boolean);
+    
+    if (user?.role === 'partner' && !activeCompany && currentPath.startsWith('/partner')) {
+      switch (currentPath) {
+        case '/partner/dashboard':
+          return { title: 'Partner Dashboard', breadcrumbs: [] };
+        case '/partner/settings':
+          return { title: 'Partner Settings', breadcrumbs: [{ label: 'Dashboard', href: '/partner/dashboard' }, { label: 'Settings' }] };
+        default:
+          return { title: 'Partner Dashboard', breadcrumbs: [] };
+      }
+    }
+
+    // Company routes
+    switch (currentPath) {
+      case '/company/dashboard':
+        return { title: 'Dashboard', breadcrumbs: [] };
+      case '/company/ropa':
+        return { title: 'Register of Processing Activities', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'ROPA' }] };
+      case '/company/dpia':
+        return { title: 'Data Protection Impact Assessments', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'DPIA' }] };
+      case '/company/dsr':
+        return { title: 'Data Subject Requests', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'DSR' }] };
+      case '/company/breaches':
+        return { title: 'Data Breaches', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Data Breaches' }] };
+      case '/company/breaches/report':
+        return { title: 'Report Incident', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Data Breaches', href: '/company/breaches' }, { label: 'Report Incident' }] };
+      case '/company/vendors':
+        return { title: 'Third Party Management', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Third Parties' }] };
+      case '/company/documents':
+        return { title: 'Document Library', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Documents' }] };
+      case '/company/settings':
+        return { title: 'Company Settings', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Settings' }] };
+      case '/company/settings/metadata':
+        return { title: 'Metadata Management', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Settings', href: '/company/settings' }, { label: 'Metadata' }] };
+      case '/company/settings/data-dictionary':
+        return { title: 'Data Dictionary', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Settings', href: '/company/settings' }, { label: 'Data Dictionary' }] };
+      case '/company/settings/users':
+        return { title: 'User Management', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Settings', href: '/company/settings' }, { label: 'Users' }] };
+      case '/company/settings/organisation':
+        return { title: 'Organisation Settings', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Settings', href: '/company/settings' }, { label: 'Organisation' }] };
+      case '/company/settings/reports':
+        return { title: 'Reports & Analytics', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Settings', href: '/company/settings' }, { label: 'Reports' }] };
+      default:
+        return { title: 'Dashboard', breadcrumbs: [] };
+    }
+  };
+
   // Function to render the correct screen based on currentPath
   const renderCurrentScreen = () => {
     if (!user) return null;
@@ -269,6 +319,9 @@ const Index = () => {
           user={user || undefined} 
           onLogout={handleLogout}
           activeCompany={activeCompany}
+          title={getPageInfo().title}
+          breadcrumbs={getPageInfo().breadcrumbs}
+          onNavigate={handleNavigate}
         />
         
         <main className="flex-1 overflow-auto">

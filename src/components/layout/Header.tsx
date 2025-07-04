@@ -2,6 +2,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  Breadcrumb, 
+  BreadcrumbList, 
+  BreadcrumbItem, 
+  BreadcrumbLink, 
+  BreadcrumbPage, 
+  BreadcrumbSeparator 
+} from '@/components/ui/breadcrumb';
 import { LogOut, Bell, Building } from 'lucide-react';
 
 interface CompanyAccess {
@@ -18,28 +26,62 @@ interface User {
   avatar?: string;
 }
 
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
 interface HeaderProps {
   user?: User;
   onLogout: () => void;
   activeCompany?: CompanyAccess | null;
+  title?: string;
+  breadcrumbs?: BreadcrumbItem[];
+  onNavigate?: (path: string) => void;
 }
 
-const Header = ({ user, onLogout, activeCompany }: HeaderProps) => {
+const Header = ({ user, onLogout, activeCompany, title, breadcrumbs, onNavigate }: HeaderProps) => {
   if (!user) return null;
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <h1 className="text-xl font-semibold text-gray-900">
-            Register of Processing Activities
-          </h1>
-          {user.role === 'partner' && activeCompany && (
-            <div className="flex items-center text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-              <Building className="h-4 w-4 mr-2" />
-              <span>Working on: {activeCompany.name}</span>
-            </div>
+        <div className="flex flex-col space-y-2">
+          {breadcrumbs && breadcrumbs.length > 0 && (
+            <Breadcrumb>
+              <BreadcrumbList>
+                {breadcrumbs.map((crumb, index) => (
+                  <React.Fragment key={index}>
+                    <BreadcrumbItem>
+                      {crumb.href && index < breadcrumbs.length - 1 ? (
+                        <BreadcrumbLink 
+                          asChild
+                          className="cursor-pointer"
+                          onClick={() => onNavigate?.(crumb.href!)}
+                        >
+                          <span>{crumb.label}</span>
+                        </BreadcrumbLink>
+                      ) : (
+                        <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                      )}
+                    </BreadcrumbItem>
+                    {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+                  </React.Fragment>
+                ))}
+              </BreadcrumbList>
+            </Breadcrumb>
           )}
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-semibold text-gray-900">
+              {title || 'Dashboard'}
+            </h1>
+            {user.role === 'partner' && activeCompany && (
+              <div className="flex items-center text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                <Building className="h-4 w-4 mr-2" />
+                <span>Working on: {activeCompany.name}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center space-x-4">
