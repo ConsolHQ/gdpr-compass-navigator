@@ -39,6 +39,7 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
   const [visibleColumns, setVisibleColumns] = useState({
+    id: true,
     name: true,
     category: true,
     status: true,
@@ -130,6 +131,7 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
   ];
 
   const columns = [
+    { key: 'id', label: 'Identifier', sortable: true },
     { key: 'name', label: 'Third Party', sortable: true },
     { key: 'category', label: 'Category', sortable: true },
     { key: 'status', label: 'Status', sortable: true },
@@ -393,7 +395,21 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
                     checked={selectedRows.length === processedThirdParties.length}
                     onCheckedChange={handleSelectAll}
                   />
-                </TableHead>
+                 </TableHead>
+                {visibleColumns.id && (
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('id')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Identifier
+                        {getSortIcon('id')}
+                      </Button>
+                    </div>
+                  </TableHead>
+                )}
                 {visibleColumns.name && (
                   <TableHead className="font-semibold">
                     <div className="flex items-center space-x-1">
@@ -510,15 +526,17 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
                       checked={selectedRows.includes(tp.id)}
                       onCheckedChange={(checked) => handleSelectRow(tp.id, !!checked)}
                     />
-                  </TableCell>
-                  {visibleColumns.name && (
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{tp.name}</div>
-                        <div className="text-sm text-gray-500">{tp.id}</div>
-                      </div>
-                    </TableCell>
-                  )}
+                   </TableCell>
+                   {visibleColumns.id && (
+                     <TableCell>
+                       <span className="text-sm font-mono">{tp.id}</span>
+                     </TableCell>
+                   )}
+                   {visibleColumns.name && (
+                     <TableCell>
+                       <div className="font-medium">{tp.name}</div>
+                     </TableCell>
+                   )}
                   {visibleColumns.category && (
                     <TableCell>
                       <Badge variant="outline">{tp.category}</Badge>

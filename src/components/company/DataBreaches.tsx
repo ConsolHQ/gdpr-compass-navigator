@@ -38,6 +38,7 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
   const [visibleColumns, setVisibleColumns] = useState({
+    id: true,
     title: true,
     severity: true,
     status: true,
@@ -104,6 +105,7 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
   ];
 
   const columns = [
+    { key: 'id', label: 'Identifier', sortable: true },
     { key: 'title', label: 'Incident Title', sortable: true },
     { key: 'severity', label: 'Severity', sortable: true },
     { key: 'status', label: 'Status', sortable: true },
@@ -379,7 +381,21 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
                     checked={selectedRows.length === processedBreaches.length}
                     onCheckedChange={handleSelectAll}
                   />
-                </TableHead>
+                 </TableHead>
+                {visibleColumns.id && (
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('id')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Identifier
+                        {getSortIcon('id')}
+                      </Button>
+                    </div>
+                  </TableHead>
+                )}
                 {visibleColumns.title && (
                   <TableHead className="font-semibold">
                     <div className="flex items-center space-x-1">
@@ -630,15 +646,17 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
                         checked={selectedRows.includes(breach.id)}
                         onCheckedChange={(checked) => handleSelectRow(breach.id, !!checked)}
                       />
-                    </TableCell>
-                    {visibleColumns.title && (
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{breach.title}</div>
-                          <div className="text-sm text-gray-500">{breach.id}</div>
-                        </div>
-                      </TableCell>
-                    )}
+                     </TableCell>
+                     {visibleColumns.id && (
+                       <TableCell>
+                         <span className="text-sm font-mono">{breach.id}</span>
+                       </TableCell>
+                     )}
+                     {visibleColumns.title && (
+                       <TableCell>
+                         <div className="font-medium">{breach.title}</div>
+                       </TableCell>
+                     )}
                     {visibleColumns.severity && (
                       <TableCell>
                         <Badge variant={getSeverityColor(breach.severity)}>

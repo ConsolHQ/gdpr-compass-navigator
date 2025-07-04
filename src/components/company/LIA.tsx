@@ -209,6 +209,28 @@ const LIA = ({ onNavigate }: LIAProps) => {
     filter && filter.length > 0
   ) || searchTerm;
 
+  const [visibleColumns, setVisibleColumns] = useState({
+    id: true,
+    title: true,
+    dataSubject: true,
+    purpose: true,
+    status: true,
+    legitimateInterest: true,
+    balancingTest: true,
+    reviewer: true,
+  });
+
+  const columns = [
+    { key: 'id', label: 'Identifier', sortable: true },
+    { key: 'title', label: 'Assessment Title', sortable: true },
+    { key: 'dataSubject', label: 'Data Subject', sortable: true },
+    { key: 'purpose', label: 'Purpose', sortable: true },
+    { key: 'status', label: 'Status', sortable: true },
+    { key: 'legitimateInterest', label: 'Legitimate Interest', sortable: true },
+    { key: 'balancingTest', label: 'Balancing Test', sortable: true },
+    { key: 'reviewer', label: 'Reviewer', sortable: true },
+  ];
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -328,16 +350,29 @@ const LIA = ({ onNavigate }: LIAProps) => {
                     checked={selectedRows.length === processedLIAs.length && processedLIAs.length > 0}
                     onCheckedChange={handleSelectAll}
                   />
-                </TableHead>
-                <TableHead className="font-semibold">
-                  <Button
-                    variant="ghost" 
-                    onClick={() => handleSort('title')}
-                    className="h-auto p-0 font-semibold hover:bg-transparent"
-                  >
-                    Assessment Title {getSortIcon('title')}
-                  </Button>
-                </TableHead>
+                 </TableHead>
+                {visibleColumns.id && (
+                  <TableHead className="font-semibold">
+                    <Button
+                      variant="ghost" 
+                      onClick={() => handleSort('id')}
+                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                    >
+                      Identifier {getSortIcon('id')}
+                    </Button>
+                  </TableHead>
+                )}
+                {visibleColumns.title && (
+                  <TableHead className="font-semibold">
+                    <Button
+                      variant="ghost" 
+                      onClick={() => handleSort('title')}
+                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                    >
+                      Assessment Title {getSortIcon('title')}
+                    </Button>
+                  </TableHead>
+                )}
                 <TableHead className="font-semibold">
                   <div className="flex items-center space-x-2">
                     <Button

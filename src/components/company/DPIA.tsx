@@ -35,6 +35,7 @@ const DPIA = () => {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
   const [visibleColumns, setVisibleColumns] = useState({
+    id: true,
     title: true,
     status: true,
     riskLevel: true,
@@ -88,6 +89,7 @@ const DPIA = () => {
   ];
 
   const columns = [
+    { key: 'id', label: 'Identifier', sortable: true },
     { key: 'title', label: 'Title', sortable: true },
     { key: 'status', label: 'Status', sortable: true },
     { key: 'riskLevel', label: 'Risk Level', sortable: true },
@@ -372,7 +374,22 @@ const DPIA = () => {
                     checked={selectedRows.length === processedAssessments.length}
                     onCheckedChange={handleSelectAll}
                   />
-                </TableHead>
+                 </TableHead>
+                {visibleColumns.id && (
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('id')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Identifier
+                        {getSortIcon('id')}
+                      </Button>
+                    </div>
+                  </TableHead>
+                )}
                 {visibleColumns.title && (
                   <TableHead className="font-semibold">
                     <div className="flex items-center space-x-2">
@@ -586,15 +603,17 @@ const DPIA = () => {
                         checked={selectedRows.includes(assessment.id)}
                         onCheckedChange={(checked) => handleSelectRow(assessment.id, !!checked)}
                       />
-                    </TableCell>
-                    {visibleColumns.title && (
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{assessment.title}</div>
-                          <div className="text-sm text-gray-500">{assessment.id}</div>
-                        </div>
-                      </TableCell>
-                    )}
+                     </TableCell>
+                     {visibleColumns.id && (
+                       <TableCell>
+                         <span className="text-sm font-mono">{assessment.id}</span>
+                       </TableCell>
+                     )}
+                     {visibleColumns.title && (
+                       <TableCell>
+                         <div className="font-medium">{assessment.title}</div>
+                       </TableCell>
+                     )}
                     {visibleColumns.status && (
                       <TableCell>
                         <Badge variant={getStatusColor(assessment.status)}>

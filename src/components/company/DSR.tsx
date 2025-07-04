@@ -33,6 +33,7 @@ const DSR = () => {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
   const [visibleColumns, setVisibleColumns] = useState({
+    id: true,
     requestType: true,
     status: true,
     priority: true,
@@ -95,6 +96,7 @@ const DSR = () => {
   ];
 
   const columns = [
+    { key: 'id', label: 'Identifier', sortable: true },
     { key: 'requestType', label: 'Request Type', sortable: true },
     { key: 'status', label: 'Status', sortable: true },
     { key: 'priority', label: 'Priority', sortable: true },
@@ -363,7 +365,22 @@ const DSR = () => {
                     checked={selectedRows.length === processedRequests.length}
                     onCheckedChange={handleSelectAll}
                   />
-                </TableHead>
+                 </TableHead>
+                {visibleColumns.id && (
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('id')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Identifier
+                        {getSortIcon('id')}
+                      </Button>
+                    </div>
+                  </TableHead>
+                )}
                 {visibleColumns.requestType && (
                   <TableHead className="font-semibold">
                     <div className="flex items-center space-x-2">
@@ -415,15 +432,17 @@ const DSR = () => {
                       checked={selectedRows.includes(request.id)}
                       onCheckedChange={(checked) => handleSelectRow(request.id, !!checked)}
                     />
-                  </TableCell>
-                  {visibleColumns.requestType && (
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{request.requestType}</div>
-                        <div className="text-sm text-gray-500">{request.id}</div>
-                      </div>
-                    </TableCell>
-                  )}
+                   </TableCell>
+                   {visibleColumns.id && (
+                     <TableCell>
+                       <span className="text-sm font-mono">{request.id}</span>
+                     </TableCell>
+                   )}
+                   {visibleColumns.requestType && (
+                     <TableCell>
+                       <div className="font-medium">{request.requestType}</div>
+                     </TableCell>
+                   )}
                   <TableCell>
                     <div className="flex space-x-1">
                       <Button variant="ghost" size="sm">
