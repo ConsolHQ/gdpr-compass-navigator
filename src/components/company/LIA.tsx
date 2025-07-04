@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Table, 
   TableBody, 
@@ -18,12 +19,30 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { Search, Plus, Filter, MoreHorizontal, Eye, Edit, Trash2 } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { 
+  Search, 
+  Plus, 
+  Filter, 
+  MoreHorizontal, 
+  Eye, 
+  Edit, 
+  Trash2,
+  ChevronsUpDown,
+  ChevronUp,
+  ChevronDown,
+  Archive,
+  Copy,
+  Download,
+  X
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 // Mock data for LIA
@@ -71,6 +90,9 @@ const LIA = ({ onNavigate }: LIAProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [purposeFilter, setPurposeFilter] = useState('all');
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -94,15 +116,73 @@ const LIA = ({ onNavigate }: LIAProps) => {
     return <Badge className={config.color}>{config.label}</Badge>;
   };
 
-  const filteredLIAs = mockLIAs.filter(lia => {
-    const matchesSearch = lia.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         lia.dataSubject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         lia.purpose.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || lia.status === statusFilter;
-    const matchesPurpose = purposeFilter === 'all' || lia.purpose === purposeFilter;
-    
-    return matchesSearch && matchesStatus && matchesPurpose;
-  });
+  // Filter and sort data
+  const processedLIAs = useMemo(() => {
+    let filtered = mockLIAs.filter(lia => {
+      const matchesSearch = lia.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           lia.dataSubject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           lia.purpose.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || lia.status === statusFilter;
+      const matchesPurpose = purposeFilter === 'all' || lia.purpose === purposeFilter;
+      
+      return matchesSearch && matchesStatus && matchesPurpose;
+    });
+
+    // Sort data
+    if (sortColumn && sortDirection) {
+      filtered.sort((a, b) => {
+        let aValue: any = a[sortColumn as keyof typeof a];
+        let bValue: any = b[sortColumn as keyof typeof b];
+        
+        if (sortColumn === 'createdDate') {
+          aValue = new Date(aValue as string).getTime();
+          bValue = new Date(bValue as string).getTime();
+        } else {
+          aValue = String(aValue).toLowerCase();
+          bValue = String(bValue).toLowerCase();
+        }
+        
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [mockLIAs, searchTerm, statusFilter, purposeFilter, sortColumn, sortDirection]);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : sortDirection === 'desc' ? null : 'asc');
+      if (sortDirection === 'desc') setSortColumn(null);
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedRows(processedLIAs.map(lia => lia.id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleSelectRow = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedRows([...selectedRows, id]);
+    } else {
+      setSelectedRows(selectedRows.filter(rowId => rowId !== id));
+    }
+  };
+
+  const getSortIcon = (column: string) => {
+    if (sortColumn !== column) return <ChevronsUpDown className="h-4 w-4" />;
+    if (sortDirection === 'asc') return <ChevronUp className="h-4 w-4" />;
+    if (sortDirection === 'desc') return <ChevronDown className="h-4 w-4" />;
+    return <ChevronsUpDown className="h-4 w-4" />;
+  };
 
   const clearFilters = () => {
     setSearchTerm('');
@@ -205,31 +285,193 @@ const LIA = ({ onNavigate }: LIAProps) => {
 
               {hasActiveFilters && (
                 <Button variant="outline" onClick={clearFilters} className="whitespace-nowrap">
+                  <X className="mr-2 h-4 w-4" />
                   Clear filters
                 </Button>
               )}
             </div>
+
+            {/* Bulk Actions */}
+            {selectedRows.length > 0 && (
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-muted-foreground">{selectedRows.length} selected</span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      Bulk Actions
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem>
+                      <Archive className="mr-2 h-4 w-4" />
+                      Archive
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Copy className="mr-2 h-4 w-4" />
+                      Duplicate
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Download className="mr-2 h-4 w-4" />
+                      Export
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-red-600">
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete Selected
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            )}
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Assessment Title</TableHead>
-                <TableHead>Data Subject</TableHead>
-                <TableHead>Purpose</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Legitimate Interest</TableHead>
-                <TableHead>Balancing Test</TableHead>
-                <TableHead>Created Date</TableHead>
-                <TableHead>Reviewer</TableHead>
+              <TableRow className="border-b bg-muted/50">
+                <TableHead className="w-12">
+                  <Checkbox
+                    checked={selectedRows.length === processedLIAs.length && processedLIAs.length > 0}
+                    onCheckedChange={handleSelectAll}
+                  />
+                </TableHead>
+                <TableHead className="font-semibold">
+                  <Button
+                    variant="ghost" 
+                    onClick={() => handleSort('title')}
+                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                  >
+                    Assessment Title {getSortIcon('title')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold">
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost" 
+                      onClick={() => handleSort('dataSubject')}
+                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                    >
+                      Data Subject {getSortIcon('dataSubject')}
+                    </Button>
+                  </div>
+                </TableHead>
+                <TableHead className="font-semibold">
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost" 
+                      onClick={() => handleSort('purpose')}
+                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                    >
+                      Purpose {getSortIcon('purpose')}
+                    </Button>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                          <Filter className="h-3 w-3" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-48">
+                        <div className="space-y-2">
+                          <h4 className="font-medium text-sm">Filter by Purpose</h4>
+                          <Select value={purposeFilter} onValueChange={setPurposeFilter}>
+                            <SelectTrigger className="w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Purposes</SelectItem>
+                              <SelectItem value="Direct Marketing">Direct Marketing</SelectItem>
+                              <SelectItem value="Analytics & Insights">Analytics & Insights</SelectItem>
+                              <SelectItem value="Security & Fraud Prevention">Security & Fraud Prevention</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </TableHead>
+                <TableHead className="font-semibold">
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost" 
+                      onClick={() => handleSort('status')}
+                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                    >
+                      Status {getSortIcon('status')}
+                    </Button>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                          <Filter className="h-3 w-3" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-48">
+                        <div className="space-y-2">
+                          <h4 className="font-medium text-sm">Filter by Status</h4>
+                          <Select value={statusFilter} onValueChange={setStatusFilter}>
+                            <SelectTrigger className="w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Status</SelectItem>
+                              <SelectItem value="completed">Completed</SelectItem>
+                              <SelectItem value="in-progress">In Progress</SelectItem>
+                              <SelectItem value="draft">Draft</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </TableHead>
+                <TableHead className="font-semibold">
+                  <Button
+                    variant="ghost" 
+                    onClick={() => handleSort('legitimateInterest')}
+                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                  >
+                    Legitimate Interest {getSortIcon('legitimateInterest')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold">
+                  <Button
+                    variant="ghost" 
+                    onClick={() => handleSort('balancingTest')}
+                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                  >
+                    Balancing Test {getSortIcon('balancingTest')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold">
+                  <Button
+                    variant="ghost" 
+                    onClick={() => handleSort('createdDate')}
+                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                  >
+                    Created Date {getSortIcon('createdDate')}
+                  </Button>
+                </TableHead>
+                <TableHead className="font-semibold">
+                  <Button
+                    variant="ghost" 
+                    onClick={() => handleSort('reviewer')}
+                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                  >
+                    Reviewer {getSortIcon('reviewer')}
+                  </Button>
+                </TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredLIAs.map((lia) => (
+              {processedLIAs.map((lia) => (
                 <TableRow key={lia.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedRows.includes(lia.id)}
+                      onCheckedChange={(checked) => handleSelectRow(lia.id, checked as boolean)}
+                    />
+                  </TableCell>
                   <TableCell>
                     <div className="font-medium">{lia.title}</div>
                   </TableCell>
@@ -268,7 +510,7 @@ const LIA = ({ onNavigate }: LIAProps) => {
             </TableBody>
           </Table>
 
-          {filteredLIAs.length === 0 && (
+          {processedLIAs.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
               No legitimate interest assessments found matching your criteria.
             </div>
