@@ -255,10 +255,8 @@ const Index = () => {
         return <CreateThirdParty onBack={() => handleNavigate('/company/vendors')} />;
       case '/company/documents':
         return <DocumentLibrary onNavigate={handleNavigate} />;
-      case '/company/vendors':
-        return <ThirdParties />;
-      case '/company/documents':
-        return <DocumentLibrary />;
+      case '/company/documents/new':
+        return <CreateDocument onBack={() => handleNavigate('/company/documents')} />;
       case '/company/settings/metadata':
         return <MetadataSettings />;
       case '/company/settings/data-dictionary':
