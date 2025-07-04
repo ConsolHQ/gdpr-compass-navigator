@@ -1,11 +1,31 @@
-
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AlertTriangle, Plus, Search, Clock, CheckCircle, Shield, Eye, Edit, FileText } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { 
+  AlertTriangle, 
+  Plus, 
+  Search, 
+  Clock, 
+  CheckCircle, 
+  Shield, 
+  Eye, 
+  Edit, 
+  FileText,
+  Columns,
+  ChevronsUpDown,
+  ChevronUp,
+  ChevronDown,
+  Archive,
+  Copy,
+  Download,
+  X
+} from 'lucide-react';
 
 interface DataBreachesProps {
   onNavigate?: (path: string) => void;
@@ -13,6 +33,18 @@ interface DataBreachesProps {
 
 const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
+  const [visibleColumns, setVisibleColumns] = useState({
+    title: true,
+    severity: true,
+    status: true,
+    affectedRecords: true,
+    reportedDate: true,
+    investigator: true,
+    reportedToAuthority: true,
+  });
   
   const breachIncidents = [
     {
@@ -68,6 +100,81 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
     },
   ];
 
+  const columns = [
+    { key: 'title', label: 'Incident Title', sortable: true },
+    { key: 'severity', label: 'Severity', sortable: true },
+    { key: 'status', label: 'Status', sortable: true },
+    { key: 'affectedRecords', label: 'Affected Records', sortable: true },
+    { key: 'reportedDate', label: 'Reported Date', sortable: true },
+    { key: 'investigator', label: 'Investigator', sortable: true },
+    { key: 'reportedToAuthority', label: 'Authority Reported', sortable: false },
+  ];
+
+  const processedBreaches = useMemo(() => {
+    let filtered = breachIncidents.filter(breach =>
+      breach.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      breach.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      breach.investigator.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (sortColumn && sortDirection) {
+      filtered.sort((a, b) => {
+        let aValue = a[sortColumn as keyof typeof a];
+        let bValue = b[sortColumn as keyof typeof b];
+        
+        if (sortColumn === 'affectedRecords') {
+          aValue = Number(aValue);
+          bValue = Number(bValue);
+        } else if (sortColumn === 'reportedDate') {
+          aValue = new Date(aValue as string).getTime();
+          bValue = new Date(bValue as string).getTime();
+        } else {
+          aValue = String(aValue).toLowerCase();
+          bValue = String(bValue).toLowerCase();
+        }
+        
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [breachIncidents, searchTerm, sortColumn, sortDirection]);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : sortDirection === 'desc' ? null : 'asc');
+      if (sortDirection === 'desc') setSortColumn(null);
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedRows(processedBreaches.map(breach => breach.id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleSelectRow = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedRows([...selectedRows, id]);
+    } else {
+      setSelectedRows(selectedRows.filter(rowId => rowId !== id));
+    }
+  };
+
+  const getSortIcon = (column: string) => {
+    if (sortColumn !== column) return <ChevronsUpDown className="h-4 w-4" />;
+    if (sortDirection === 'asc') return <ChevronUp className="h-4 w-4" />;
+    if (sortDirection === 'desc') return <ChevronDown className="h-4 w-4" />;
+    return <ChevronsUpDown className="h-4 w-4" />;
+  };
+
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'High': return 'destructive';
@@ -94,11 +201,6 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
     }
   };
 
-  const filteredBreaches = breachIncidents.filter(breach =>
-    breach.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    breach.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const stats = {
     total: breachIncidents.length,
     highSeverity: breachIncidents.filter(b => b.severity === 'High').length,
@@ -114,12 +216,82 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div></div>
+        <div>
+          <p className="text-gray-600 mt-1">{processedBreaches.length} incidents</p>
+        </div>
         <Button className="bg-red-600 hover:bg-red-700" onClick={handleReportBreach}>
           <Plus className="mr-2 h-4 w-4" />
           Report Breach
         </Button>
+      </div>
+
+      {/* Toolbar */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search data breaches..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 w-80"
+            />
+          </div>
+
+          {/* Column Visibility */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Columns className="mr-2 h-4 w-4" />
+                Columns
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56">
+              <div className="space-y-2">
+                <h4 className="font-medium">Toggle columns</h4>
+                {columns.map(column => (
+                  <div key={column.key} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={column.key}
+                      checked={visibleColumns[column.key as keyof typeof visibleColumns]}
+                      onCheckedChange={(checked) => {
+                        setVisibleColumns(prev => ({ ...prev, [column.key]: checked }));
+                      }}
+                    />
+                    <label htmlFor={column.key} className="text-sm">{column.label}</label>
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        {/* Bulk Actions */}
+        {selectedRows.length > 0 && (
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-600">{selectedRows.length} selected</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  Bulk Actions
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>
+                  <Archive className="mr-2 h-4 w-4" />
+                  Archive
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Download className="mr-2 h-4 w-4" />
+                  Export
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
       </div>
 
       {/* Stats */}
@@ -170,89 +342,148 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
         </Card>
       </div>
 
-      {/* Search */}
+      {/* Enhanced Table */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search breach incidents..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Breaches Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Breach Incidents</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Incident</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Severity</TableHead>
-                <TableHead>Affected Records</TableHead>
-                <TableHead>Discovered</TableHead>
-                <TableHead>Investigator</TableHead>
-                <TableHead>Authority Reported</TableHead>
-                <TableHead>Data Types</TableHead>
-                <TableHead>Actions</TableHead>
+              <TableRow className="border-b bg-gray-50">
+                <TableHead className="w-12">
+                  <Checkbox
+                    checked={selectedRows.length === processedBreaches.length}
+                    onCheckedChange={handleSelectAll}
+                  />
+                </TableHead>
+                {visibleColumns.title && (
+                  <TableHead className="font-semibold">
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleSort('title')}
+                      className="h-auto p-0 font-semibold"
+                    >
+                      Incident Title
+                      {getSortIcon('title')}
+                    </Button>
+                  </TableHead>
+                )}
+                {visibleColumns.severity && (
+                  <TableHead className="font-semibold">
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleSort('severity')}
+                      className="h-auto p-0 font-semibold"
+                    >
+                      Severity
+                      {getSortIcon('severity')}
+                    </Button>
+                  </TableHead>
+                )}
+                {visibleColumns.status && (
+                  <TableHead className="font-semibold">
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleSort('status')}
+                      className="h-auto p-0 font-semibold"
+                    >
+                      Status
+                      {getSortIcon('status')}
+                    </Button>
+                  </TableHead>
+                )}
+                {visibleColumns.affectedRecords && (
+                  <TableHead className="font-semibold">
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleSort('affectedRecords')}
+                      className="h-auto p-0 font-semibold"
+                    >
+                      Affected Records
+                      {getSortIcon('affectedRecords')}
+                    </Button>
+                  </TableHead>
+                )}
+                {visibleColumns.reportedDate && (
+                  <TableHead className="font-semibold">
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleSort('reportedDate')}
+                      className="h-auto p-0 font-semibold"
+                    >
+                      Reported Date
+                      {getSortIcon('reportedDate')}
+                    </Button>
+                  </TableHead>
+                )}
+                {visibleColumns.investigator && (
+                  <TableHead className="font-semibold">
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleSort('investigator')}
+                      className="h-auto p-0 font-semibold"
+                    >
+                      Investigator
+                      {getSortIcon('investigator')}
+                    </Button>
+                  </TableHead>
+                )}
+                {visibleColumns.reportedToAuthority && (
+                  <TableHead className="font-semibold">Authority Reported</TableHead>
+                )}
+                <TableHead className="font-semibold">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredBreaches.map((breach) => {
+              {processedBreaches.map((breach) => {
                 const StatusIcon = getStatusIcon(breach.status);
                 return (
-                  <TableRow key={breach.id} className="border-l-4 border-l-red-500">
+                  <TableRow key={breach.id}>
                     <TableCell>
-                      <div>
-                        <div className="font-medium">{breach.title}</div>
-                        <div className="text-sm text-gray-500">{breach.id}</div>
-                      </div>
+                      <Checkbox
+                        checked={selectedRows.includes(breach.id)}
+                        onCheckedChange={(checked) => handleSelectRow(breach.id, !!checked)}
+                      />
                     </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusColor(breach.status)}>
-                        <StatusIcon className="mr-1 h-3 w-3" />
-                        {breach.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getSeverityColor(breach.severity)}>
-                        {breach.severity}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-semibold text-red-600">
-                        {breach.affectedRecords.toLocaleString()}
-                      </div>
-                    </TableCell>
-                    <TableCell>{breach.discoveredDate}</TableCell>
-                    <TableCell>{breach.investigator}</TableCell>
-                    <TableCell>
-                      <Badge variant={breach.reportedToAuthority ? 'default' : 'destructive'}>
-                        {breach.reportedToAuthority ? 'Yes' : 'No'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {breach.dataTypes.slice(0, 2).map((type, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {type}
-                          </Badge>
-                        ))}
-                        {breach.dataTypes.length > 2 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{breach.dataTypes.length - 2}
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
+                    {visibleColumns.title && (
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{breach.title}</div>
+                          <div className="text-sm text-gray-500">{breach.id}</div>
+                        </div>
+                      </TableCell>
+                    )}
+                    {visibleColumns.severity && (
+                      <TableCell>
+                        <Badge variant={getSeverityColor(breach.severity)}>
+                          {breach.severity}
+                        </Badge>
+                      </TableCell>
+                    )}
+                    {visibleColumns.status && (
+                      <TableCell>
+                        <Badge variant={getStatusColor(breach.status)}>
+                          <StatusIcon className="mr-1 h-3 w-3" />
+                          {breach.status}
+                        </Badge>
+                      </TableCell>
+                    )}
+                    {visibleColumns.affectedRecords && (
+                      <TableCell>
+                        <span className="font-medium">{breach.affectedRecords.toLocaleString()}</span>
+                      </TableCell>
+                    )}
+                    {visibleColumns.reportedDate && (
+                      <TableCell>{breach.reportedDate}</TableCell>
+                    )}
+                    {visibleColumns.investigator && (
+                      <TableCell>{breach.investigator}</TableCell>
+                    )}
+                    {visibleColumns.reportedToAuthority && (
+                      <TableCell>
+                        <Badge variant={breach.reportedToAuthority ? 'default' : 'secondary'}>
+                          {breach.reportedToAuthority ? 'Yes' : 'No'}
+                        </Badge>
+                      </TableCell>
+                    )}
                     <TableCell>
                       <div className="flex space-x-1">
                         <Button variant="ghost" size="sm">
@@ -274,12 +505,12 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
         </CardContent>
       </Card>
 
-      {filteredBreaches.length === 0 && (
+      {processedBreaches.length === 0 && (
         <Card>
           <CardContent className="py-8 text-center">
-            <Shield className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-4 text-lg font-medium">No breach incidents found</h3>
-            <p className="text-gray-600">Breach incidents will be tracked here when reported.</p>
+            <AlertTriangle className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-4 text-lg font-medium">No data breaches found</h3>
+            <p className="text-gray-600">Data breach incidents will appear here when reported.</p>
           </CardContent>
         </Card>
       )}
