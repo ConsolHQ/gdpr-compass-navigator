@@ -111,7 +111,9 @@ const ROPA = () => {
   const [visibleColumns, setVisibleColumns] = useState(() => {
     const saved = localStorage.getItem('ropa-visible-columns');
     return saved ? JSON.parse(saved) : {
+      id: true,
       processingActivity: true,
+      description: true,
       department: true,
       status: true,
       role: true,
@@ -202,7 +204,9 @@ const ROPA = () => {
   ];
 
   const columns = [
+    { key: 'id', label: 'Identifier', sortable: true },
     { key: 'processingActivity', label: 'Processing Activity', sortable: true },
+    { key: 'description', label: 'Description', sortable: true },
     { key: 'department', label: 'Department', sortable: true },
     { key: 'status', label: 'Status', sortable: true },
     { key: 'role', label: 'Role', sortable: true },
@@ -494,7 +498,20 @@ const ROPA = () => {
                     checked={selectedRows.length === paginatedEntries.length}
                     onCheckedChange={handleSelectAll}
                   />
-                </TableHead>
+                 </TableHead>
+                {visibleColumns.id && (
+                  <TableHead className="font-semibold">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleSort('id')}
+                      className="h-auto p-0 font-semibold"
+                    >
+                      Identifier
+                      {getSortIcon('id')}
+                    </Button>
+                  </TableHead>
+                )}
                 {visibleColumns.processingActivity && (
                   <TableHead className="font-semibold">
                     <Button
@@ -505,6 +522,19 @@ const ROPA = () => {
                     >
                       Processing Activity
                       {getSortIcon('name')}
+                    </Button>
+                  </TableHead>
+                )}
+                {visibleColumns.description && (
+                  <TableHead className="font-semibold">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleSort('description')}
+                      className="h-auto p-0 font-semibold"
+                    >
+                      Description
+                      {getSortIcon('description')}
                     </Button>
                   </TableHead>
                 )}
@@ -774,15 +804,21 @@ const ROPA = () => {
                     <Checkbox
                       checked={selectedRows.includes(entry.id)}
                       onCheckedChange={(checked) => handleSelectRow(entry.id, checked as boolean)}
-                    />
+                   />
                   </TableCell>
+                  {visibleColumns.id && (
+                    <TableCell>
+                      <span className="text-sm font-mono">{entry.id}</span>
+                    </TableCell>
+                  )}
                   {visibleColumns.processingActivity && (
+                    <TableCell>
+                      <div className="font-medium text-gray-900">{entry.name}</div>
+                    </TableCell>
+                  )}
+                  {visibleColumns.description && (
                     <TableCell className="max-w-xs">
-                      <div className="space-y-1">
-                        <div className="font-medium text-gray-900">{entry.name}</div>
-                        <div className="text-sm text-gray-500 truncate">{entry.description}</div>
-                        <div className="text-xs text-gray-400">ID: {entry.id}</div>
-                      </div>
+                      <div className="text-sm text-gray-500 truncate">{entry.description}</div>
                     </TableCell>
                   )}
                   {visibleColumns.department && (
