@@ -24,7 +24,8 @@ import {
   Archive,
   Copy,
   Download,
-  X
+  X,
+  Filter
 } from 'lucide-react';
 
 interface DataBreachesProps {
@@ -356,74 +357,104 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
                 </TableHead>
                 {visibleColumns.title && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('title')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Incident Title
-                      {getSortIcon('title')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('title')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Incident Title
+                        {getSortIcon('title')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.severity && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('severity')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Severity
-                      {getSortIcon('severity')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('severity')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Severity
+                        {getSortIcon('severity')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.status && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('status')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Status
-                      {getSortIcon('status')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('status')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Status
+                        {getSortIcon('status')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.affectedRecords && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('affectedRecords')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Affected Records
-                      {getSortIcon('affectedRecords')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('affectedRecords')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Affected Records
+                        {getSortIcon('affectedRecords')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.reportedDate && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('reportedDate')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Reported Date
-                      {getSortIcon('reportedDate')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('reportedDate')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Reported Date
+                        {getSortIcon('reportedDate')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.investigator && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('investigator')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Investigator
-                      {getSortIcon('investigator')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('investigator')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Investigator
+                        {getSortIcon('investigator')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.reportedToAuthority && (

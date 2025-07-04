@@ -24,7 +24,8 @@ import {
   ChevronDown,
   Archive,
   Copy,
-  X
+  X,
+  Filter
 } from 'lucide-react';
 
 interface DSRProps {
@@ -379,86 +380,121 @@ const DSR = ({ onNavigate }: DSRProps) => {
                 </TableHead>
                 {visibleColumns.type && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('type')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Request Type
-                      {getSortIcon('type')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('type')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Request Type
+                        {getSortIcon('type')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.requester && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('requester')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Requester
-                      {getSortIcon('requester')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('requester')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Requester
+                        {getSortIcon('requester')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.status && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('status')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Status
-                      {getSortIcon('status')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('status')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Status
+                        {getSortIcon('status')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.priority && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('priority')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Priority
-                      {getSortIcon('priority')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('priority')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Priority
+                        {getSortIcon('priority')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.dueDate && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('dueDate')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Due Date
-                      {getSortIcon('dueDate')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('dueDate')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Due Date
+                        {getSortIcon('dueDate')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.daysRemaining && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('daysRemaining')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Days Remaining
-                      {getSortIcon('daysRemaining')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('daysRemaining')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Days Remaining
+                        {getSortIcon('daysRemaining')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.assignedTo && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('assignedTo')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Assigned To
-                      {getSortIcon('assignedTo')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('assignedTo')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Assigned To
+                        {getSortIcon('assignedTo')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.legalBasis && (

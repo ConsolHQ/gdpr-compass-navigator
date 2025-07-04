@@ -25,7 +25,8 @@ import {
   Archive,
   Copy,
   Download,
-  X
+  X,
+  Filter
 } from 'lucide-react';
 
 interface ThirdPartiesProps {
@@ -370,74 +371,104 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
                 </TableHead>
                 {visibleColumns.name && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('name')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Third Party
-                      {getSortIcon('name')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('name')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Third Party
+                        {getSortIcon('name')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.category && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('category')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Category
-                      {getSortIcon('category')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('category')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Category
+                        {getSortIcon('category')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.status && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('status')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Status
-                      {getSortIcon('status')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('status')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Status
+                        {getSortIcon('status')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.contractStatus && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('contractStatus')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Contract Status
-                      {getSortIcon('contractStatus')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('contractStatus')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Contract Status
+                        {getSortIcon('contractStatus')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.riskLevel && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('riskLevel')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Risk Level
-                      {getSortIcon('riskLevel')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('riskLevel')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Risk Level
+                        {getSortIcon('riskLevel')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.location && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('location')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Location
-                      {getSortIcon('location')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('location')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Location
+                        {getSortIcon('location')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.dpuSigned && (

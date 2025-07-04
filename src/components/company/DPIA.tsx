@@ -341,74 +341,104 @@ const DPIA = () => {
                 </TableHead>
                 {visibleColumns.title && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('title')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Title
-                      {getSortIcon('title')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('title')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Title
+                        {getSortIcon('title')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.status && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('status')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Status
-                      {getSortIcon('status')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('status')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Status
+                        {getSortIcon('status')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.riskLevel && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('riskLevel')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Risk Level
-                      {getSortIcon('riskLevel')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('riskLevel')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Risk Level
+                        {getSortIcon('riskLevel')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.progress && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('progress')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Progress
-                      {getSortIcon('progress')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('progress')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Progress
+                        {getSortIcon('progress')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.dueDate && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('dueDate')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Due Date
-                      {getSortIcon('dueDate')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('dueDate')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Due Date
+                        {getSortIcon('dueDate')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.assessor && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort('assessor')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Assessor
-                      {getSortIcon('assessor')}
-                    </Button>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('assessor')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Assessor
+                        {getSortIcon('assessor')}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Filter className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.dataTypes && (
