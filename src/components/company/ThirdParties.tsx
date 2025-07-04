@@ -28,7 +28,11 @@ import {
   X
 } from 'lucide-react';
 
-const ThirdParties = () => {
+interface ThirdPartiesProps {
+  onNavigate?: (path: string) => void;
+}
+
+const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
@@ -231,7 +235,7 @@ const ThirdParties = () => {
         <div>
           <p className="text-gray-600 mt-1">{processedThirdParties.length} third parties</p>
         </div>
-        <Button onClick={() => window.location.hash = '/company/vendors/new'}>
+        <Button onClick={() => onNavigate?.('/company/vendors/new')}>
           <Plus className="mr-2 h-4 w-4" />
           Add Third Party
         </Button>

@@ -7,7 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, Plus, Search, Download, Eye, Edit, Trash2, Upload, Folder, File } from 'lucide-react';
 
-const DocumentLibrary = () => {
+interface DocumentLibraryProps {
+  onNavigate?: (path: string) => void;
+}
+
+const DocumentLibrary = ({ onNavigate }: DocumentLibraryProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentView, setCurrentView] = useState('all');
   
@@ -155,7 +159,7 @@ const DocumentLibrary = () => {
             <Upload className="mr-2 h-4 w-4" />
             Upload
           </Button>
-          <Button onClick={() => window.location.hash = '/company/documents/new'}>
+          <Button onClick={() => onNavigate?.('/company/documents/new')}>
             <Plus className="mr-2 h-4 w-4" />
             New Document
           </Button>

@@ -27,7 +27,11 @@ import {
   X
 } from 'lucide-react';
 
-const DSR = () => {
+interface DSRProps {
+  onNavigate?: (path: string) => void;
+}
+
+const DSR = ({ onNavigate }: DSRProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
@@ -234,7 +238,7 @@ const DSR = () => {
         <div>
           <p className="text-gray-600 mt-1">{processedRequests.length} requests</p>
         </div>
-        <Button onClick={() => window.location.hash = '/company/dsr/new'}>
+        <Button onClick={() => onNavigate?.('/company/dsr/new')}>
           <Plus className="mr-2 h-4 w-4" />
           New DSR
         </Button>

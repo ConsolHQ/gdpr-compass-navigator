@@ -242,17 +242,19 @@ const Index = () => {
       case '/company/dpia':
         return <DPIA />;
       case '/company/dsr':
-        return <DSR />;
+        return <DSR onNavigate={handleNavigate} />;
       case '/company/breaches':
         return <DataBreaches onNavigate={handleNavigate} />;
       case '/company/breaches/report':
         return <IncidentReporting />;
       case '/company/dsr/new':
         return <CreateDSR onBack={() => handleNavigate('/company/dsr')} />;
+      case '/company/vendors':
+        return <ThirdParties onNavigate={handleNavigate} />;
       case '/company/vendors/new':
         return <CreateThirdParty onBack={() => handleNavigate('/company/vendors')} />;
-      case '/company/documents/new':
-        return <CreateDocument onBack={() => handleNavigate('/company/documents')} />;
+      case '/company/documents':
+        return <DocumentLibrary onNavigate={handleNavigate} />;
       case '/company/vendors':
         return <ThirdParties />;
       case '/company/documents':
