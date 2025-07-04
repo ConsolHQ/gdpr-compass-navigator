@@ -234,7 +234,7 @@ const DSR = () => {
         <div>
           <p className="text-gray-600 mt-1">{processedRequests.length} requests</p>
         </div>
-        <Button>
+        <Button onClick={() => window.location.hash = '/company/dsr/new'}>
           <Plus className="mr-2 h-4 w-4" />
           New DSR
         </Button>

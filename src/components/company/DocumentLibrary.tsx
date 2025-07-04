@@ -155,7 +155,7 @@ const DocumentLibrary = () => {
             <Upload className="mr-2 h-4 w-4" />
             Upload
           </Button>
-          <Button>
+          <Button onClick={() => window.location.hash = '/company/documents/new'}>
             <Plus className="mr-2 h-4 w-4" />
             New Document
           </Button>

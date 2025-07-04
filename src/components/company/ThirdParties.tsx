@@ -231,7 +231,7 @@ const ThirdParties = () => {
         <div>
           <p className="text-gray-600 mt-1">{processedThirdParties.length} third parties</p>
         </div>
-        <Button>
+        <Button onClick={() => window.location.hash = '/company/vendors/new'}>
           <Plus className="mr-2 h-4 w-4" />
           Add Third Party
         </Button>

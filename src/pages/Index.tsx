@@ -21,6 +21,9 @@ import MetadataSettings from '@/components/company/settings/MetadataSettings';
 import DataDictionary from '@/components/company/settings/DataDictionary';
 import ReportsSettings from '@/components/company/settings/ReportsSettings';
 import PartnerSettings from '@/components/partner/PartnerSettings';
+import CreateDSR from '@/components/company/CreateDSR';
+import CreateThirdParty from '@/components/company/CreateThirdParty';
+import CreateDocument from '@/components/company/CreateDocument';
 
 interface User {
   id: string;
@@ -187,6 +190,12 @@ const Index = () => {
         return { title: 'Data Breaches', breadcrumbs: [] };
       case '/company/breaches/report':
         return { title: 'Report Incident', breadcrumbs: [{ label: 'Data Breaches', href: '/company/breaches' }, { label: 'Report Incident' }] };
+      case '/company/dsr/new':
+        return { title: 'New Data Subject Request', breadcrumbs: [{ label: 'Data Subject Requests', href: '/company/dsr' }, { label: 'New Request' }] };
+      case '/company/vendors/new':
+        return { title: 'Add Third Party', breadcrumbs: [{ label: 'Third Party Management', href: '/company/vendors' }, { label: 'Add Third Party' }] };
+      case '/company/documents/new':
+        return { title: 'Add Document', breadcrumbs: [{ label: 'Document Library', href: '/company/documents' }, { label: 'Add Document' }] };
       case '/company/vendors':
         return { title: 'Third Party Management', breadcrumbs: [] };
       case '/company/documents':
@@ -238,6 +247,12 @@ const Index = () => {
         return <DataBreaches onNavigate={handleNavigate} />;
       case '/company/breaches/report':
         return <IncidentReporting />;
+      case '/company/dsr/new':
+        return <CreateDSR onBack={() => handleNavigate('/company/dsr')} />;
+      case '/company/vendors/new':
+        return <CreateThirdParty onBack={() => handleNavigate('/company/vendors')} />;
+      case '/company/documents/new':
+        return <CreateDocument onBack={() => handleNavigate('/company/documents')} />;
       case '/company/vendors':
         return <ThirdParties />;
       case '/company/documents':
