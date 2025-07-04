@@ -32,7 +32,7 @@ const Header = ({ user, onLogout, activeCompany }: HeaderProps) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <h1 className="text-xl font-semibold text-gray-900">
-            GDPR Compliance Platform
+            Register of Processing Activities
           </h1>
           {user.role === 'partner' && activeCompany && (
             <div className="flex items-center text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
