@@ -174,31 +174,31 @@ const Index = () => {
       case '/company/dashboard':
         return { title: 'Dashboard', breadcrumbs: [] };
       case '/company/ropa':
-        return { title: 'Register of Processing Activities', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'ROPA' }] };
+        return { title: 'Register of Processing Activities', breadcrumbs: [] };
       case '/company/dpia':
-        return { title: 'Data Protection Impact Assessments', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'DPIA' }] };
+        return { title: 'Data Protection Impact Assessments', breadcrumbs: [] };
       case '/company/dsr':
-        return { title: 'Data Subject Requests', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'DSR' }] };
+        return { title: 'Data Subject Requests', breadcrumbs: [] };
       case '/company/breaches':
-        return { title: 'Data Breaches', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Data Breaches' }] };
+        return { title: 'Data Breaches', breadcrumbs: [] };
       case '/company/breaches/report':
-        return { title: 'Report Incident', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Data Breaches', href: '/company/breaches' }, { label: 'Report Incident' }] };
+        return { title: 'Report Incident', breadcrumbs: [{ label: 'Data Breaches', href: '/company/breaches' }, { label: 'Report Incident' }] };
       case '/company/vendors':
-        return { title: 'Third Party Management', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Third Parties' }] };
+        return { title: 'Third Party Management', breadcrumbs: [] };
       case '/company/documents':
-        return { title: 'Document Library', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Documents' }] };
+        return { title: 'Document Library', breadcrumbs: [] };
       case '/company/settings':
-        return { title: 'Company Settings', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Settings' }] };
+        return { title: 'Company Settings', breadcrumbs: [] };
       case '/company/settings/metadata':
-        return { title: 'Metadata Management', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Settings', href: '/company/settings' }, { label: 'Metadata' }] };
+        return { title: 'Metadata Management', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Metadata' }] };
       case '/company/settings/data-dictionary':
-        return { title: 'Data Dictionary', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Settings', href: '/company/settings' }, { label: 'Data Dictionary' }] };
+        return { title: 'Data Dictionary', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Data Dictionary' }] };
       case '/company/settings/users':
-        return { title: 'User Management', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Settings', href: '/company/settings' }, { label: 'Users' }] };
+        return { title: 'User Management', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Users' }] };
       case '/company/settings/organisation':
-        return { title: 'Organisation Settings', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Settings', href: '/company/settings' }, { label: 'Organisation' }] };
+        return { title: 'Organisation Settings', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Organisation' }] };
       case '/company/settings/reports':
-        return { title: 'Reports & Analytics', breadcrumbs: [{ label: 'Dashboard', href: '/company/dashboard' }, { label: 'Settings', href: '/company/settings' }, { label: 'Reports' }] };
+        return { title: 'Reports & Analytics', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Reports' }] };
       default:
         return { title: 'Dashboard', breadcrumbs: [] };
     }
