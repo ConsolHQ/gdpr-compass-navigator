@@ -88,11 +88,10 @@ interface LIAProps {
 
 const LIA = ({ onNavigate }: LIAProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [purposeFilter, setPurposeFilter] = useState('all');
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
+  const [columnFilters, setColumnFilters] = useState<{[key: string]: string[]}>({});
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -116,16 +115,33 @@ const LIA = ({ onNavigate }: LIAProps) => {
     return <Badge className={config.color}>{config.label}</Badge>;
   };
 
+  // Get unique values for filters
+  const getUniqueValues = (key: string) => {
+    return [...new Set(mockLIAs.map(lia => {
+      return lia[key as keyof typeof lia];
+    }))];
+  };
+
   // Filter and sort data
   const processedLIAs = useMemo(() => {
     let filtered = mockLIAs.filter(lia => {
-      const matchesSearch = lia.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           lia.dataSubject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           lia.purpose.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || lia.status === statusFilter;
-      const matchesPurpose = purposeFilter === 'all' || lia.purpose === purposeFilter;
+      // Search filter
+      const searchMatch = lia.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         lia.dataSubject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         lia.purpose.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         lia.reviewer.toLowerCase().includes(searchTerm.toLowerCase());
       
-      return matchesSearch && matchesStatus && matchesPurpose;
+      if (!searchMatch) return false;
+
+      // Column filters
+      for (const [column, filterValues] of Object.entries(columnFilters)) {
+        if (!filterValues || filterValues.length === 0) continue;
+        
+        const liaValue = lia[column as keyof typeof lia];
+        if (!filterValues.includes(liaValue as string)) return false;
+      }
+      
+      return true;
     });
 
     // Sort data
@@ -149,7 +165,7 @@ const LIA = ({ onNavigate }: LIAProps) => {
     }
 
     return filtered;
-  }, [mockLIAs, searchTerm, statusFilter, purposeFilter, sortColumn, sortDirection]);
+  }, [mockLIAs, searchTerm, columnFilters, sortColumn, sortDirection]);
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -186,11 +202,12 @@ const LIA = ({ onNavigate }: LIAProps) => {
 
   const clearFilters = () => {
     setSearchTerm('');
-    setStatusFilter('all');
-    setPurposeFilter('all');
+    setColumnFilters({});
   };
 
-  const hasActiveFilters = searchTerm !== '' || statusFilter !== 'all' || purposeFilter !== 'all';
+  const hasActiveFilters = Object.values(columnFilters).some(filter => 
+    filter && filter.length > 0
+  ) || searchTerm;
 
   return (
     <div className="p-6 space-y-6">
@@ -258,30 +275,6 @@ const LIA = ({ onNavigate }: LIAProps) => {
                   className="pl-9"
                 />
               </div>
-              
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="in-progress">In Progress</SelectItem>
-                  <SelectItem value="draft">Draft</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={purposeFilter} onValueChange={setPurposeFilter}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Purpose" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Purposes</SelectItem>
-                  <SelectItem value="Direct Marketing">Direct Marketing</SelectItem>
-                  <SelectItem value="Analytics & Insights">Analytics & Insights</SelectItem>
-                  <SelectItem value="Security & Fraud Prevention">Security & Fraud Prevention</SelectItem>
-                </SelectContent>
-              </Select>
 
               {hasActiveFilters && (
                 <Button variant="outline" onClick={clearFilters} className="whitespace-nowrap">
@@ -365,29 +358,31 @@ const LIA = ({ onNavigate }: LIAProps) => {
                     >
                       Purpose {getSortIcon('purpose')}
                     </Button>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-auto p-1">
                           <Filter className="h-3 w-3" />
                         </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-48">
-                        <div className="space-y-2">
-                          <h4 className="font-medium text-sm">Filter by Purpose</h4>
-                          <Select value={purposeFilter} onValueChange={setPurposeFilter}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">All Purposes</SelectItem>
-                              <SelectItem value="Direct Marketing">Direct Marketing</SelectItem>
-                              <SelectItem value="Analytics & Insights">Analytics & Insights</SelectItem>
-                              <SelectItem value="Security & Fraud Prevention">Security & Fraud Prevention</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        {getUniqueValues('purpose').map(value => (
+                          <DropdownMenuCheckboxItem
+                            key={String(value)}
+                            checked={(columnFilters.purpose || []).includes(value as string)}
+                            onCheckedChange={(checked) => {
+                              const current = columnFilters.purpose || [];
+                              if (checked) {
+                                setColumnFilters(prev => ({ ...prev, purpose: [...current, value as string] }));
+                              } else {
+                                setColumnFilters(prev => ({ ...prev, purpose: current.filter(v => v !== value) }));
+                              }
+                            }}
+                          >
+                            {value as string}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </TableHead>
                 <TableHead className="font-semibold">
@@ -399,48 +394,104 @@ const LIA = ({ onNavigate }: LIAProps) => {
                     >
                       Status {getSortIcon('status')}
                     </Button>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-auto p-1">
                           <Filter className="h-3 w-3" />
                         </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-48">
-                        <div className="space-y-2">
-                          <h4 className="font-medium text-sm">Filter by Status</h4>
-                          <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">All Status</SelectItem>
-                              <SelectItem value="completed">Completed</SelectItem>
-                              <SelectItem value="in-progress">In Progress</SelectItem>
-                              <SelectItem value="draft">Draft</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        {getUniqueValues('status').map(value => (
+                          <DropdownMenuCheckboxItem
+                            key={String(value)}
+                            checked={(columnFilters.status || []).includes(value as string)}
+                            onCheckedChange={(checked) => {
+                              const current = columnFilters.status || [];
+                              if (checked) {
+                                setColumnFilters(prev => ({ ...prev, status: [...current, value as string] }));
+                              } else {
+                                setColumnFilters(prev => ({ ...prev, status: current.filter(v => v !== value) }));
+                              }
+                            }}
+                          >
+                            {value as string}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </TableHead>
                 <TableHead className="font-semibold">
-                  <Button
-                    variant="ghost" 
-                    onClick={() => handleSort('legitimateInterest')}
-                    className="h-auto p-0 font-semibold hover:bg-transparent"
-                  >
-                    Legitimate Interest {getSortIcon('legitimateInterest')}
-                  </Button>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost" 
+                      onClick={() => handleSort('legitimateInterest')}
+                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                    >
+                      Legitimate Interest {getSortIcon('legitimateInterest')}
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-auto p-1">
+                          <Filter className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        {getUniqueValues('legitimateInterest').map(value => (
+                          <DropdownMenuCheckboxItem
+                            key={String(value)}
+                            checked={(columnFilters.legitimateInterest || []).includes(value as string)}
+                            onCheckedChange={(checked) => {
+                              const current = columnFilters.legitimateInterest || [];
+                              if (checked) {
+                                setColumnFilters(prev => ({ ...prev, legitimateInterest: [...current, value as string] }));
+                              } else {
+                                setColumnFilters(prev => ({ ...prev, legitimateInterest: current.filter(v => v !== value) }));
+                              }
+                            }}
+                          >
+                            {value as string}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </TableHead>
                 <TableHead className="font-semibold">
-                  <Button
-                    variant="ghost" 
-                    onClick={() => handleSort('balancingTest')}
-                    className="h-auto p-0 font-semibold hover:bg-transparent"
-                  >
-                    Balancing Test {getSortIcon('balancingTest')}
-                  </Button>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost" 
+                      onClick={() => handleSort('balancingTest')}
+                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                    >
+                      Balancing Test {getSortIcon('balancingTest')}
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-auto p-1">
+                          <Filter className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        {getUniqueValues('balancingTest').map(value => (
+                          <DropdownMenuCheckboxItem
+                            key={String(value)}
+                            checked={(columnFilters.balancingTest || []).includes(value as string)}
+                            onCheckedChange={(checked) => {
+                              const current = columnFilters.balancingTest || [];
+                              if (checked) {
+                                setColumnFilters(prev => ({ ...prev, balancingTest: [...current, value as string] }));
+                              } else {
+                                setColumnFilters(prev => ({ ...prev, balancingTest: current.filter(v => v !== value) }));
+                              }
+                            }}
+                          >
+                            {value as string}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </TableHead>
                 <TableHead className="font-semibold">
                   <Button
