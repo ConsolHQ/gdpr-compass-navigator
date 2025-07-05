@@ -48,7 +48,7 @@ import {
 // Mock data for LIA
 const mockLIAs = [
   {
-    id: '1',
+    id: 'LIA-001',
     title: 'Marketing Email Campaign Analysis',
     dataSubject: 'Email Subscribers',
     purpose: 'Direct Marketing',
@@ -59,7 +59,7 @@ const mockLIAs = [
     reviewer: 'John Smith'
   },
   {
-    id: '2',
+    id: 'LIA-002',
     title: 'Customer Behavior Analytics',
     dataSubject: 'Website Visitors',
     purpose: 'Analytics & Insights',
@@ -70,7 +70,7 @@ const mockLIAs = [
     reviewer: 'Sarah Johnson'
   },
   {
-    id: '3',
+    id: 'LIA-003',
     title: 'Fraud Detection System',
     dataSubject: 'Transaction Data',
     purpose: 'Security & Fraud Prevention',
