@@ -558,9 +558,16 @@ const LIA = ({ onNavigate }: LIAProps) => {
                       onCheckedChange={(checked) => handleSelectRow(lia.id, checked as boolean)}
                     />
                   </TableCell>
-                  <TableCell>
-                    <div className="font-medium">{lia.title}</div>
-                  </TableCell>
+                  {visibleColumns.id && (
+                    <TableCell>
+                      <div className="font-medium">{lia.id}</div>
+                    </TableCell>
+                  )}
+                  {visibleColumns.title && (
+                    <TableCell>
+                      <div className="font-medium">{lia.title}</div>
+                    </TableCell>
+                  )}
                   <TableCell>{lia.dataSubject}</TableCell>
                   <TableCell>{lia.purpose}</TableCell>
                   <TableCell>{getStatusBadge(lia.status)}</TableCell>
