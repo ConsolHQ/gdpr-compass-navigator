@@ -29,7 +29,11 @@ import {
   Download
 } from 'lucide-react';
 
-const DPIA = () => {
+interface DPIAProps {
+  onNavigate?: (path: string) => void;
+}
+
+const DPIA = ({ onNavigate }: DPIAProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
@@ -224,7 +228,7 @@ const DPIA = () => {
         <div>
           <p className="text-gray-600 mt-1">{processedAssessments.length} assessments</p>
         </div>
-        <Button>
+        <Button onClick={() => onNavigate?.('/company/assessments/dpia/new')}>
           <Plus className="mr-2 h-4 w-4" />
           New DPIA
         </Button>
@@ -659,7 +663,7 @@ const DPIA = () => {
             <Shield className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-4 text-lg font-medium">No DPIA assessments found</h3>
             <p className="text-gray-600">Create your first Data Protection Impact Assessment.</p>
-            <Button className="mt-4">
+            <Button className="mt-4" onClick={() => onNavigate?.('/company/assessments/dpia/new')}>
               <Plus className="mr-2 h-4 w-4" />
               Create DPIA
             </Button>
