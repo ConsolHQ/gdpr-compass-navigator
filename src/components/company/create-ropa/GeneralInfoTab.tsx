@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Plus } from 'lucide-react';
+import { useMetadata } from '@/hooks/useMetadata';
 
 interface GeneralInfoTabProps {
   formData: any;
@@ -16,9 +17,10 @@ interface GeneralInfoTabProps {
 
 const GeneralInfoTab = ({ formData, setFormData, handleArrayFieldChange }: GeneralInfoTabProps) => {
   const [showNewDepartment, setShowNewDepartment] = useState(false);
+  const { getMetadataItems } = useMetadata();
   
-  const departments = ['IT', 'HR', 'Marketing', 'Finance', 'Legal', 'Operations'];
-  const vendors = ['AWS', 'Microsoft', 'Google', 'Salesforce', 'HubSpot'];
+  const departments = getMetadataItems('department');
+  const vendors = getMetadataItems('vendor');
 
   return (
     <Card>
@@ -84,11 +86,11 @@ const GeneralInfoTab = ({ formData, setFormData, handleArrayFieldChange }: Gener
               <SelectTrigger>
                 <SelectValue placeholder="Select role" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Controller">Controller</SelectItem>
-                <SelectItem value="Processor">Processor</SelectItem>
-                <SelectItem value="Joint Controller">Joint Controller</SelectItem>
-              </SelectContent>
+                <SelectContent>
+                  {getMetadataItems('agreement-role').map(role => (
+                    <SelectItem key={role} value={role}>{role}</SelectItem>
+                  ))}
+                </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">

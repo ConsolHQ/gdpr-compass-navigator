@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useMetadata } from '@/hooks/useMetadata';
 
 interface IncidentOriginStepProps {
   data: any;
@@ -12,27 +13,10 @@ interface IncidentOriginStepProps {
 }
 
 const IncidentOriginStep: React.FC<IncidentOriginStepProps> = ({ data, onUpdate }) => {
-  const internalFunctions = [
-    'IT Department',
-    'HR Department',
-    'Finance',
-    'Marketing',
-    'Sales',
-    'Customer Support',
-    'Legal',
-    'Operations'
-  ];
-
-  const externalVendors = [
-    'Cloud Service Provider',
-    'Email Service Provider',
-    'CRM System',
-    'Payment Processor',
-    'Analytics Provider',
-    'Third-party Developer',
-    'Contractor',
-    'Other Vendor'
-  ];
+  const { getMetadataItems } = useMetadata();
+  const internalFunctions = getMetadataItems('employee-function');
+  const externalVendors = getMetadataItems('vendor');
+  const agreementRoles = getMetadataItems('agreement-role');
 
   return (
     <div className="space-y-6">
@@ -112,14 +96,12 @@ const IncidentOriginStep: React.FC<IncidentOriginStepProps> = ({ data, onUpdate 
               onValueChange={(value) => onUpdate({ privacyRole: value })}
               className="flex space-x-6"
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="controller" id="controller" />
-                <Label htmlFor="controller">Controller</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="processor" id="processor" />
-                <Label htmlFor="processor">Processor</Label>
-              </div>
+              {agreementRoles.filter(role => ['Controller', 'Processor'].includes(role)).map(role => (
+                <div key={role} className="flex items-center space-x-2">
+                  <RadioGroupItem value={role.toLowerCase()} id={role.toLowerCase()} />
+                  <Label htmlFor={role.toLowerCase()}>{role}</Label>
+                </div>
+              ))}
             </RadioGroup>
           </div>
         </CardContent>

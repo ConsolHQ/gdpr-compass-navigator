@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Plus } from 'lucide-react';
+import { useMetadata } from '@/hooks/useMetadata';
 
 interface ContextTabProps {
   formData: any;
@@ -16,10 +17,11 @@ interface ContextTabProps {
 
 const ContextTab = ({ formData, setFormData, handleArrayFieldChange }: ContextTabProps) => {
   const [showNewIMSystem, setShowNewIMSystem] = useState(false);
+  const { getMetadataItems } = useMetadata();
   
-  const departments = ['IT', 'HR', 'Marketing', 'Finance', 'Legal', 'Operations'];
-  const vendors = ['AWS', 'Microsoft', 'Google', 'Salesforce', 'HubSpot'];
-  const countries = ['United States', 'Canada', 'United Kingdom', 'Germany', 'France', 'Japan'];
+  const departments = getMetadataItems('department');
+  const vendors = getMetadataItems('vendor');
+  const countries = getMetadataItems('country');
 
   return (
     <Card>

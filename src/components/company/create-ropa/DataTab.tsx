@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Info } from 'lucide-react';
+import { useMetadata } from '@/hooks/useMetadata';
 
 interface DataTabProps {
   formData: any;
@@ -13,9 +14,10 @@ interface DataTabProps {
 }
 
 const DataTab = ({ formData, setFormData, handleArrayFieldChange }: DataTabProps) => {
-  const dataSubjectTypes = ['Customers', 'Employees', 'Suppliers', 'Website Visitors', 'Job Applicants'];
-  const personalDataTypes = ['Personal Identifiers', 'Contact Information', 'Financial Data', 'Location Data', 'Technical Data'];
-  const specialCategoryGrounds = ['Explicit Consent', 'Employment Law', 'Public Health', 'Legal Claims'];
+  const { getMetadataItems } = useMetadata();
+  const dataSubjectTypes = getMetadataItems('data-subject-type');
+  const personalDataTypes = getMetadataItems('personal-data-type');
+  const specialCategoryGrounds = getMetadataItems('special-category-ground');
 
   return (
     <Card>

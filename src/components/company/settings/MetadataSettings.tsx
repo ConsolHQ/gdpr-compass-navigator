@@ -17,6 +17,7 @@ import {
   Trash2,
   Search
 } from 'lucide-react';
+import { useMetadata } from '@/hooks/useMetadata';
 
 interface MetadataCategory {
   id: string;
@@ -29,43 +30,7 @@ const MetadataSettings = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [openCategories, setOpenCategories] = useState<Set<string>>(new Set());
   const [showImportDialog, setShowImportDialog] = useState(false);
-
-  const [metadataCategories, setMetadataCategories] = useState<MetadataCategory[]>([
-    { id: 'agreement-role', name: 'Agreement role', items: ['Controller', 'Processor', 'Joint Controller', 'Sub-processor', 'Third Party'], count: 5 },
-    { id: 'category', name: 'Category', items: [], count: 42 },
-    { id: 'consequence', name: 'Consequence', items: [], count: 83 },
-    { id: 'control-requirement-status', name: 'Control requirement status', items: ['Not Started', 'In Progress', 'Completed'], count: 3 },
-    { id: 'cost-currency', name: 'Cost (currency)', items: ['USD', 'EUR', 'GBP'], count: 3 },
-    { id: 'cost-frequency', name: 'Cost (frequency)', items: ['One-time', 'Monthly', 'Quarterly', 'Annually'], count: 4 },
-    { id: 'country', name: 'Country', items: [], count: 203 },
-    { id: 'data-access-type', name: 'Data Access Type', items: ['Read', 'Write'], count: 2 },
-    { id: 'data-classification', name: 'Data classification', items: ['Public', 'Internal', 'Confidential', 'Restricted', 'Personal', 'Sensitive Personal', 'Special Category', 'Criminal', 'Health'], count: 9 },
-    { id: 'data-disclosure-type', name: 'Data disclosure type', items: [], count: 8 },
-    { id: 'data-subject-request-status', name: 'Data subject request status', items: ['Received', 'In Review', 'Approved', 'Rejected'], count: 4 },
-    { id: 'data-subject-request-type', name: 'Data subject request type', items: ['Access', 'Rectification', 'Erasure', 'Restriction', 'Portability', 'Object', 'Automated Decision Making', 'Consent Withdrawal', 'Complaint', 'Other'], count: 10 },
-    { id: 'data-transfer-format', name: 'Data transfer format', items: ['API', 'File Transfer', 'Database Sync'], count: 3 },
-    { id: 'data-transfer-mechanism', name: 'Data transfer mechanism', items: [], count: 21 },
-    { id: 'employee-function', name: 'Employee function', items: [], count: 73 },
-    { id: 'incident-category', name: 'Incident category', items: [], count: 26 },
-    { id: 'incident-status', name: 'Incident status', items: [], count: 10 },
-    { id: 'information-management-system-status', name: 'Information management system status', items: ['Active', 'Inactive', 'Retired', 'Under Development'], count: 4 },
-    { id: 'information-management-system-type', name: 'Information management system type', items: ['CRM', 'ERP', 'Database'], count: 3 },
-    { id: 'justification', name: 'Justification', items: [], count: 15 },
-    { id: 'legal-basis', name: 'Legal basis', items: ['Consent', 'Contract', 'Legal Obligation', 'Vital Interests', 'Public Task', 'Legitimate Interests', 'Explicit Consent'], count: 7 },
-    { id: 'legal-ground', name: 'Legal ground', items: [], count: 26 },
-    { id: 'legal-template-type', name: 'Legal template type', items: [], count: 10 },
-    { id: 'material-category', name: 'Material category', items: [], count: 0 },
-    { id: 'mitigation', name: 'Mitigation', items: ['Technical', 'Organizational'], count: 2 },
-    { id: 'mitigation-status', name: 'Mitigation status', items: ['Not Started', 'In Progress', 'Completed', 'On Hold'], count: 4 },
-    { id: 'policy-type', name: 'Policy Type', items: ['Privacy Policy', 'Cookie Policy', 'Terms of Service', 'Data Processing Agreement'], count: 4 },
-    { id: 'risk-category', name: 'Risk category', items: [], count: 28 },
-    { id: 'risk-handling-method', name: 'Risk handling method', items: [], count: 8 },
-    { id: 'sector', name: 'Sector', items: [], count: 22 },
-    { id: 'statuses', name: 'Statuses', items: ['Active', 'Inactive', 'Draft'], count: 3 },
-    { id: 'tag', name: 'Tag', items: [], count: 74 },
-    { id: 'task-priority', name: 'Task priority', items: [], count: 8 },
-    { id: 'task-status', name: 'Task status', items: [], count: 8 }
-  ]);
+  const { metadataCategories } = useMetadata();
 
   const toggleCategory = (categoryId: string) => {
     const newOpenCategories = new Set(openCategories);

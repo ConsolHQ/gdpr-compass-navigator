@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useMetadata } from '@/hooks/useMetadata';
 
 interface PurposeTabProps {
   formData: any;
@@ -10,7 +11,8 @@ interface PurposeTabProps {
 }
 
 const PurposeTab = ({ formData, setFormData }: PurposeTabProps) => {
-  const legalBasisOptions = ['Consent', 'Legal Obligation', 'Legitimate Interest', 'Public Interest', 'Vital Interest'];
+  const { getMetadataItems } = useMetadata();
+  const legalBasisOptions = getMetadataItems('legal-basis');
 
   return (
     <Card>
