@@ -8,7 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, HelpCircle } from 'lucide-react';
+import { Plus, Trash2, HelpCircle, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface LeakedDataStepProps {
   data: any;
@@ -58,6 +59,16 @@ const LeakedDataStep: React.FC<LeakedDataStepProps> = ({ data, onUpdate }) => {
     ]
   };
 
+  const mitigatingFactors = {
+    'Mitigating/Reinforcing Factors': [
+      { id: 'mitigating_1', text: 'Were measures taken to prevent unauthorized access?', weight: -0.2 },
+      { id: 'mitigating_2', text: 'Was the data encrypted or pseudonymized?', weight: -0.3 },
+      { id: 'mitigating_3', text: 'Were data subjects promptly notified?', weight: -0.1 },
+      { id: 'reinforcing_1', text: 'Was the breach intentional or malicious?', weight: 0.4 },
+      { id: 'reinforcing_2', text: 'Are there ongoing security vulnerabilities?', weight: 0.3 }
+    ]
+  };
+
   const addDataSubject = () => {
     if (newDataSubject.type && newDataSubject.numberAffected > 0) {
       const updatedSubjects = [...data.dataSubjects, { ...newDataSubject }];
@@ -77,6 +88,14 @@ const LeakedDataStep: React.FC<LeakedDataStepProps> = ({ data, onUpdate }) => {
       [questionId]: { answer, justification }
     };
     onUpdate({ dpcAnswers: updatedAnswers });
+  };
+
+  const updateMitigatingAnswer = (questionId: string, answer: boolean, justification: string = '') => {
+    const updatedAnswers = {
+      ...data.mitigatingFactors,
+      [questionId]: { answer, justification }
+    };
+    onUpdate({ mitigatingFactors: updatedAnswers });
   };
 
   const toggleDataAttribute = (attribute: string) => {
@@ -219,8 +238,21 @@ const LeakedDataStep: React.FC<LeakedDataStepProps> = ({ data, onUpdate }) => {
                 <div key={question.id} className="space-y-3 p-3 border rounded">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <Label className="text-sm font-medium">{question.text}</Label>
-                      <p className="text-xs text-gray-500 mt-1">Weight: {question.weight}</p>
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm font-medium">{question.text}</Label>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info className="h-3 w-3 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Question Weight: {question.weight}</p>
+                              <p className="text-xs">Higher weights have greater impact on risk scoring</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">Weight: {question.weight}</p>
                     </div>
                     <Switch
                       checked={data.dpcAnswers[question.id]?.answer || false}
@@ -233,6 +265,66 @@ const LeakedDataStep: React.FC<LeakedDataStepProps> = ({ data, onUpdate }) => {
                       <Textarea
                         value={data.dpcAnswers[question.id]?.justification || ''}
                         onChange={(e) => updateDPCAnswer(question.id, true, e.target.value)}
+                        placeholder="Provide justification..."
+                        rows={2}
+                        className="text-sm"
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Mitigating/Reinforcing Factors */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center">
+            Mitigating & Reinforcing Factors
+            <HelpCircle className="h-4 w-4 ml-2 text-gray-400" />
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {Object.entries(mitigatingFactors).map(([category, questions]) => (
+            <div key={category} className="space-y-4">
+              <h3 className="font-semibold text-gray-800 border-b pb-2">{category}</h3>
+              {questions.map((question) => (
+                <div key={question.id} className="space-y-3 p-3 border rounded">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm font-medium">{question.text}</Label>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info className="h-3 w-3 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Weight: {question.weight}</p>
+                              <p className="text-xs">
+                                {question.weight < 0 ? 'Reduces risk score' : 'Increases risk score'}
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Impact: {question.weight < 0 ? 'Mitigating' : 'Reinforcing'} ({question.weight})
+                      </p>
+                    </div>
+                    <Switch
+                      checked={data.mitigatingFactors?.[question.id]?.answer || false}
+                      onCheckedChange={(checked) => updateMitigatingAnswer(question.id, checked, data.mitigatingFactors?.[question.id]?.justification || '')}
+                    />
+                  </div>
+                  {data.mitigatingFactors?.[question.id]?.answer && (
+                    <div className="space-y-2">
+                      <Label className="text-xs text-gray-600">Justification (optional)</Label>
+                      <Textarea
+                        value={data.mitigatingFactors?.[question.id]?.justification || ''}
+                        onChange={(e) => updateMitigatingAnswer(question.id, true, e.target.value)}
                         placeholder="Provide justification..."
                         rows={2}
                         className="text-sm"
