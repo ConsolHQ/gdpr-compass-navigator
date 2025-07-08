@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   ArrowLeft, 
   Save, 
   Building,
   Shield,
   Users,
+  CheckSquare,
   Globe,
   Clock,
   Lock
@@ -14,11 +16,13 @@ import {
 import GeneralInfoTab from './create-ropa/GeneralInfoTab';
 import PurposeTab from './create-ropa/PurposeTab';
 import DataTab from './create-ropa/DataTab';
+import DPIACheckTab from './create-ropa/DPIACheckTab';
 import ContextTab from './create-ropa/ContextTab';
 import RetentionTab from './create-ropa/RetentionTab';
 import SecurityTab from './create-ropa/SecurityTab';
 
 const CreateROPA = ({ onBack }: { onBack: () => void }) => {
+  const [showDPIADialog, setShowDPIADialog] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -33,6 +37,7 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
     specialCategoryData: 'No',
     specialCategoryDetails: '',
     specialCategoryGround: '',
+    dpiaCheck: {} as any,
     processingReason: '',
     imSystems: [] as string[],
     vendors: [] as string[],
@@ -92,6 +97,29 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
     }));
   };
 
+  const handleCreateROPA = () => {
+    // Check if DPIA is recommended
+    const dpiaQuestions = Object.keys(formData.dpiaCheck || {});
+    const yesAnswers = dpiaQuestions.filter(q => 
+      formData.dpiaCheck?.[q]?.answer === 'Yes'
+    ).length;
+
+    if (yesAnswers >= 2) {
+      setShowDPIADialog(true);
+    } else {
+      // Create ROPA without DPIA recommendation
+      console.log('ROPA created successfully');
+      onBack();
+    }
+  };
+
+  const handleCreateDPIA = () => {
+    setShowDPIADialog(false);
+    // Navigate to DPIA creation with ROPA link
+    console.log('Creating DPIA linked to ROPA:', formData.name);
+    // Here you would navigate to DPIA creation form
+  };
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
@@ -110,14 +138,14 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
             <Save className="mr-2 h-4 w-4" />
             Save Draft
           </Button>
-          <Button className="bg-teal-600 hover:bg-teal-700">
+          <Button className="bg-teal-600 hover:bg-teal-700" onClick={handleCreateROPA}>
             Create ROPA
           </Button>
         </div>
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="general" className="flex items-center space-x-2">
             <Building className="h-4 w-4" />
             <span>General</span>
@@ -129,6 +157,10 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
           <TabsTrigger value="data" className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
             <span>Data</span>
+          </TabsTrigger>
+          <TabsTrigger value="dpiacheck" className="flex items-center space-x-2">
+            <CheckSquare className="h-4 w-4" />
+            <span>DPIA Check</span>
           </TabsTrigger>
           <TabsTrigger value="context" className="flex items-center space-x-2">
             <Globe className="h-4 w-4" />
@@ -164,6 +196,10 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
           />
         </TabsContent>
 
+        <TabsContent value="dpiacheck">
+          <DPIACheckTab formData={formData} setFormData={setFormData} />
+        </TabsContent>
+
         <TabsContent value="context">
           <ContextTab 
             formData={formData} 
@@ -186,6 +222,29 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
           />
         </TabsContent>
       </Tabs>
+
+      {/* DPIA Recommendation Dialog */}
+      <Dialog open={showDPIADialog} onOpenChange={setShowDPIADialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>DPIA Recommended</DialogTitle>
+            <DialogDescription>
+              Based on your responses in the DPIA Check, a Data Protection Impact Assessment is recommended for this processing activity.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex space-x-2">
+            <Button variant="outline" onClick={() => {
+              setShowDPIADialog(false);
+              onBack();
+            }}>
+              Continue without DPIA
+            </Button>
+            <Button onClick={handleCreateDPIA} className="bg-teal-600 hover:bg-teal-700">
+              Create DPIA
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
