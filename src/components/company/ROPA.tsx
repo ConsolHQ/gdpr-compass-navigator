@@ -516,41 +516,122 @@ const ROPA = () => {
                  </TableHead>
                 {visibleColumns.id && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleSort('id')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Identifier
-                      {getSortIcon('id')}
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('id')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Identifier
+                        {getSortIcon('id')}
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-auto p-1">
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {getUniqueValues('id').map(value => (
+                            <DropdownMenuCheckboxItem
+                              key={String(value)}
+                              checked={(columnFilters.id as string[])?.includes(value as string) || false}
+                              onCheckedChange={(checked) => {
+                                const current = (columnFilters.id as string[]) || [];
+                                if (checked) {
+                                  setColumnFilters(prev => ({ ...prev, id: [...current, value as string] }));
+                                } else {
+                                  setColumnFilters(prev => ({ ...prev, id: current.filter(v => v !== value) }));
+                                }
+                              }}
+                            >
+                              {value as string}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.processingActivity && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleSort('name')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Processing Activity
-                      {getSortIcon('name')}
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('name')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Processing Activity
+                        {getSortIcon('name')}
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-auto p-1">
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {getUniqueValues('name').map(value => (
+                            <DropdownMenuCheckboxItem
+                              key={String(value)}
+                              checked={(columnFilters.name as string[])?.includes(value as string) || false}
+                              onCheckedChange={(checked) => {
+                                const current = (columnFilters.name as string[]) || [];
+                                if (checked) {
+                                  setColumnFilters(prev => ({ ...prev, name: [...current, value as string] }));
+                                } else {
+                                  setColumnFilters(prev => ({ ...prev, name: current.filter(v => v !== value) }));
+                                }
+                              }}
+                            >
+                              {value as string}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.description && (
                   <TableHead className="font-semibold">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleSort('description')}
-                      className="h-auto p-0 font-semibold"
-                    >
-                      Description
-                      {getSortIcon('description')}
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('description')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Description
+                        {getSortIcon('description')}
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-auto p-1">
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {getUniqueValues('description').map(value => (
+                            <DropdownMenuCheckboxItem
+                              key={String(value)}
+                              checked={(columnFilters.description as string[])?.includes(value as string) || false}
+                              onCheckedChange={(checked) => {
+                                const current = (columnFilters.description as string[]) || [];
+                                if (checked) {
+                                  setColumnFilters(prev => ({ ...prev, description: [...current, value as string] }));
+                                } else {
+                                  setColumnFilters(prev => ({ ...prev, description: current.filter(v => v !== value) }));
+                                }
+                              }}
+                            >
+                              {value as string}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableHead>
                 )}
                 {visibleColumns.department && (
