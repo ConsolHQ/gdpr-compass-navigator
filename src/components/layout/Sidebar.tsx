@@ -125,7 +125,7 @@ const Sidebar = ({
         <Button
           variant="ghost"
           className={itemClasses}
-          onClick={() => hasSubmenu && !isCollapsed ? toggleSubmenu(item.id) : onNavigate(item.href)}
+          onClick={() => hasSubmenu && !isCollapsed && !isSubmenuItem ? toggleSubmenu(item.id) : onNavigate(item.href)}
         >
           <item.icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
           {!isCollapsed && (
