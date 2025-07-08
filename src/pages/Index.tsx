@@ -20,6 +20,7 @@ import OrganizationSettings from '@/components/company/settings/OrganizationSett
 import UserManagement from '@/components/company/settings/UserManagement';
 import MetadataSettings from '@/components/company/settings/MetadataSettings';
 import DataDictionary from '@/components/company/settings/DataDictionary';
+import IMSystems from '@/components/company/settings/IMSystems';
 import ReportsSettings from '@/components/company/settings/ReportsSettings';
 import PartnerSettings from '@/components/partner/PartnerSettings';
 import CreateDSR from '@/components/company/CreateDSR';
@@ -215,6 +216,8 @@ const Index = () => {
         return { title: 'Metadata Management', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Metadata' }] };
       case '/company/settings/data-dictionary':
         return { title: 'Data Dictionary', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Data Dictionary' }] };
+      case '/company/settings/im-systems':
+        return { title: 'IM Systems', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'IM Systems' }] };
       case '/company/settings/users':
         return { title: 'User Management', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Users' }] };
       case '/company/settings/organisation':
@@ -276,6 +279,8 @@ const Index = () => {
         return <MetadataSettings />;
       case '/company/settings/data-dictionary':
         return <DataDictionary />;
+      case '/company/settings/im-systems':
+        return <IMSystems />;
       case '/company/settings/users':
         return <UserManagement />;
       case '/company/settings/organisation':
