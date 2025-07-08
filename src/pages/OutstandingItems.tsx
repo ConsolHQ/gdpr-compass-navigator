@@ -152,7 +152,15 @@ const OutstandingItems = () => {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm" className="flex items-center space-x-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex items-center space-x-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleItemClick(item);
+                      }}
+                    >
                       <span>{item.action}</span>
                       <ExternalLink className="h-3 w-3" />
                     </Button>
