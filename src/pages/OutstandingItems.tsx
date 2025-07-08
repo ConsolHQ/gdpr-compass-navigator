@@ -17,7 +17,7 @@ const OutstandingItems = () => {
       ropaId: 'ROPA-003',
       priority: 'High',
       action: 'Create DPIA',
-      route: '/company/dpia/create',
+      route: '/company/assessments/dpia/new',
       variant: 'destructive' as const
     },
     {
