@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Info } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Badge } from '@/components/ui/badge';
+import { Info, Check, ChevronsUpDown, X } from 'lucide-react';
 import { useMetadata } from '@/hooks/useMetadata';
+import { cn } from '@/lib/utils';
 
 interface DataTabProps {
   formData: any;
@@ -18,6 +22,92 @@ const DataTab = ({ formData, setFormData, handleArrayFieldChange }: DataTabProps
   const dataSubjectTypes = getMetadataItems('data-subject-type');
   const personalDataTypes = getMetadataItems('personal-data-type');
   const specialCategoryGrounds = getMetadataItems('special-category-ground');
+  
+  const [subjectTypesOpen, setSubjectTypesOpen] = useState(false);
+  const [personalDataOpen, setPersonalDataOpen] = useState(false);
+
+  const MultiSelectDropdown = ({ 
+    options, 
+    selectedValues, 
+    onSelectionChange, 
+    placeholder, 
+    isOpen, 
+    setIsOpen 
+  }: {
+    options: string[];
+    selectedValues: string[];
+    onSelectionChange: (values: string[]) => void;
+    placeholder: string;
+    isOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+  }) => {
+    const handleSelect = (value: string) => {
+      const newValues = selectedValues.includes(value)
+        ? selectedValues.filter(v => v !== value)
+        : [...selectedValues, value];
+      onSelectionChange(newValues);
+    };
+
+    const removeValue = (valueToRemove: string) => {
+      onSelectionChange(selectedValues.filter(v => v !== valueToRemove));
+    };
+
+    return (
+      <div className="space-y-2">
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={isOpen}
+              className="w-full justify-between"
+            >
+              {selectedValues.length > 0 ? `${selectedValues.length} selected` : placeholder}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0">
+            <Command>
+              <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
+              <CommandList>
+                <CommandEmpty>No options found.</CommandEmpty>
+                <CommandGroup>
+                  {options.map((option) => (
+                    <CommandItem
+                      key={option}
+                      onSelect={() => handleSelect(option)}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedValues.includes(option) ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {option}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        
+        {selectedValues.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {selectedValues.map((value) => (
+              <Badge key={value} variant="secondary" className="flex items-center gap-1">
+                {value}
+                <X 
+                  className="h-3 w-3 cursor-pointer" 
+                  onClick={() => removeValue(value)}
+                />
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <Card>
@@ -29,30 +119,26 @@ const DataTab = ({ formData, setFormData, handleArrayFieldChange }: DataTabProps
         <div className="space-y-6">
           <div className="space-y-4">
             <Label>Categories of Data Subjects</Label>
-            {dataSubjectTypes.map(type => (
-              <div key={type} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`subject-${type}`}
-                  checked={formData.dataSubjectCategories.includes(type)}
-                  onCheckedChange={(checked) => handleArrayFieldChange('dataSubjectCategories', type, !!checked)}
-                />
-                <Label htmlFor={`subject-${type}`}>{type}</Label>
-              </div>
-            ))}
+            <MultiSelectDropdown
+              options={dataSubjectTypes}
+              selectedValues={formData.dataSubjectCategories || []}
+              onSelectionChange={(values) => setFormData(prev => ({ ...prev, dataSubjectCategories: values }))}
+              placeholder="Select data subject categories"
+              isOpen={subjectTypesOpen}
+              setIsOpen={setSubjectTypesOpen}
+            />
           </div>
           
           <div className="space-y-4">
             <Label>Categories of Personal Data</Label>
-            {personalDataTypes.map(type => (
-              <div key={type} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`data-${type}`}
-                  checked={formData.personalDataCategories.includes(type)}
-                  onCheckedChange={(checked) => handleArrayFieldChange('personalDataCategories', type, !!checked)}
-                />
-                <Label htmlFor={`data-${type}`}>{type}</Label>
-              </div>
-            ))}
+            <MultiSelectDropdown
+              options={personalDataTypes}
+              selectedValues={formData.personalDataCategories || []}
+              onSelectionChange={(values) => setFormData(prev => ({ ...prev, personalDataCategories: values }))}
+              placeholder="Select personal data categories"
+              isOpen={personalDataOpen}
+              setIsOpen={setPersonalDataOpen}
+            />
           </div>
         </div>
 
