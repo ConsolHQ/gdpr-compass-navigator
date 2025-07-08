@@ -156,91 +156,100 @@ const IMSystems = () => {
                     Add IM System
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>{editingSystem ? 'Edit IM System' : 'Add New IM System'}</DialogTitle>
-                    <DialogDescription>
-                      {editingSystem ? 'Update the information management system details' : 'Add a new information management system to your organization'}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">System Name *</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                        placeholder="e.g., CRM System"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Description</Label>
-                      <Textarea
-                        id="description"
-                        value={formData.description}
-                        onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                        placeholder="Brief description of the system"
-                        rows={2}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="location">Location</Label>
-                      <Input
-                        id="location"
-                        value={formData.location}
-                        onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                        placeholder="e.g., UK Data Center"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="storageLocation">Storage Location</Label>
-                      <Select 
-                        value={formData.storageLocation} 
-                        onValueChange={(value) => setFormData(prev => ({ ...prev, storageLocation: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select storage location" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="internal">Internal</SelectItem>
-                          <SelectItem value="external">External</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="vendor">Vendor</Label>
-                      <Input
-                        id="vendor"
-                        value={formData.vendor}
-                        onChange={(e) => setFormData(prev => ({ ...prev, vendor: e.target.value }))}
-                        placeholder="e.g., Microsoft, Google"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="status">Status</Label>
-                      <Select 
-                        value={formData.status} 
-                        onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="active">Active</SelectItem>
-                          <SelectItem value="inactive">Inactive</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex justify-end space-x-2">
-                      <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                        Cancel
-                      </Button>
-                      <Button type="submit">
-                        {editingSystem ? 'Update' : 'Add'} System
-                      </Button>
-                    </div>
-                  </form>
+                 <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                   <DialogHeader>
+                     <DialogTitle>{editingSystem ? 'Edit IM System' : 'Add New IM System'}</DialogTitle>
+                     <DialogDescription>
+                       {editingSystem ? 'Update the information management system details' : 'Add a new information management system to your organization'}
+                     </DialogDescription>
+                   </DialogHeader>
+                   <form onSubmit={handleSubmit} className="space-y-6">
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       <div className="space-y-2">
+                         <Label htmlFor="name">System Name *</Label>
+                         <Input
+                           id="name"
+                           value={formData.name}
+                           onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                           placeholder="e.g., CRM System"
+                           required
+                         />
+                       </div>
+                       <div className="space-y-2">
+                         <Label htmlFor="vendor">Vendor</Label>
+                         <Input
+                           id="vendor"
+                           value={formData.vendor}
+                           onChange={(e) => setFormData(prev => ({ ...prev, vendor: e.target.value }))}
+                           placeholder="e.g., Microsoft, Google"
+                         />
+                       </div>
+                     </div>
+                     
+                     <div className="space-y-2">
+                       <Label htmlFor="description">Description</Label>
+                       <Textarea
+                         id="description"
+                         value={formData.description}
+                         onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                         placeholder="Brief description of the system"
+                         rows={3}
+                         className="resize-none"
+                       />
+                     </div>
+                     
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       <div className="space-y-2">
+                         <Label htmlFor="location">Location</Label>
+                         <Input
+                           id="location"
+                           value={formData.location}
+                           onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                           placeholder="e.g., UK Data Center"
+                         />
+                       </div>
+                       <div className="space-y-2">
+                         <Label htmlFor="status">Status</Label>
+                         <Select 
+                           value={formData.status} 
+                           onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
+                         >
+                           <SelectTrigger>
+                             <SelectValue />
+                           </SelectTrigger>
+                           <SelectContent>
+                             <SelectItem value="active">Active</SelectItem>
+                             <SelectItem value="inactive">Inactive</SelectItem>
+                           </SelectContent>
+                         </Select>
+                       </div>
+                     </div>
+                     
+                     <div className="space-y-2">
+                       <Label htmlFor="storageLocation">Storage Location</Label>
+                       <Select 
+                         value={formData.storageLocation} 
+                         onValueChange={(value) => setFormData(prev => ({ ...prev, storageLocation: value }))}
+                       >
+                         <SelectTrigger>
+                           <SelectValue placeholder="Select storage location" />
+                         </SelectTrigger>
+                         <SelectContent>
+                           <SelectItem value="internal">Internal</SelectItem>
+                           <SelectItem value="external">External</SelectItem>
+                         </SelectContent>
+                       </Select>
+                     </div>
+                     
+                     <div className="flex justify-end space-x-2 pt-4 border-t">
+                       <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                         Cancel
+                       </Button>
+                       <Button type="submit">
+                         {editingSystem ? 'Update' : 'Add'} System
+                       </Button>
+                     </div>
+                   </form>
                 </DialogContent>
               </Dialog>
             </div>
