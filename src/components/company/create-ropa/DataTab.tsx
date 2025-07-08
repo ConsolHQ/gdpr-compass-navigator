@@ -26,7 +26,7 @@ const DataTab = ({ formData, setFormData, handleArrayFieldChange }: DataTabProps
         <CardDescription>Define the types of data and data subjects involved</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-6">
           <div className="space-y-4">
             <Label>Categories of Data Subjects</Label>
             {dataSubjectTypes.map(type => (
@@ -40,6 +40,7 @@ const DataTab = ({ formData, setFormData, handleArrayFieldChange }: DataTabProps
               </div>
             ))}
           </div>
+          
           <div className="space-y-4">
             <Label>Categories of Personal Data</Label>
             {personalDataTypes.map(type => (

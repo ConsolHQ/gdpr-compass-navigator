@@ -40,36 +40,7 @@ const ContextTab = ({ formData, setFormData, handleArrayFieldChange }: ContextTa
           />
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label>Information Management Systems</Label>
-            <Button variant="outline" size="sm" onClick={() => setShowNewIMSystem(!showNewIMSystem)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add New IM System
-            </Button>
-          </div>
-
-          {showNewIMSystem && (
-            <Card className="p-4 bg-gray-50">
-              <div className="grid grid-cols-2 gap-4">
-                <Input placeholder="System Name *" />
-                <Input placeholder="Description" />
-                <Input placeholder="Location" />
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Storage Location" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="internal">Internal</SelectItem>
-                    <SelectItem value="external">External</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </Card>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-6">
           <div className="space-y-4">
             <Label>Data Recipients - Internal</Label>
             {departments.map(dept => (
@@ -83,8 +54,15 @@ const ContextTab = ({ formData, setFormData, handleArrayFieldChange }: ContextTa
               </div>
             ))}
           </div>
+          
           <div className="space-y-4">
-            <Label>Data Recipients - External</Label>
+            <div className="flex items-center justify-between">
+              <Label>Data Recipients - External</Label>
+              <Button variant="outline" size="sm" onClick={() => setShowNewIMSystem(!showNewIMSystem)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add New IM System
+              </Button>
+            </div>
             {vendors.map(vendor => (
               <div key={vendor} className="flex items-center space-x-2">
                 <Checkbox
@@ -95,6 +73,25 @@ const ContextTab = ({ formData, setFormData, handleArrayFieldChange }: ContextTa
                 <Label htmlFor={`external-${vendor}`}>{vendor}</Label>
               </div>
             ))}
+            
+            {showNewIMSystem && (
+              <Card className="p-4 bg-gray-50">
+                <div className="grid grid-cols-2 gap-4">
+                  <Input placeholder="System Name *" />
+                  <Input placeholder="Description" />
+                  <Input placeholder="Location" />
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Storage Location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="internal">Internal</SelectItem>
+                      <SelectItem value="external">External</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </Card>
+            )}
           </div>
         </div>
 

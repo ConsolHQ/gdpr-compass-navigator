@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   ArrowLeft, 
+  ArrowRight,
   Save, 
   Building,
   Shield,
@@ -11,7 +12,8 @@ import {
   CheckSquare,
   Globe,
   Clock,
-  Lock
+  Lock,
+  FileCheck
 } from 'lucide-react';
 import GeneralInfoTab from './create-ropa/GeneralInfoTab';
 import PurposeTab from './create-ropa/PurposeTab';
@@ -20,9 +22,11 @@ import DPIACheckTab from './create-ropa/DPIACheckTab';
 import ContextTab from './create-ropa/ContextTab';
 import RetentionTab from './create-ropa/RetentionTab';
 import SecurityTab from './create-ropa/SecurityTab';
+import DataProtectionPrinciplesTab from './create-ropa/DataProtectionPrinciplesTab';
 
 const CreateROPA = ({ onBack }: { onBack: () => void }) => {
   const [showDPIADialog, setShowDPIADialog] = useState(false);
+  const [currentTab, setCurrentTab] = useState('general');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -52,7 +56,8 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
     justificationType: 'Internal',
     justificationText: '',
     legislation: '',
-    securityMeasures: [] as any[]
+    securityMeasures: [] as any[],
+    dataProtectionPrinciples: {} as any
   });
 
   const handleArrayFieldChange = (field: keyof typeof formData, value: string, checked: boolean) => {
@@ -120,6 +125,39 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
     // Here you would navigate to DPIA creation form
   };
 
+  const tabs = [
+    'general', 'purpose', 'data', 'dpiacheck', 
+    'context', 'retention', 'security', 'principles'
+  ];
+
+  const getTabName = (tab: string) => {
+    const names = {
+      general: 'General',
+      purpose: 'Purpose',
+      data: 'Data',
+      dpiacheck: 'DPIA Check',
+      context: 'Context',
+      retention: 'Retention',
+      security: 'Security',
+      principles: 'Data Protection Principles'
+    };
+    return names[tab as keyof typeof names];
+  };
+
+  const handleNext = () => {
+    const currentIndex = tabs.indexOf(currentTab);
+    if (currentIndex < tabs.length - 1) {
+      setCurrentTab(tabs[currentIndex + 1]);
+    }
+  };
+
+  const handleBack = () => {
+    const currentIndex = tabs.indexOf(currentTab);
+    if (currentIndex > 0) {
+      setCurrentTab(tabs[currentIndex - 1]);
+    }
+  };
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
@@ -133,19 +171,10 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
             <p className="text-gray-600">Record of Processing Activities</p>
           </div>
         </div>
-        <div className="flex space-x-2">
-          <Button variant="outline">
-            <Save className="mr-2 h-4 w-4" />
-            Save Draft
-          </Button>
-          <Button className="bg-teal-600 hover:bg-teal-700" onClick={handleCreateROPA}>
-            Create ROPA
-          </Button>
-        </div>
       </div>
 
-      <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-7">
+      <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="general" className="flex items-center space-x-2">
             <Building className="h-4 w-4" />
             <span>General</span>
@@ -174,51 +203,144 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
             <Lock className="h-4 w-4" />
             <span>Security</span>
           </TabsTrigger>
+          <TabsTrigger value="principles" className="flex items-center space-x-2">
+            <FileCheck className="h-4 w-4" />
+            <span>Principles</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
-          <GeneralInfoTab 
-            formData={formData} 
-            setFormData={setFormData} 
-            handleArrayFieldChange={handleArrayFieldChange} 
-          />
+          <div className="space-y-6">
+            <GeneralInfoTab 
+              formData={formData} 
+              setFormData={setFormData} 
+              handleArrayFieldChange={handleArrayFieldChange} 
+            />
+            <div className="flex justify-end">
+              <Button onClick={handleNext}>
+                Next
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="purpose">
-          <PurposeTab formData={formData} setFormData={setFormData} />
+          <div className="space-y-6">
+            <PurposeTab formData={formData} setFormData={setFormData} />
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={handleBack}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+              </Button>
+              <Button onClick={handleNext}>
+                Next
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="data">
-          <DataTab 
-            formData={formData} 
-            setFormData={setFormData} 
-            handleArrayFieldChange={handleArrayFieldChange} 
-          />
+          <div className="space-y-6">
+            <DataTab 
+              formData={formData} 
+              setFormData={setFormData} 
+              handleArrayFieldChange={handleArrayFieldChange} 
+            />
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={handleBack}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+              </Button>
+              <Button onClick={handleNext}>
+                Next
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="dpiacheck">
-          <DPIACheckTab formData={formData} setFormData={setFormData} />
+          <div className="space-y-6">
+            <DPIACheckTab formData={formData} setFormData={setFormData} />
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={handleBack}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+              </Button>
+              <Button onClick={handleNext}>
+                Next
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="context">
-          <ContextTab 
-            formData={formData} 
-            setFormData={setFormData} 
-            handleArrayFieldChange={handleArrayFieldChange} 
-          />
+          <div className="space-y-6">
+            <ContextTab 
+              formData={formData} 
+              setFormData={setFormData} 
+              handleArrayFieldChange={handleArrayFieldChange} 
+            />
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={handleBack}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+              </Button>
+              <Button onClick={handleNext}>
+                Next
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="retention">
-          <RetentionTab formData={formData} setFormData={setFormData} />
+          <div className="space-y-6">
+            <RetentionTab formData={formData} setFormData={setFormData} />
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={handleBack}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+              </Button>
+              <Button onClick={handleNext}>
+                Next
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="security">
-          <SecurityTab 
-            formData={formData} 
+          <div className="space-y-6">
+            <SecurityTab 
+              formData={formData} 
+              setFormData={setFormData}
+              addSecurityMeasure={addSecurityMeasure}
+              updateSecurityMeasure={updateSecurityMeasure}
+              removeSecurityMeasure={removeSecurityMeasure}
+            />
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={handleBack}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+              </Button>
+              <Button onClick={handleNext}>
+                Next
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="principles">
+          <DataProtectionPrinciplesTab
+            formData={formData}
             setFormData={setFormData}
-            addSecurityMeasure={addSecurityMeasure}
-            updateSecurityMeasure={updateSecurityMeasure}
-            removeSecurityMeasure={removeSecurityMeasure}
+            onBack={handleBack}
+            onCreateROPA={handleCreateROPA}
           />
         </TabsContent>
       </Tabs>
