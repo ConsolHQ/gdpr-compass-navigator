@@ -30,8 +30,10 @@ import {
   Merge,
   BookmarkPlus,
   X,
-  Trash2
+  Trash2,
+  Bell
 } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import CreateROPA from './CreateROPA';
 
 const ROPATemplates = () => {
@@ -124,6 +126,7 @@ const ROPA = () => {
       owner: true,
     };
   });
+  const [showOutstandingItems, setShowOutstandingItems] = useState(false);
   
   const ropaEntries = [
     {
@@ -378,24 +381,36 @@ const ROPA = () => {
         <div>
           <p className="text-gray-600 mt-1">{processedEntries.length} processing activities</p>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="bg-teal-600 hover:bg-teal-700">
-              <Plus className="mr-2 h-4 w-4" />
-              Create New ROPA
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setShowCreateForm(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Create New
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setShowTemplates(true)}>
-              <FileText className="mr-2 h-4 w-4" />
-              Create from Template
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowOutstandingItems(true)}
+            className="relative"
+          >
+            <Bell className="h-4 w-4" />
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              2
+            </span>
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="bg-teal-600 hover:bg-teal-700">
+                <Plus className="mr-2 h-4 w-4" />
+                Create New ROPA
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setShowCreateForm(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create New
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setShowTemplates(true)}>
+                <FileText className="mr-2 h-4 w-4" />
+                Create from Template
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {/* Toolbar */}
@@ -995,6 +1010,52 @@ const ROPA = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Outstanding Items Dialog */}
+      <Dialog open={showOutstandingItems} onOpenChange={setShowOutstandingItems}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Outstanding Items</DialogTitle>
+            <DialogDescription>
+              Items requiring attention across your ROPA activities
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>ROPA</TableHead>
+                  <TableHead>Priority</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell>
+                    <Badge variant="destructive">DPIA Required</Badge>
+                  </TableCell>
+                  <TableCell>Marketing Analytics requires a DPIA assessment</TableCell>
+                  <TableCell>ROPA-003</TableCell>
+                  <TableCell>
+                    <Badge variant="destructive">High</Badge>
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>
+                    <Badge variant="secondary">Draft</Badge>
+                  </TableCell>
+                  <TableCell>Vendor Management ROPA is incomplete</TableCell>
+                  <TableCell>ROPA-004</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">Medium</Badge>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
