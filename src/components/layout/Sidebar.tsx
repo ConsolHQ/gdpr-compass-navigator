@@ -76,6 +76,7 @@ const companyMenuItems: SidebarItem[] = [
     submenu: [
       { id: 'metadata', label: 'Meta Data', icon: Database, href: '/company/settings/metadata' },
       { id: 'data-dictionary', label: 'Data Dictionary', icon: Book, href: '/company/settings/data-dictionary' },
+      { id: 'im-systems', label: 'IM Systems', icon: Database, href: '/company/settings/im-systems' },
       { id: 'users', label: 'Users', icon: Users, href: '/company/settings/users' },
       { id: 'organisation', label: 'Organisation Setup', icon: Settings, href: '/company/settings/organisation' },
       { id: 'reports', label: 'Reports', icon: BarChart, href: '/company/settings/reports' },
