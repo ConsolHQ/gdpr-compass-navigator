@@ -215,7 +215,7 @@ const ROPA = () => {
     { key: 'role', label: 'Role', sortable: true },
     { key: 'legalBasis', label: 'Legal Basis', sortable: true },
     { key: 'dataSubjects', label: 'Data Subjects', sortable: true },
-    { key: 'specialCategory', label: 'Special Category', sortable: false },
+    { key: 'specialCategory', label: 'Special Category', sortable: true },
     { key: 'progress', label: 'Progress', sortable: true },
     { key: 'owner', label: 'Owner', sortable: true },
   ];
@@ -835,7 +835,44 @@ const ROPA = () => {
                   </TableHead>
                 )}
                 {visibleColumns.specialCategory && (
-                  <TableHead className="font-semibold text-center">Special Category</TableHead>
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('specialCategory')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Special Category
+                        {getSortIcon('specialCategory')}
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-auto p-1">
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {getUniqueValues('specialCategory').map(value => (
+                            <DropdownMenuCheckboxItem
+                              key={String(value)}
+                              checked={(columnFilters.specialCategory as string[])?.includes(value as string) || false}
+                              onCheckedChange={(checked) => {
+                                const current = (columnFilters.specialCategory as string[]) || [];
+                                if (checked) {
+                                  setColumnFilters(prev => ({ ...prev, specialCategory: [...current, value as string] }));
+                                } else {
+                                  setColumnFilters(prev => ({ ...prev, specialCategory: current.filter(v => v !== value) }));
+                                }
+                              }}
+                            >
+                              {value as string}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableHead>
                 )}
                 {visibleColumns.progress && (
                   <TableHead className="font-semibold">
