@@ -31,9 +31,9 @@ import {
   BookmarkPlus,
   X,
   Trash2,
-  Bell
+  CheckSquare
 } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useNavigate } from 'react-router-dom';
 import CreateROPA from './CreateROPA';
 
 const ROPATemplates = () => {
@@ -126,7 +126,7 @@ const ROPA = () => {
       owner: true,
     };
   });
-  const [showOutstandingItems, setShowOutstandingItems] = useState(false);
+  const navigate = useNavigate();
   
   const ropaEntries = [
     {
@@ -384,10 +384,10 @@ const ROPA = () => {
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
-            onClick={() => setShowOutstandingItems(true)}
+            onClick={() => navigate('/company/ropa/outstanding')}
             className="relative"
           >
-            <Bell className="h-4 w-4" />
+            <CheckSquare className="h-4 w-4" />
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
               2
             </span>
@@ -1011,51 +1011,6 @@ const ROPA = () => {
         </Card>
       )}
 
-      {/* Outstanding Items Dialog */}
-      <Dialog open={showOutstandingItems} onOpenChange={setShowOutstandingItems}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Outstanding Items</DialogTitle>
-            <DialogDescription>
-              Items requiring attention across your ROPA activities
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>ROPA</TableHead>
-                  <TableHead>Priority</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell>
-                    <Badge variant="destructive">DPIA Required</Badge>
-                  </TableCell>
-                  <TableCell>Marketing Analytics requires a DPIA assessment</TableCell>
-                  <TableCell>ROPA-003</TableCell>
-                  <TableCell>
-                    <Badge variant="destructive">High</Badge>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>
-                    <Badge variant="secondary">Draft</Badge>
-                  </TableCell>
-                  <TableCell>Vendor Management ROPA is incomplete</TableCell>
-                  <TableCell>ROPA-004</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">Medium</Badge>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
