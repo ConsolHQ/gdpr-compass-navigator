@@ -5,9 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Plus } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Check, ChevronsUpDown, X } from 'lucide-react';
 import { useMetadata } from '@/hooks/useMetadata';
+import { cn } from '@/lib/utils';
 
 interface ContextTabProps {
   formData: any;
@@ -17,11 +20,97 @@ interface ContextTabProps {
 
 const ContextTab = ({ formData, setFormData, handleArrayFieldChange }: ContextTabProps) => {
   const [showNewIMSystem, setShowNewIMSystem] = useState(false);
+  const [internalRecipientsOpen, setInternalRecipientsOpen] = useState(false);
+  const [externalRecipientsOpen, setExternalRecipientsOpen] = useState(false);
+  const [countriesOpen, setCountriesOpen] = useState(false);
   const { getMetadataItems } = useMetadata();
   
   const departments = getMetadataItems('department');
   const vendors = getMetadataItems('vendor');
   const countries = getMetadataItems('country');
+
+  const MultiSelectDropdown = ({ 
+    options, 
+    selectedValues, 
+    onSelectionChange, 
+    placeholder, 
+    isOpen, 
+    setIsOpen 
+  }: {
+    options: string[];
+    selectedValues: string[];
+    onSelectionChange: (values: string[]) => void;
+    placeholder: string;
+    isOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+  }) => {
+    const handleSelect = (value: string) => {
+      const newValues = selectedValues.includes(value)
+        ? selectedValues.filter(v => v !== value)
+        : [...selectedValues, value];
+      onSelectionChange(newValues);
+    };
+
+    const removeValue = (valueToRemove: string) => {
+      onSelectionChange(selectedValues.filter(v => v !== valueToRemove));
+    };
+
+    return (
+      <div className="space-y-2">
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={isOpen}
+              className="w-full justify-between"
+            >
+              {selectedValues.length > 0 ? `${selectedValues.length} selected` : placeholder}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0">
+            <Command>
+              <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
+              <CommandList>
+                <CommandEmpty>No options found.</CommandEmpty>
+                <CommandGroup>
+                  {options.map((option) => (
+                    <CommandItem
+                      key={option}
+                      onSelect={() => handleSelect(option)}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedValues.includes(option) ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {option}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        
+        {selectedValues.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {selectedValues.map((value) => (
+              <Badge key={value} variant="secondary" className="flex items-center gap-1">
+                {value}
+                <X 
+                  className="h-3 w-3 cursor-pointer" 
+                  onClick={() => removeValue(value)}
+                />
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <Card>
@@ -43,16 +132,14 @@ const ContextTab = ({ formData, setFormData, handleArrayFieldChange }: ContextTa
         <div className="space-y-6">
           <div className="space-y-4">
             <Label>Data Recipients - Internal</Label>
-            {departments.map(dept => (
-              <div key={dept} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`internal-${dept}`}
-                  checked={formData.internalRecipients.includes(dept)}
-                  onCheckedChange={(checked) => handleArrayFieldChange('internalRecipients', dept, !!checked)}
-                />
-                <Label htmlFor={`internal-${dept}`}>{dept}</Label>
-              </div>
-            ))}
+            <MultiSelectDropdown
+              options={departments}
+              selectedValues={formData.internalRecipients || []}
+              onSelectionChange={(values) => setFormData(prev => ({ ...prev, internalRecipients: values }))}
+              placeholder="Select internal recipients"
+              isOpen={internalRecipientsOpen}
+              setIsOpen={setInternalRecipientsOpen}
+            />
           </div>
           
           <div className="space-y-4">
@@ -63,16 +150,14 @@ const ContextTab = ({ formData, setFormData, handleArrayFieldChange }: ContextTa
                 Add New IM System
               </Button>
             </div>
-            {vendors.map(vendor => (
-              <div key={vendor} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`external-${vendor}`}
-                  checked={formData.externalRecipients.includes(vendor)}
-                  onCheckedChange={(checked) => handleArrayFieldChange('externalRecipients', vendor, !!checked)}
-                />
-                <Label htmlFor={`external-${vendor}`}>{vendor}</Label>
-              </div>
-            ))}
+            <MultiSelectDropdown
+              options={vendors}
+              selectedValues={formData.externalRecipients || []}
+              onSelectionChange={(values) => setFormData(prev => ({ ...prev, externalRecipients: values }))}
+              placeholder="Select external recipients"
+              isOpen={externalRecipientsOpen}
+              setIsOpen={setExternalRecipientsOpen}
+            />
             
             {showNewIMSystem && (
               <Card className="p-4 bg-gray-50">
@@ -111,20 +196,16 @@ const ContextTab = ({ formData, setFormData, handleArrayFieldChange }: ContextTa
           </Select>
 
           {formData.internationalTransfers === 'Yes' && (
-            <div className="space-y-2">
+            <div className="space-y-4">
               <Label>Select Countries</Label>
-              <div className="grid grid-cols-3 gap-2">
-                {countries.map(country => (
-                  <div key={country} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`country-${country}`}
-                      checked={formData.transferCountries.includes(country)}
-                      onCheckedChange={(checked) => handleArrayFieldChange('transferCountries', country, !!checked)}
-                    />
-                    <Label htmlFor={`country-${country}`} className="text-sm">{country}</Label>
-                  </div>
-                ))}
-              </div>
+              <MultiSelectDropdown
+                options={countries}
+                selectedValues={formData.transferCountries || []}
+                onSelectionChange={(values) => setFormData(prev => ({ ...prev, transferCountries: values }))}
+                placeholder="Select transfer countries"
+                isOpen={countriesOpen}
+                setIsOpen={setCountriesOpen}
+              />
             </div>
           )}
         </div>
