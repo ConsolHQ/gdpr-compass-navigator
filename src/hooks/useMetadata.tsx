@@ -16,6 +16,42 @@ interface MetadataContextType {
 const MetadataContext = createContext<MetadataContextType | undefined>(undefined);
 
 const defaultMetadata: MetadataCategory[] = [
+  // Risk & Assessment Categories
+  { id: 'risk-levels', name: 'Risk Levels', items: ['Low', 'Medium', 'High', 'Critical'], count: 4 },
+  { id: 'impact-levels', name: 'Impact Levels', items: ['Low', 'Medium', 'High', 'Very High'], count: 4 },
+  { id: 'compliance-scores', name: 'Compliance Scores', items: ['1-20', '21-40', '41-60', '61-80', '81-100'], count: 5 },
+  
+  // Security & Technical Measures
+  { id: 'security-measures', name: 'Security Measures', items: ['Encryption', 'Access Controls', 'Audit Logging', 'Anonymization', 'Pseudonymization'], count: 5 },
+  { id: 'breach-types', name: 'Breach Types', items: ['Confidentiality', 'Integrity', 'Availability'], count: 3 },
+  { id: 'containment-status', name: 'Containment Status', items: ['Active', 'Contained', 'Resolved'], count: 3 },
+  
+  // Compliance & Legal
+  { id: 'compliance-frameworks', name: 'Compliance Frameworks', items: ['GDPR', 'CCPA', 'LGPD', 'PIPEDA', 'PDPA', 'Other'], count: 6 },
+  { id: 'certifications', name: 'Certifications', items: ['ISO 27001', 'SOC 2', 'Privacy Shield', 'BCRs', 'SCCs'], count: 5 },
+  { id: 'jurisdictions', name: 'Jurisdictions', items: ['EU', 'US', 'Canada', 'Brazil', 'Singapore', 'Multiple'], count: 6 },
+  { id: 'contract-status', name: 'Contract Status', items: ['Draft', 'Under Review', 'Signed', 'Expired', 'Terminated'], count: 5 },
+  
+  // Data Subject Requests
+  { id: 'priority-levels', name: 'Priority Levels', items: ['Low', 'Normal', 'High', 'Urgent'], count: 4 },
+  { id: 'request-categories', name: 'Request Categories', items: ['Access', 'Rectification', 'Erasure', 'Portability', 'Restriction', 'Objection'], count: 6 },
+  { id: 'verification-methods', name: 'Verification Methods', items: ['Document Upload', 'Email Verification', 'Phone Verification', 'In-Person'], count: 4 },
+  
+  // Workflow & Status Management
+  { id: 'review-status', name: 'Review Status', items: ['Current', 'Under Review', 'Outdated', 'Archived'], count: 4 },
+  { id: 'training-status', name: 'Training Status', items: ['Not Started', 'In Progress', 'Completed', 'Expired'], count: 4 },
+  { id: 'mitigation-status', name: 'Mitigation Status', items: ['Not Started', 'In Progress', 'Completed', 'Review Required'], count: 4 },
+  
+  // Document & Classification
+  { id: 'classification-levels', name: 'Classification Levels', items: ['Public', 'Internal', 'Confidential', 'Restricted'], count: 4 },
+  { id: 'document-types', name: 'Document Types', items: ['Policy', 'Procedure', 'Contract', 'Notice', 'Form', 'Report'], count: 6 },
+  { id: 'access-levels', name: 'Access Levels', items: ['Basic', 'Standard', 'Advanced', 'Administrative'], count: 4 },
+  
+  // Data Categories (Enhanced)
+  { id: 'personal-data-categories', name: 'Personal Data Categories', items: ['Personal Identifiers', 'Financial Data', 'Health Data', 'Biometric Data', 'Location Data'], count: 5 },
+  { id: 'role-permissions', name: 'Role Permissions', items: ['Data Access', 'Data Modification', 'Admin Functions', 'Reporting', 'Audit'], count: 5 },
+  
+  // Legacy Categories (maintained for compatibility)
   { id: 'agreement-role', name: 'Agreement role', items: ['Controller', 'Processor', 'Joint Controller', 'Sub-processor', 'Third Party'], count: 5 },
   { id: 'control-requirement-status', name: 'Control requirement status', items: ['Not Started', 'In Progress', 'Completed'], count: 3 },
   { id: 'cost-currency', name: 'Cost (currency)', items: ['USD', 'EUR', 'GBP'], count: 3 },
@@ -32,7 +68,6 @@ const defaultMetadata: MetadataCategory[] = [
   { id: 'information-management-system-type', name: 'Information management system type', items: ['CRM', 'ERP', 'Database'], count: 3 },
   { id: 'legal-basis', name: 'Legal basis', items: ['Consent', 'Contract', 'Legal Obligation', 'Vital Interests', 'Public Task', 'Legitimate Interests', 'Explicit Consent'], count: 7 },
   { id: 'mitigation', name: 'Mitigation', items: ['Technical', 'Organizational'], count: 2 },
-  { id: 'mitigation-status', name: 'Mitigation status', items: ['Not Started', 'In Progress', 'Completed', 'On Hold'], count: 4 },
   { id: 'policy-type', name: 'Policy Type', items: ['Privacy Policy', 'Cookie Policy', 'Terms of Service', 'Data Processing Agreement'], count: 4 },
   { id: 'statuses', name: 'Statuses', items: ['Active', 'Inactive', 'Draft'], count: 3 },
   { id: 'department', name: 'Department', items: ['IT', 'HR', 'Marketing', 'Finance', 'Legal', 'Operations'], count: 6 },
