@@ -259,8 +259,15 @@ const CreateDPIA = ({ onBack }: CreateDPIAProps) => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>File Upload</CardTitle>
-              <CardDescription>Upload documents from your computer</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>File Upload</CardTitle>
+                  <CardDescription>Upload documents from your computer</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" className="h-10 w-10 p-0">
+                  <Eye className="h-4 w-4" />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-muted-foreground/40 transition-colors relative">
