@@ -229,7 +229,7 @@ const DSR = () => {
         <div>
           <p className="text-gray-600 mt-1">{processedRequests.length} data subject requests</p>
         </div>
-        <Button>
+        <Button onClick={() => {/* Navigate to CreateDSR */}}>
           <Plus className="mr-2 h-4 w-4" />
           New DSR
         </Button>
@@ -421,6 +421,146 @@ const DSR = () => {
                     </div>
                   </TableHead>
                 )}
+                {visibleColumns.status && (
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('status')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Status
+                        {getSortIcon('status')}
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-auto p-1">
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {getUniqueValues('status').map(value => (
+                            <DropdownMenuCheckboxItem
+                              key={value}
+                              checked={(columnFilters.status || []).includes(value)}
+                              onCheckedChange={(checked) => {
+                                const current = columnFilters.status || [];
+                                if (checked) {
+                                  setColumnFilters(prev => ({ ...prev, status: [...current, value] }));
+                                } else {
+                                  setColumnFilters(prev => ({ ...prev, status: current.filter(v => v !== value) }));
+                                }
+                              }}
+                            >
+                              {value}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableHead>
+                )}
+                {visibleColumns.priority && (
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('priority')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Priority
+                        {getSortIcon('priority')}
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-auto p-1">
+                            <Filter className="h-3 w-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {getUniqueValues('priority').map(value => (
+                            <DropdownMenuCheckboxItem
+                              key={value}
+                              checked={(columnFilters.priority || []).includes(value)}
+                              onCheckedChange={(checked) => {
+                                const current = columnFilters.priority || [];
+                                if (checked) {
+                                  setColumnFilters(prev => ({ ...prev, priority: [...current, value] }));
+                                } else {
+                                  setColumnFilters(prev => ({ ...prev, priority: current.filter(v => v !== value) }));
+                                }
+                              }}
+                            >
+                              {value}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableHead>
+                )}
+                {visibleColumns.requester && (
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('requester')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Requester
+                        {getSortIcon('requester')}
+                      </Button>
+                    </div>
+                  </TableHead>
+                )}
+                {visibleColumns.assignee && (
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('assignee')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Assignee
+                        {getSortIcon('assignee')}
+                      </Button>
+                    </div>
+                  </TableHead>
+                )}
+                {visibleColumns.submissionDate && (
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('submissionDate')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Submitted
+                        {getSortIcon('submissionDate')}
+                      </Button>
+                    </div>
+                  </TableHead>
+                )}
+                {visibleColumns.dueDate && (
+                  <TableHead className="font-semibold">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('dueDate')}
+                        className="h-auto p-0 font-semibold"
+                      >
+                        Due Date
+                        {getSortIcon('dueDate')}
+                      </Button>
+                    </div>
+                  </TableHead>
+                )}
                 <TableHead className="font-semibold">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -441,6 +581,39 @@ const DSR = () => {
                    {visibleColumns.requestType && (
                      <TableCell>
                        <div className="font-medium">{request.requestType}</div>
+                     </TableCell>
+                   )}
+                   {visibleColumns.status && (
+                     <TableCell>
+                       <Badge variant={getStatusColor(request.status)}>{request.status}</Badge>
+                     </TableCell>
+                   )}
+                   {visibleColumns.priority && (
+                     <TableCell>
+                       <Badge variant={getPriorityColor(request.priority)}>{request.priority}</Badge>
+                     </TableCell>
+                   )}
+                   {visibleColumns.requester && (
+                     <TableCell>
+                       <div>
+                         <div className="font-medium">{request.requester}</div>
+                         <div className="text-sm text-muted-foreground">{request.requesterEmail}</div>
+                       </div>
+                     </TableCell>
+                   )}
+                   {visibleColumns.assignee && (
+                     <TableCell>
+                       <div className="font-medium">{request.assignee}</div>
+                     </TableCell>
+                   )}
+                   {visibleColumns.submissionDate && (
+                     <TableCell>
+                       <div className="text-sm">{request.submissionDate}</div>
+                     </TableCell>
+                   )}
+                   {visibleColumns.dueDate && (
+                     <TableCell>
+                       <div className="text-sm">{request.dueDate}</div>
                      </TableCell>
                    )}
                   <TableCell>
