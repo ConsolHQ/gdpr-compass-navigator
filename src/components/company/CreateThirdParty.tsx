@@ -5,20 +5,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { CalendarIcon, Building, ArrowLeft, Save, Send, Upload, FileText } from 'lucide-react';
+import { CalendarIcon, Building, ArrowLeft, Save, Send, Upload, FileText, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useMetadata } from '@/hooks/useMetadata';
 
 interface CreateThirdPartyProps {
   onBack?: () => void;
 }
 
 const CreateThirdParty = ({ onBack }: CreateThirdPartyProps) => {
+  const { getMetadataItems } = useMetadata();
+  
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -42,26 +44,15 @@ const CreateThirdParty = ({ onBack }: CreateThirdPartyProps) => {
     notes: '',
   });
 
+  // Get values from metadata
+  const dataCategories = getMetadataItems('personal-data-categories');
+  const riskLevels = getMetadataItems('risk-levels');
+  const countries = getMetadataItems('country');
+
   const categories = [
     'Data Processor', 'Data Controller', 'Cloud Service Provider', 'Software Vendor',
     'Marketing Agency', 'Analytics Provider', 'Payment Processor', 'HR Services',
     'IT Support', 'Legal Services', 'Consulting', 'Other'
-  ];
-
-  const countries = [
-    'United Kingdom', 'United States', 'Germany', 'France', 'Netherlands',
-    'Ireland', 'Canada', 'Australia', 'Other EU Country', 'Other'
-  ];
-
-  const riskLevels = [
-    { value: 'low', label: 'Low Risk', color: 'bg-green-100 text-green-800' },
-    { value: 'medium', label: 'Medium Risk', color: 'bg-yellow-100 text-yellow-800' },
-    { value: 'high', label: 'High Risk', color: 'bg-red-100 text-red-800' }
-  ];
-
-  const dataCategories = [
-    'Personal Identifiers', 'Contact Information', 'Financial Data', 'Employment Data',
-    'Health Data', 'Behavioral Data', 'Location Data', 'Technical Data', 'Marketing Data'
   ];
 
   const transferMechanisms = [
@@ -69,12 +60,19 @@ const CreateThirdParty = ({ onBack }: CreateThirdPartyProps) => {
     'Certification', 'Code of Conduct', 'Other'
   ];
 
-  const handleDataCategoryChange = (category: string, checked: boolean) => {
+  const handleDataCategoryAdd = (category: string) => {
+    if (!formData.dataCategories.includes(category)) {
+      setFormData(prev => ({
+        ...prev,
+        dataCategories: [...prev.dataCategories, category]
+      }));
+    }
+  };
+
+  const handleDataCategoryRemove = (category: string) => {
     setFormData(prev => ({
       ...prev,
-      dataCategories: checked 
-        ? [...prev.dataCategories, category]
-        : prev.dataCategories.filter(c => c !== category)
+      dataCategories: prev.dataCategories.filter(c => c !== category)
     }));
   };
 
@@ -108,198 +106,199 @@ const CreateThirdParty = ({ onBack }: CreateThirdPartyProps) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Form */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Basic Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
-              <CardDescription>General details about the third party organization</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">Organization Name *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Enter organization name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="category">Category *</Label>
-                  <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>{category}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
+      {/* Vertical Layout */}
+      <div className="space-y-6">
+        {/* Basic Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Basic Information</CardTitle>
+            <CardDescription>General details about the third party organization</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="description">Services Provided *</Label>
-                <Textarea
-                  id="description"
-                  value={formData.services}
-                  onChange={(e) => setFormData(prev => ({ ...prev, services: e.target.value }))}
-                  placeholder="Describe the services provided by this third party..."
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="website">Website</Label>
+                <Label htmlFor="name">Organization Name *</Label>
                 <Input
-                  id="website"
-                  value={formData.website}
-                  onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
-                  placeholder="https://example.com"
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Enter organization name"
                 />
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Contact Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact Information</CardTitle>
-              <CardDescription>Primary contact details for this third party</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="contactPerson">Contact Person</Label>
-                  <Input
-                    id="contactPerson"
-                    value={formData.contactPerson}
-                    onChange={(e) => setFormData(prev => ({ ...prev, contactPerson: e.target.value }))}
-                    placeholder="Primary contact name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="contact@example.com"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    placeholder="Phone number"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="country">Country *</Label>
-                  <Select value={formData.country} onValueChange={(value) => setFormData(prev => ({ ...prev, country: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {countries.map((country) => (
-                        <SelectItem key={country} value={country}>{country}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
               <div>
-                <Label htmlFor="address">Address</Label>
-                <Textarea
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                  placeholder="Full address"
-                  rows={2}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Data Processing Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Data Processing Details</CardTitle>
-              <CardDescription>Information about data handling and processing</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>Data Categories Processed</Label>
-                <p className="text-sm text-muted-foreground mb-3">Select all categories of personal data processed by this third party</p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {dataCategories.map((category) => (
-                    <div key={category} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={category}
-                        checked={formData.dataCategories.includes(category)}
-                        onCheckedChange={(checked) => handleDataCategoryChange(category, checked as boolean)}
-                      />
-                      <Label htmlFor={category} className="text-sm cursor-pointer">{category}</Label>
-                    </div>
-                  ))}
-                </div>
-                {formData.dataCategories.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {formData.dataCategories.map((category) => (
-                      <Badge key={category} variant="secondary">{category}</Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="dataTransferMechanism">Data Transfer Mechanism</Label>
-                <Select value={formData.dataTransferMechanism} onValueChange={(value) => setFormData(prev => ({ ...prev, dataTransferMechanism: value }))}>
+                <Label htmlFor="category">Category *</Label>
+                <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select transfer mechanism" />
+                    <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {transferMechanisms.map((mechanism) => (
-                      <SelectItem key={mechanism} value={mechanism}>{mechanism}</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>{category}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
+            </div>
 
+            <div>
+              <Label htmlFor="services">Services Provided *</Label>
+              <Textarea
+                id="services"
+                value={formData.services}
+                onChange={(e) => setFormData(prev => ({ ...prev, services: e.target.value }))}
+                placeholder="Describe the services provided by this third party..."
+                rows={3}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                value={formData.website}
+                onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
+                placeholder="https://example.com"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Contact Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Contact Information</CardTitle>
+            <CardDescription>Primary contact details for this third party</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="securityMeasures">Security Measures</Label>
-                <Textarea
-                  id="securityMeasures"
-                  value={formData.securityMeasures}
-                  onChange={(e) => setFormData(prev => ({ ...prev, securityMeasures: e.target.value }))}
-                  placeholder="Describe security measures implemented..."
-                  rows={3}
+                <Label htmlFor="contactPerson">Contact Person</Label>
+                <Input
+                  id="contactPerson"
+                  value={formData.contactPerson}
+                  onChange={(e) => setFormData(prev => ({ ...prev, contactPerson: e.target.value }))}
+                  placeholder="Primary contact name"
                 />
               </div>
-            </CardContent>
-          </Card>
-        </div>
+              <div>
+                <Label htmlFor="email">Email Address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="contact@example.com"
+                />
+              </div>
+            </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Risk Assessment */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Risk Assessment</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  value={formData.phone}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  placeholder="Phone number"
+                />
+              </div>
+              <div>
+                <Label htmlFor="country">Country *</Label>
+                <Select value={formData.country} onValueChange={(value) => setFormData(prev => ({ ...prev, country: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map((country) => (
+                      <SelectItem key={country} value={country}>{country}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="address">Address</Label>
+              <Textarea
+                id="address"
+                value={formData.address}
+                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                placeholder="Full address"
+                rows={2}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Data Processing Details */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Data Processing Details</CardTitle>
+            <CardDescription>Information about data handling and processing</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Data Categories Processed</Label>
+              <p className="text-sm text-muted-foreground mb-3">Select all categories of personal data processed by this third party</p>
+              <Select onValueChange={handleDataCategoryAdd}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select data categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  {dataCategories.map((category) => (
+                    <SelectItem key={category} value={category}>{category}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {formData.dataCategories.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {formData.dataCategories.map((category) => (
+                    <Badge key={category} variant="secondary" className="flex items-center gap-1">
+                      {category}
+                      <X 
+                        className="h-3 w-3 cursor-pointer" 
+                        onClick={() => handleDataCategoryRemove(category)} 
+                      />
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="dataTransferMechanism">Data Transfer Mechanism</Label>
+              <Select value={formData.dataTransferMechanism} onValueChange={(value) => setFormData(prev => ({ ...prev, dataTransferMechanism: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select transfer mechanism" />
+                </SelectTrigger>
+                <SelectContent>
+                  {transferMechanisms.map((mechanism) => (
+                    <SelectItem key={mechanism} value={mechanism}>{mechanism}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="securityMeasures">Security Measures</Label>
+              <Textarea
+                id="securityMeasures"
+                value={formData.securityMeasures}
+                onChange={(e) => setFormData(prev => ({ ...prev, securityMeasures: e.target.value }))}
+                placeholder="Describe security measures implemented..."
+                rows={3}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Risk Assessment */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Risk Assessment</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label>Risk Level</Label>
                 <Select value={formData.riskLevel} onValueChange={(value) => setFormData(prev => ({ ...prev, riskLevel: value }))}>
@@ -308,7 +307,7 @@ const CreateThirdParty = ({ onBack }: CreateThirdPartyProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     {riskLevels.map((level) => (
-                      <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
+                      <SelectItem key={level} value={level.toLowerCase()}>{level}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -322,15 +321,17 @@ const CreateThirdParty = ({ onBack }: CreateThirdPartyProps) => {
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, gdprCompliant: checked }))}
                 />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Contract Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Contract Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        {/* Contract Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Contract Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label>Contract Start Date</Label>
                 <Popover>
@@ -352,6 +353,7 @@ const CreateThirdParty = ({ onBack }: CreateThirdPartyProps) => {
                       selected={formData.contractStartDate}
                       onSelect={(date) => setFormData(prev => ({ ...prev, contractStartDate: date }))}
                       initialFocus
+                      className={cn("p-3 pointer-events-auto")}
                     />
                   </PopoverContent>
                 </Popover>
@@ -378,11 +380,14 @@ const CreateThirdParty = ({ onBack }: CreateThirdPartyProps) => {
                       selected={formData.contractEndDate}
                       onSelect={(date) => setFormData(prev => ({ ...prev, contractEndDate: date }))}
                       initialFocus
+                      className={cn("p-3 pointer-events-auto")}
                     />
                   </PopoverContent>
                 </Popover>
               </div>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center justify-between">
                 <Label htmlFor="dpuSigned">DPU Signed</Label>
                 <Switch
@@ -414,42 +419,41 @@ const CreateThirdParty = ({ onBack }: CreateThirdPartyProps) => {
                         selected={formData.dpuDate}
                         onSelect={(date) => setFormData(prev => ({ ...prev, dpuDate: date }))}
                         initialFocus
+                        className={cn("p-3 pointer-events-auto")}
                       />
                     </PopoverContent>
                   </Popover>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Documents */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Documents</CardTitle>
-            </CardHeader>
-            <CardContent>
+        {/* Documents & Notes */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Documents & Notes</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
               <Button variant="outline" className="w-full">
                 <Upload className="h-4 w-4 mr-2" />
                 Upload Contract
               </Button>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Notes */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Additional Notes</CardTitle>
-            </CardHeader>
-            <CardContent>
+            <div>
+              <Label htmlFor="notes">Internal Notes</Label>
               <Textarea
+                id="notes"
                 value={formData.notes}
                 onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                placeholder="Add any additional notes..."
+                placeholder="Add any internal notes about this third party..."
                 rows={4}
               />
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
