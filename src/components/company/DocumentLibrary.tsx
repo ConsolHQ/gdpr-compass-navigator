@@ -114,6 +114,7 @@ const DocumentLibrary = ({ onNavigate }: DocumentLibraryProps) => {
     { id: 'legal', name: 'Legal Documents', count: documents.filter(d => d.category === 'Legal Documents').length },
     { id: 'agreements', name: 'Third Party Agreements', count: documents.filter(d => d.category === 'Third Party Agreements').length },
     { id: 'training', name: 'Training & Awareness', count: documents.filter(d => d.category === 'Training & Awareness').length },
+    { id: 'dpia', name: 'DPIA', count: documents.filter(d => d.category === 'DPIA').length },
   ];
 
   const getStatusColor = (status: string) => {
@@ -145,7 +146,8 @@ const DocumentLibrary = ({ onNavigate }: DocumentLibraryProps) => {
                            (currentView === 'policies' && doc.category === 'Policies & Procedures') ||
                            (currentView === 'legal' && doc.category === 'Legal Documents') ||
                            (currentView === 'agreements' && doc.category === 'Third Party Agreements') ||
-                           (currentView === 'training' && doc.category === 'Training & Awareness');
+                           (currentView === 'training' && doc.category === 'Training & Awareness') ||
+                           (currentView === 'dpia' && doc.category === 'DPIA');
     
     return matchesSearch && matchesCategory;
   });

@@ -26,7 +26,10 @@ import {
   X,
   Archive,
   Copy,
-  Download
+  Download,
+  CheckSquare,
+  Upload,
+  FileText
 } from 'lucide-react';
 
 interface DPIAProps {
@@ -228,10 +231,22 @@ const DPIA = ({ onNavigate }: DPIAProps) => {
         <div>
           <p className="text-gray-600 mt-1">{processedAssessments.length} assessments</p>
         </div>
-        <Button onClick={() => onNavigate?.('/company/assessments/dpia/new')}>
-          <Plus className="mr-2 h-4 w-4" />
-          New DPIA
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => onNavigate?.('/company/dpia/outstanding')}
+            className="relative"
+          >
+            <CheckSquare className="h-4 w-4" />
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              4
+            </span>
+          </Button>
+          <Button onClick={() => onNavigate?.('/company/assessments/dpia/new')}>
+            <Plus className="mr-2 h-4 w-4" />
+            New DPIA
+          </Button>
+        </div>
       </div>
 
       {/* DPIA Stats */}

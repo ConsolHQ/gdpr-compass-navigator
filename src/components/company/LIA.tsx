@@ -34,7 +34,8 @@ import {
   Archive,
   Copy,
   Download,
-  X
+  X,
+  CheckSquare
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -234,11 +235,26 @@ const LIA = ({ onNavigate }: LIAProps) => {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex justify-end items-center">
-        <Button onClick={() => onNavigate?.('/company/assessments/lia/new')} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          New LIA
-        </Button>
+      <div className="flex justify-between items-center">
+        <div>
+          <p className="text-gray-600 mt-1">{processedLIAs.length} legitimate interest assessments</p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => onNavigate?.('/company/lia/outstanding')}
+            className="relative"
+          >
+            <CheckSquare className="h-4 w-4" />
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              3
+            </span>
+          </Button>
+          <Button onClick={() => onNavigate?.('/company/assessments/lia/new')} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            New LIA
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}

@@ -31,10 +31,12 @@ import {
   BookmarkPlus,
   X,
   Trash2,
-  CheckSquare
+  CheckSquare,
+  Upload
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CreateROPA from './CreateROPA';
+import ROPATemplateImport from './ROPATemplateImport';
 
 const ROPATemplates = () => {
   const templates = [
@@ -104,6 +106,7 @@ const ROPA = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [showImportTemplate, setShowImportTemplate] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
@@ -357,8 +360,24 @@ const ROPA = () => {
     return <ChevronsUpDown className="h-4 w-4" />;
   };
 
+  const handleTemplateImport = (templateData: any) => {
+    console.log('Importing template:', templateData);
+    // Here you would create a new ROPA with the imported data
+    setShowImportTemplate(false);
+    setShowCreateForm(true);
+  };
+
   if (showCreateForm) {
     return <CreateROPA onBack={() => setShowCreateForm(false)} />;
+  }
+
+  if (showImportTemplate) {
+    return (
+      <ROPATemplateImport 
+        onBack={() => setShowImportTemplate(false)}
+        onImport={handleTemplateImport}
+      />
+    );
   }
 
   if (showTemplates) {
@@ -367,6 +386,10 @@ const ROPA = () => {
         <div className="flex items-center space-x-2">
           <Button variant="outline" onClick={() => setShowTemplates(false)}>
             ← Back to ROPA
+          </Button>
+          <Button onClick={() => setShowImportTemplate(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Import Template
           </Button>
         </div>
         <ROPATemplates />
