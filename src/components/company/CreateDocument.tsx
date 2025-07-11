@@ -125,15 +125,20 @@ const CreateDocument = ({ onBack }: CreateDocumentProps) => {
             <p className="text-muted-foreground">Upload or link documents to your document library</p>
           </div>
         </div>
-        <div className="flex space-x-2">
-          <Button variant="outline" onClick={() => handleSubmit('save')}>
-            <Save className="h-4 w-4 mr-2" />
-            Save Draft
+        <div className="flex items-center space-x-4">
+          <Button variant="outline" size="sm" className="h-10 w-10 p-0">
+            <Eye className="h-4 w-4" />
           </Button>
-          <Button onClick={() => handleSubmit('publish')}>
-            <FileText className="h-4 w-4 mr-2" />
-            Add Document
-          </Button>
+          <div className="flex space-x-2">
+            <Button variant="outline" onClick={() => handleSubmit('save')}>
+              <Save className="h-4 w-4 mr-2" />
+              Save Draft
+            </Button>
+            <Button onClick={() => handleSubmit('publish')}>
+              <FileText className="h-4 w-4 mr-2" />
+              Add Document
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -259,12 +264,7 @@ const CreateDocument = ({ onBack }: CreateDocumentProps) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              File Upload
-              <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                <Eye className="h-4 w-4" />
-              </Button>
-            </CardTitle>
+            <CardTitle>File Upload</CardTitle>
             <CardDescription>Upload documents from your computer</CardDescription>
           </CardHeader>
           <CardContent>

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,9 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Progress } from '@/components/ui/progress';
 import { format } from 'date-fns';
-import { CalendarIcon, Users, ArrowLeft, Save, Send, X, Upload, File, CheckCircle, AlertCircle, Link as LinkIcon, Eye } from 'lucide-react';
+import { CalendarIcon, Users, ArrowLeft, Save, Send, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMetadata } from '@/hooks/useMetadata';
 
@@ -21,10 +20,6 @@ interface CreateDSRProps {
 
 const CreateDSR = ({ onBack }: CreateDSRProps) => {
   const { getMetadataItems } = useMetadata();
-  
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   
   const [formData, setFormData] = useState({
     type: '',
@@ -37,7 +32,6 @@ const CreateDSR = ({ onBack }: CreateDSRProps) => {
     assignedTo: '',
     dueDate: undefined as Date | undefined,
     internalNotes: '',
-    externalUrl: '',
   });
 
   // Get values from metadata
@@ -65,42 +59,8 @@ const CreateDSR = ({ onBack }: CreateDSRProps) => {
     }));
   };
 
-  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
-
-    setIsUploading(true);
-    const newFiles = Array.from(files);
-    
-    // Simulate upload progress
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      setUploadProgress(progress);
-      
-      if (progress >= 100) {
-        clearInterval(interval);
-        setUploadedFiles(prev => [...prev, ...newFiles]);
-        setIsUploading(false);
-        setUploadProgress(0);
-      }
-    }, 200);
-  }, []);
-
-  const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
   const handleSubmit = (action: 'save' | 'submit') => {
-    console.log('DSR Form Data:', { ...formData, files: uploadedFiles, action });
+    console.log('DSR Form Data:', { ...formData, action });
     // Handle form submission
     if (onBack) onBack();
   };
@@ -324,100 +284,6 @@ const CreateDSR = ({ onBack }: CreateDSRProps) => {
             />
           </CardContent>
         </Card>
-
-        {/* Supporting Documents */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                File Upload
-                <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                  <Eye className="h-4 w-4" />
-                </Button>
-              </CardTitle>
-              <CardDescription>Upload documents from your computer</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors relative">
-                <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <div className="space-y-2">
-                  <p className="text-lg font-medium">Drop files here or click to browse</p>
-                  <p className="text-sm text-gray-500">
-                    Supports PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT (Max 50MB per file)
-                  </p>
-                </div>
-                <input
-                  type="file"
-                  multiple
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
-                  onChange={handleFileUpload}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-              </div>
-
-              {isUploading && (
-                <div className="mt-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Uploading...</span>
-                    <span className="text-sm text-gray-500">{uploadProgress}%</span>
-                  </div>
-                  <Progress value={uploadProgress} />
-                </div>
-              )}
-
-              {uploadedFiles.length > 0 && (
-                <div className="mt-6 space-y-3">
-                  <h4 className="font-medium">Uploaded Files</h4>
-                  {uploadedFiles.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <File className="h-8 w-8 text-blue-600" />
-                        <div>
-                          <p className="font-medium">{file.name}</p>
-                          <p className="text-sm text-gray-500">{formatFileSize(file.size)}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <CheckCircle className="h-5 w-5 text-green-600" />
-                        <Button variant="ghost" size="sm" onClick={() => removeFile(index)}>
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>External Link</CardTitle>
-              <CardDescription>Add a link to an external document or resource</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="externalUrl">Document URL</Label>
-                <div className="flex">
-                  <div className="flex items-center px-3 border border-r-0 rounded-l-md bg-gray-50">
-                    <LinkIcon className="h-4 w-4 text-gray-500" />
-                  </div>
-                  <Input
-                    id="externalUrl"
-                    value={formData.externalUrl}
-                    onChange={(e) => setFormData(prev => ({ ...prev, externalUrl: e.target.value }))}
-                    placeholder="https://example.com/document.pdf"
-                    className="rounded-l-none"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-amber-600">
-                <AlertCircle className="h-4 w-4" />
-                <span>External links will be validated for accessibility</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );
