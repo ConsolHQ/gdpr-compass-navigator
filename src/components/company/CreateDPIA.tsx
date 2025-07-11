@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Save, Eye, Upload, File, CheckCircle, X } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Upload, File, CheckCircle, X, Link as LinkIcon, AlertCircle } from 'lucide-react';
 import { useMetadata } from '@/hooks/useMetadata';
 
 interface CreateDPIAProps {
@@ -27,6 +27,8 @@ const CreateDPIA = ({ onBack }: CreateDPIAProps) => {
     dueDate: '',
     dataTypes: [] as string[],
     risks: [] as string[],
+    externalUrl: '',
+    notes: '',
   });
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -253,75 +255,142 @@ const CreateDPIA = ({ onBack }: CreateDPIAProps) => {
           </CardContent>
         </Card>
 
-        {/* Document Upload */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Supporting Documents</CardTitle>
-                <CardDescription>
-                  Upload relevant documents for your DPIA assessment
-                </CardDescription>
-              </div>
-              <Button variant="outline" size="sm" className="h-10 w-10 p-0">
-                <Eye className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-muted-foreground/40 transition-colors relative">
-              <div className="flex flex-col items-center space-y-4">
-                <Upload className="h-8 w-8 text-muted-foreground" />
+        {/* File Upload and External Link */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>File Upload</CardTitle>
+              <CardDescription>Upload documents from your computer</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-muted-foreground/40 transition-colors relative">
+                <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <div className="space-y-2">
                   <p className="text-lg font-medium">Drop files here or click to browse</p>
                   <p className="text-sm text-muted-foreground">
                     Supports PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT (Max 50MB per file)
                   </p>
                 </div>
+                <input
+                  type="file"
+                  multiple
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                  onChange={handleFileUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
               </div>
-              <input
-                type="file"
-                multiple
-                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
-                onChange={handleFileUpload}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-            </div>
 
-            {isUploading && (
-              <div className="mt-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Uploading...</span>
-                  <span className="text-sm text-muted-foreground">{uploadProgress}%</span>
+              {isUploading && (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">Uploading...</span>
+                    <span className="text-sm text-muted-foreground">{uploadProgress}%</span>
+                  </div>
+                  <Progress value={uploadProgress} />
                 </div>
-                <Progress value={uploadProgress} />
-              </div>
-            )}
+              )}
 
-            {uploadedFiles.length > 0 && (
-              <div className="mt-6 space-y-3">
-                <h4 className="font-medium">Uploaded Files</h4>
-                {uploadedFiles.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <File className="h-8 w-8 text-primary" />
-                      <div>
-                        <p className="font-medium">{file.name}</p>
-                        <p className="text-sm text-muted-foreground">{formatFileSize(file.size)}</p>
+              {uploadedFiles.length > 0 && (
+                <div className="mt-6 space-y-3">
+                  <h4 className="font-medium">Uploaded Files</h4>
+                  {uploadedFiles.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <File className="h-8 w-8 text-primary" />
+                        <div>
+                          <p className="font-medium">{file.name}</p>
+                          <p className="text-sm text-muted-foreground">{formatFileSize(file.size)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                        <Button variant="ghost" size="sm" onClick={() => removeFile(index)}>
+                          <X className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      <Button variant="ghost" size="sm" onClick={() => removeFile(index)}>
-                        <X className="h-4 w-4" />
-                      </Button>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>External Link</CardTitle>
+              <CardDescription>Add a link to an external document or resource</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="externalUrl">Document URL</Label>
+                <div className="flex">
+                  <div className="flex items-center px-3 border border-r-0 rounded-l-md bg-muted">
+                    <LinkIcon className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <Input
+                    id="externalUrl"
+                    value={formData.externalUrl}
+                    onChange={(e) => setFormData(prev => ({ ...prev, externalUrl: e.target.value }))}
+                    placeholder="https://example.com/document.pdf"
+                    className="rounded-l-none"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center space-x-2 text-sm text-amber-600">
+                <AlertCircle className="h-4 w-4" />
+                <span>External links will be validated for accessibility</span>
+              </div>
+              
+              <div>
+                <Label htmlFor="notes">Additional Notes</Label>
+                <Textarea
+                  id="notes"
+                  value={formData.notes}
+                  onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                  placeholder="Add any additional notes about this document..."
+                  rows={4}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Document Preview */}
+        {(uploadedFiles.length > 0 || formData.externalUrl) && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Document Preview</CardTitle>
+                  <CardDescription>
+                    Preview of uploaded documents and external links
+                  </CardDescription>
+                </div>
+                <Button variant="outline" size="sm" className="h-10 w-10 p-0">
+                  <Eye className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {formData.externalUrl && (
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <LinkIcon className="h-8 w-8 text-primary" />
+                      <div className="flex-1">
+                        <p className="font-medium">External Document</p>
+                        <p className="text-sm text-muted-foreground truncate">{formData.externalUrl}</p>
+                        {formData.notes && (
+                          <p className="text-sm text-muted-foreground mt-1">{formData.notes}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                ))}
+                )}
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
