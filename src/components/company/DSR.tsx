@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import CreateDSR from './CreateDSR';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -28,6 +29,7 @@ import {
 } from 'lucide-react';
 
 const DSR = () => {
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
@@ -229,7 +231,7 @@ const DSR = () => {
         <div>
           <p className="text-gray-600 mt-1">{processedRequests.length} data subject requests</p>
         </div>
-        <Button onClick={() => {/* Navigate to CreateDSR */}}>
+        <Button onClick={() => setShowCreateForm(true)}>
           <Plus className="mr-2 h-4 w-4" />
           New DSR
         </Button>
@@ -632,6 +634,13 @@ const DSR = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Conditionally render CreateDSR form */}
+      {showCreateForm && (
+        <div className="fixed inset-0 bg-background z-50 overflow-auto">
+          <CreateDSR onBack={() => setShowCreateForm(false)} />
+        </div>
+      )}
     </div>
   );
 };
