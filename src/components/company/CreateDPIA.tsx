@@ -256,18 +256,22 @@ const CreateDPIA = ({ onBack }: CreateDPIAProps) => {
         {/* Document Upload */}
         <Card>
           <CardHeader>
-            <CardTitle>Supporting Documents</CardTitle>
-            <CardDescription>
-              Upload relevant documents for your DPIA assessment
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Supporting Documents</CardTitle>
+                <CardDescription>
+                  Upload relevant documents for your DPIA assessment
+                </CardDescription>
+              </div>
+              <Button variant="outline" size="sm" className="h-10 w-10 p-0">
+                <Eye className="h-4 w-4" />
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-muted-foreground/40 transition-colors relative">
               <div className="flex flex-col items-center space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Upload className="h-8 w-8 text-muted-foreground" />
-                  <Eye className="h-6 w-6 text-muted-foreground" />
-                </div>
+                <Upload className="h-8 w-8 text-muted-foreground" />
                 <div className="space-y-2">
                   <p className="text-lg font-medium">Drop files here or click to browse</p>
                   <p className="text-sm text-muted-foreground">
