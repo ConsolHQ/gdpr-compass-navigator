@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, Save, Eye } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { ArrowLeft, Save, Eye, Upload, File, CheckCircle, X } from 'lucide-react';
 import { useMetadata } from '@/hooks/useMetadata';
 
 interface CreateDPIAProps {
@@ -15,6 +16,9 @@ interface CreateDPIAProps {
 
 const CreateDPIA = ({ onBack }: CreateDPIAProps) => {
   const { getMetadataItems } = useMetadata();
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -25,8 +29,42 @@ const CreateDPIA = ({ onBack }: CreateDPIAProps) => {
     risks: [] as string[],
   });
 
+  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    setIsUploading(true);
+    const newFiles = Array.from(files);
+    
+    // Simulate upload progress
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += 10;
+      setUploadProgress(progress);
+      
+      if (progress >= 100) {
+        clearInterval(interval);
+        setUploadedFiles(prev => [...prev, ...newFiles]);
+        setIsUploading(false);
+        setUploadProgress(0);
+      }
+    }, 200);
+  }, []);
+
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   const handleSave = () => {
-    console.log('Saving DPIA:', formData);
+    console.log('Saving DPIA:', { ...formData, files: uploadedFiles });
     // In a real app, this would save to backend
     onBack();
   };
@@ -212,6 +250,72 @@ const CreateDPIA = ({ onBack }: CreateDPIAProps) => {
                 </div>
               )}
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Document Upload */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Supporting Documents</CardTitle>
+            <CardDescription>
+              Upload relevant documents for your DPIA assessment
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-muted-foreground/40 transition-colors relative">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Upload className="h-8 w-8 text-muted-foreground" />
+                  <Eye className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-lg font-medium">Drop files here or click to browse</p>
+                  <p className="text-sm text-muted-foreground">
+                    Supports PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT (Max 50MB per file)
+                  </p>
+                </div>
+              </div>
+              <input
+                type="file"
+                multiple
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                onChange={handleFileUpload}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+            </div>
+
+            {isUploading && (
+              <div className="mt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Uploading...</span>
+                  <span className="text-sm text-muted-foreground">{uploadProgress}%</span>
+                </div>
+                <Progress value={uploadProgress} />
+              </div>
+            )}
+
+            {uploadedFiles.length > 0 && (
+              <div className="mt-6 space-y-3">
+                <h4 className="font-medium">Uploaded Files</h4>
+                {uploadedFiles.map((file, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <File className="h-8 w-8 text-primary" />
+                      <div>
+                        <p className="font-medium">{file.name}</p>
+                        <p className="text-sm text-muted-foreground">{formatFileSize(file.size)}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                      <Button variant="ghost" size="sm" onClick={() => removeFile(index)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
