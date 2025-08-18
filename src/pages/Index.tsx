@@ -23,6 +23,7 @@ import DataDictionary from '@/components/company/settings/DataDictionary';
 import IMSystems from '@/components/company/settings/IMSystems';
 import ReportsSettings from '@/components/company/settings/ReportsSettings';
 import CompanySettings from '@/components/company/settings/CompanySettings';
+import AIIntegrationSettings from '@/components/company/settings/AIIntegrationSettings';
 import PartnerSettings from '@/components/partner/PartnerSettings';
 import CreateDSR from '@/components/company/CreateDSR';
 import CreateThirdParty from '@/components/company/CreateThirdParty';
@@ -291,7 +292,7 @@ const Index = () => {
       case '/company/settings/reports':
         return <ReportsSettings />;
       case '/company/settings/ai-integration':
-        return <CompanySettings defaultTab="ai-integration" />;
+        return <AIIntegrationSettings />;
       
       default:
         // Default to dashboard based on user role and context
