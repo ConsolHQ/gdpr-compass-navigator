@@ -26,19 +26,23 @@ interface Suggestion {
 }
 
 interface CopilotPanelProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
+  title?: string;
   context?: string;
   suggestions?: Suggestion[];
   onApplySuggestion?: (suggestionId: string) => void;
+  children?: React.ReactNode;
 }
 
 export const CopilotPanel: React.FC<CopilotPanelProps> = ({
-  isOpen,
+  isOpen = true,
   onClose,
+  title,
   context = "General",
   suggestions = [],
-  onApplySuggestion
+  onApplySuggestion,
+  children
 }) => {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -81,7 +85,7 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
           <div>
-            <h3 className="font-semibold">AI Copilot</h3>
+            <h3 className="font-semibold">{title || 'AI Copilot'}</h3>
             <p className="text-sm text-muted-foreground">{context}</p>
           </div>
         </div>
@@ -97,8 +101,15 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
 
       {/* Content */}
       <div className="flex-1 flex flex-col">
+        {/* Custom Children Content */}
+        {children && (
+          <ScrollArea className="flex-1 p-4">
+            {children}
+          </ScrollArea>
+        )}
+        
         {/* Suggestions */}
-        {suggestions.length > 0 && (
+        {!children && suggestions.length > 0 && (
           <div className="p-4 border-b border-border">
             <div className="flex items-center gap-2 mb-3">
               <Lightbulb className="h-4 w-4 text-amber-500" />
@@ -148,6 +159,7 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
         )}
 
         {/* Chat Interface */}
+        {!children && (
         <div className="flex-1 flex flex-col">
           <div className="flex-1 p-4">
             <div className="text-center text-muted-foreground text-sm">
@@ -181,6 +193,7 @@ export const CopilotPanel: React.FC<CopilotPanelProps> = ({
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

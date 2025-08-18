@@ -10,7 +10,9 @@ import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { CalendarIcon, Users, ArrowLeft, Save, Send, X } from 'lucide-react';
+import { CalendarIcon, Users, ArrowLeft, Save, Send, X, Sparkles } from 'lucide-react';
+import { CopilotPanel } from '@/components/ai/CopilotPanel';
+import { DSRTriageAgent, IdentityVerificationAgent, DataDiscoveryAgent, ResponseLetterAgent } from '@/components/ai/dsr';
 import { cn } from '@/lib/utils';
 import { useMetadata } from '@/hooks/useMetadata';
 
@@ -20,6 +22,7 @@ interface CreateDSRProps {
 
 const CreateDSR = ({ onBack }: CreateDSRProps) => {
   const { getMetadataItems } = useMetadata();
+  const [showAIAssist, setShowAIAssist] = useState(false);
   
   const [formData, setFormData] = useState({
     type: '',
@@ -78,6 +81,10 @@ const CreateDSR = ({ onBack }: CreateDSRProps) => {
           </div>
         </div>
         <div className="flex space-x-2">
+          <Button variant="outline" onClick={() => setShowAIAssist(!showAIAssist)}>
+            <Sparkles className="h-4 w-4 mr-2" />
+            AI Assist
+          </Button>
           <Button variant="outline" onClick={() => handleSubmit('save')}>
             <Save className="h-4 w-4 mr-2" />
             Save Draft
@@ -89,8 +96,9 @@ const CreateDSR = ({ onBack }: CreateDSRProps) => {
         </div>
       </div>
 
-      {/* Vertical Layout */}
-      <div className="space-y-6">
+      <div className="flex gap-6">
+        {/* Main Form */}
+        <div className={`space-y-6 transition-all duration-300 ${showAIAssist ? 'w-2/3' : 'w-full'}`}>
         {/* Request Type */}
         <Card>
           <CardHeader>
@@ -284,6 +292,76 @@ const CreateDSR = ({ onBack }: CreateDSRProps) => {
             />
           </CardContent>
         </Card>
+        </div>
+
+        {/* AI Assistant Panel */}
+        {showAIAssist && (
+          <div className="w-1/3">
+            <CopilotPanel
+              title="DSR AI Assistant"
+              onClose={() => setShowAIAssist(false)}
+            >
+              <div className="space-y-4">
+                <DSRTriageAgent
+                  requestData={{
+                    type: formData.type,
+                    description: formData.description,
+                    requesterEmail: formData.requesterEmail,
+                    requesterName: formData.requesterName
+                  }}
+                  onTriageComplete={(results) => {
+                    console.log('Triage completed:', results);
+                    // Auto-fill form based on triage results
+                    if (results.priority.level) {
+                      setFormData(prev => ({ ...prev, priority: results.priority.level }));
+                    }
+                  }}
+                />
+
+                {formData.requesterName && formData.requesterEmail && (
+                  <IdentityVerificationAgent
+                    requesterInfo={{
+                      name: formData.requesterName,
+                      email: formData.requesterEmail,
+                      phone: formData.requesterPhone
+                    }}
+                    onVerificationComplete={(results) => {
+                      console.log('Verification completed:', results);
+                    }}
+                  />
+                )}
+
+                {formData.type && formData.requesterName && (
+                  <DataDiscoveryAgent
+                    requesterInfo={{
+                      name: formData.requesterName,
+                      email: formData.requesterEmail,
+                      phone: formData.requesterPhone
+                    }}
+                    requestType={formData.type}
+                    onDiscoveryComplete={(results) => {
+                      console.log('Discovery completed:', results);
+                    }}
+                  />
+                )}
+
+                {formData.type && formData.requesterName && (
+                  <ResponseLetterAgent
+                    requestType={formData.type}
+                    requesterInfo={{
+                      name: formData.requesterName,
+                      email: formData.requesterEmail
+                    }}
+                    verificationStatus="verified"
+                    onLetterComplete={(letter) => {
+                      console.log('Letter generated:', letter);
+                    }}
+                  />
+                )}
+              </div>
+            </CopilotPanel>
+          </div>
+        )}
       </div>
     </div>
   );
