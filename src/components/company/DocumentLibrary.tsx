@@ -169,7 +169,7 @@ const DocumentLibrary = ({ onNavigate }: DocumentLibraryProps) => {
             onClick={() => setIsCopilotOpen(true)}
           >
             <Bot className="mr-2 h-4 w-4" />
-            AI Search
+            AI Assist
           </Button>
           <Button onClick={() => onNavigate?.('/company/documents/new')}>
             <Plus className="mr-2 h-4 w-4" />
