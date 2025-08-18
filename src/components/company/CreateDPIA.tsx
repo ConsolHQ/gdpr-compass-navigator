@@ -7,8 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Save, Eye, Upload, File, CheckCircle, X, Link as LinkIcon, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Upload, File, CheckCircle, X, Link as LinkIcon, AlertCircle, Bot } from 'lucide-react';
 import { useMetadata } from '@/hooks/useMetadata';
+import { DPIACopilotPanel } from '@/components/ai/dpia';
 
 interface CreateDPIAProps {
   onBack: () => void;
@@ -19,6 +20,7 @@ const CreateDPIA = ({ onBack }: CreateDPIAProps) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -105,6 +107,13 @@ const CreateDPIA = ({ onBack }: CreateDPIAProps) => {
           </div>
         </div>
         <div className="flex space-x-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setIsCopilotOpen(true)}
+          >
+            <Bot className="mr-2 h-4 w-4" />
+            AI Assist
+          </Button>
           <Button variant="outline">
             <Eye className="mr-2 h-4 w-4" />
             Preview
@@ -399,6 +408,18 @@ const CreateDPIA = ({ onBack }: CreateDPIAProps) => {
           </Card>
         )}
       </div>
+
+      {/* AI Copilot Panel */}
+      <DPIACopilotPanel
+        isOpen={isCopilotOpen}
+        onClose={() => setIsCopilotOpen(false)}
+        formData={formData}
+        onFormUpdate={setFormData}
+        onGeneratedDPIAApply={(generatedData) => {
+          setFormData(prev => ({ ...prev, ...generatedData }));
+          setIsCopilotOpen(false);
+        }}
+      />
     </div>
   );
 };

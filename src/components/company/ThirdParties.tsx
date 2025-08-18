@@ -26,9 +26,11 @@ import {
   Copy,
   Download,
   X,
-  Filter
+  Filter,
+  Bot
 } from 'lucide-react';
 import CreateThirdParty from './CreateThirdParty';
+import { ThirdPartyCopilotPanel } from '@/components/ai/third-party';
 
 interface ThirdPartiesProps {
   onNavigate?: (path: string) => void;
@@ -40,6 +42,8 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
+  const [formData, setFormData] = useState({});
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     name: true,
@@ -265,10 +269,19 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
         <div>
           <p className="text-gray-600 mt-1">{processedThirdParties.length} third parties</p>
         </div>
-        <Button onClick={() => setShowCreateForm(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Third Party
-        </Button>
+        <div className="flex space-x-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setIsCopilotOpen(true)}
+          >
+            <Bot className="mr-2 h-4 w-4" />
+            AI Assist
+          </Button>
+          <Button onClick={() => setShowCreateForm(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Third Party
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -605,12 +618,24 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
         </Card>
       )}
 
-      {/* Conditionally render CreateThirdParty form */}
+      {/* Create Form */}
       {showCreateForm && (
-        <div className="fixed inset-0 bg-background z-50 overflow-auto">
-          <CreateThirdParty onBack={() => setShowCreateForm(false)} />
-        </div>
+        <CreateThirdParty 
+          onBack={() => setShowCreateForm(false)} 
+        />
       )}
+
+      {/* AI Copilot Panel */}
+      <ThirdPartyCopilotPanel
+        isOpen={isCopilotOpen}
+        onClose={() => setIsCopilotOpen(false)}
+        formData={formData}
+        onFormUpdate={setFormData}
+        onGeneratedThirdPartyApply={(generatedData) => {
+          setFormData(prev => ({ ...prev, ...generatedData }));
+          setIsCopilotOpen(false);
+        }}
+      />
     </div>
   );
 };

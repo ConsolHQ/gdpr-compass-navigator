@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bot } from 'lucide-react';
 import IdentifyingLegitimateInterest from './create-lia/IdentifyingLegitimateInterest';
 import ScopeDefinition from './create-lia/ScopeDefinition';
 import BalanceOfInterests from './create-lia/BalanceOfInterests';
 import Conclusion from './create-lia/Conclusion';
+import { LIACopilotPanel } from '@/components/ai/lia';
 
 interface LIAFormData {
   // Section 1: Identifying Legitimate Interest
@@ -58,6 +59,7 @@ interface CreateLIAProps {
 
 const CreateLIA = ({ onBack }: CreateLIAProps) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [formData, setFormData] = useState<LIAFormData>({
     name: '',
     relatedProcessingActivities: [],
@@ -169,17 +171,26 @@ const CreateLIA = ({ onBack }: CreateLIAProps) => {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          Back to LIA Overview
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">Create Legitimate Interest Assessment</h1>
-          <p className="text-muted-foreground mt-1">
-            Conduct a comprehensive balancing test to assess legitimate interest
-          </p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back to LIA Overview
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Create Legitimate Interest Assessment</h1>
+            <p className="text-muted-foreground mt-1">
+              Conduct a comprehensive balancing test to assess legitimate interest
+            </p>
+          </div>
         </div>
+        <Button 
+          variant="outline" 
+          onClick={() => setIsCopilotOpen(true)}
+        >
+          <Bot className="mr-2 h-4 w-4" />
+          AI Assist
+        </Button>
       </div>
 
       {/* Progress */}
@@ -236,6 +247,18 @@ const CreateLIA = ({ onBack }: CreateLIAProps) => {
           </div>
         </CardContent>
       </Card>
+
+      {/* AI Copilot Panel */}
+      <LIACopilotPanel
+        isOpen={isCopilotOpen}
+        onClose={() => setIsCopilotOpen(false)}
+        formData={formData}
+        onFormUpdate={setFormData}
+        onGeneratedLIAApply={(generatedData) => {
+          setFormData(prev => ({ ...prev, ...generatedData }));
+          setIsCopilotOpen(false);
+        }}
+      />
     </div>
   );
 };

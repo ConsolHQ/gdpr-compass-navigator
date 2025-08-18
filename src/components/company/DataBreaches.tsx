@@ -25,7 +25,8 @@ import {
   Copy,
   Download,
   X,
-  Filter
+  Filter,
+  Bot
 } from 'lucide-react';
 
 interface DataBreachesProps {
@@ -37,6 +38,7 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     title: true,
@@ -249,10 +251,19 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
         <div>
           <p className="text-gray-600 mt-1">{processedBreaches.length} incidents</p>
         </div>
-        <Button className="bg-red-600 hover:bg-red-700" onClick={handleReportBreach}>
-          <Plus className="mr-2 h-4 w-4" />
-          Report Breach
-        </Button>
+        <div className="flex space-x-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setIsCopilotOpen(true)}
+          >
+            <Bot className="mr-2 h-4 w-4" />
+            AI Assist
+          </Button>
+          <Button className="bg-red-600 hover:bg-red-700" onClick={handleReportBreach}>
+            <Plus className="mr-2 h-4 w-4" />
+            Report Breach
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -719,6 +730,28 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
             <p className="text-gray-600">Data breach incidents will appear here when reported.</p>
           </CardContent>
         </Card>
+      )}
+      {/* Note: AI Copilot Panel would be added here once breach-specific AI agents are created */}
+      {isCopilotOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <Card className="w-full max-w-lg">
+            <CardHeader>
+              <CardTitle>Data Breach AI Assistant</CardTitle>
+              <CardDescription>
+                AI assistance for data breach management is coming soon!
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                variant="outline" 
+                onClick={() => setIsCopilotOpen(false)}
+                className="w-full"
+              >
+                Close
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );
