@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Plus, Search, Download, Eye, Edit, Trash2, Upload, Folder, File } from 'lucide-react';
+import { FileText, Plus, Search, Download, Eye, Edit, Trash2, Upload, Folder, File, Bot } from 'lucide-react';
+import { DocumentLibraryCopilotPanel } from '@/components/ai/document-library';
 
 interface DocumentLibraryProps {
   onNavigate?: (path: string) => void;
@@ -14,6 +15,8 @@ interface DocumentLibraryProps {
 const DocumentLibrary = ({ onNavigate }: DocumentLibraryProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentView, setCurrentView] = useState('all');
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
+  const [documentData, setDocumentData] = useState({});
   
   const documents = [
     {
@@ -161,6 +164,13 @@ const DocumentLibrary = ({ onNavigate }: DocumentLibraryProps) => {
             <Upload className="mr-2 h-4 w-4" />
             Upload
           </Button>
+          <Button 
+            variant="outline"
+            onClick={() => setIsCopilotOpen(true)}
+          >
+            <Bot className="mr-2 h-4 w-4" />
+            AI Search
+          </Button>
           <Button onClick={() => onNavigate?.('/company/documents/new')}>
             <Plus className="mr-2 h-4 w-4" />
             New Document
@@ -294,6 +304,18 @@ const DocumentLibrary = ({ onNavigate }: DocumentLibraryProps) => {
           )}
         </div>
       </div>
+      
+      {/* Document Library AI Copilot */}
+      <DocumentLibraryCopilotPanel
+        isOpen={isCopilotOpen}
+        onClose={() => setIsCopilotOpen(false)}
+        formData={documentData}
+        onFormUpdate={setDocumentData}
+        onGeneratedDocumentApply={(document) => {
+          // Handle generated document application
+          console.log('Generated document applied:', document);
+        }}
+      />
     </div>
   );
 };

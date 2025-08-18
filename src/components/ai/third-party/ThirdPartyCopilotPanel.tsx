@@ -11,34 +11,32 @@ import {
   Send, 
   X, 
   Sparkles,
-  FileText,
-  Tags,
-  Wand2
+  Building2,
+  Shield
 } from 'lucide-react';
-import DocumentGenerationAgent from './DocumentGenerationAgent';
-import DocumentClassificationAgent from './DocumentClassificationAgent';
-import DocumentSearchAgent from './DocumentSearchAgent';
+import ThirdPartyGenerationAgent from './ThirdPartyGenerationAgent';
+import ComplianceMonitoringAgent from './ComplianceMonitoringAgent';
 
-interface DocumentLibraryCopilotPanelProps {
+interface ThirdPartyCopilotPanelProps {
   isOpen: boolean;
   onClose: () => void;
   formData: any;
   onFormUpdate: (updates: any) => void;
-  onGeneratedDocumentApply: (generatedDocument: any) => void;
+  onGeneratedThirdPartyApply: (generatedThirdParty: any) => void;
 }
 
-const DocumentLibraryCopilotPanel: React.FC<DocumentLibraryCopilotPanelProps> = ({
+const ThirdPartyCopilotPanel: React.FC<ThirdPartyCopilotPanelProps> = ({
   isOpen,
   onClose,
   formData,
   onFormUpdate,
-  onGeneratedDocumentApply
+  onGeneratedThirdPartyApply
 }) => {
   const [chatMessages, setChatMessages] = useState<any[]>([
     {
       id: 1,
       type: 'assistant',
-      content: "I'm your Document Library AI Assistant! I can help you generate GDPR compliance documents, analyze and classify existing documents, and organize your privacy documentation efficiently.",
+      content: "I'm your Third Party Management AI Assistant! I can help you generate comprehensive vendor records, monitor compliance status, assess risks, and manage third-party relationships efficiently.",
       timestamp: new Date()
     }
   ]);
@@ -48,8 +46,7 @@ const DocumentLibraryCopilotPanel: React.FC<DocumentLibraryCopilotPanelProps> = 
   const getActiveAgents = () => {
     return {
       generation: true, // Always available
-      classification: true, // Always available for document analysis
-      search: true // Always available for intelligent search
+      monitoring: true // Always available for compliance monitoring
     };
   };
 
@@ -71,10 +68,10 @@ const DocumentLibraryCopilotPanel: React.FC<DocumentLibraryCopilotPanelProps> = 
 
     setTimeout(() => {
       const responses = [
-        "I can help you create any GDPR compliance document you need! Privacy policies, data breach response plans, data retention policies - just tell me what you're looking for and I'll generate a comprehensive document.",
-        "Need to organize your existing documents? I can analyze and classify them automatically, adding appropriate tags and compliance assessments. Just upload a document and I'll do the rest!",
-        "For document generation, I can create industry-specific privacy policies, cookie policies, data processing agreements, and more. What type of document would be most helpful for your compliance needs?",
-        "I can analyze uploaded documents for GDPR compliance, suggest improvements, and automatically tag them for easy organization. This helps maintain an organized and compliant document library."
+        "I can help you create detailed third-party vendor records with comprehensive risk assessments, compliance checks, and contract details. Just provide the company name and I'll generate a complete profile!",
+        "Need to monitor your vendor compliance? I can analyze all your third-party relationships, identify risks, track contract renewals, and ensure GDPR compliance across your vendor ecosystem.",
+        "For vendor onboarding, I can generate due diligence questionnaires, assess data processing activities, evaluate security measures, and create appropriate data processing agreements.",
+        "I can continuously monitor your third-party compliance status, alert you to contract renewals, track certification updates, and identify potential risks before they become issues."
       ];
 
       const assistantMessage = {
@@ -92,19 +89,19 @@ const DocumentLibraryCopilotPanel: React.FC<DocumentLibraryCopilotPanelProps> = 
   if (!isOpen) return null;
 
   return (
-    <Card className="fixed right-4 top-4 bottom-4 w-96 z-50 shadow-2xl border-teal-200">
-      <CardHeader className="bg-gradient-to-r from-teal-50 to-green-50 border-b">
+    <Card className="fixed right-4 top-4 bottom-4 w-96 z-50 shadow-2xl border-purple-200">
+      <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Bot className="h-5 w-5 text-teal-600" />
-            <CardTitle className="text-sm">Document Library AI</CardTitle>
+            <Bot className="h-5 w-5 text-purple-600" />
+            <CardTitle className="text-sm">Third Party Management AI</CardTitle>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
         </div>
         <CardDescription className="text-xs">
-          AI-powered document generation, classification, and organization
+          AI-powered vendor management, compliance monitoring, and risk assessment
         </CardDescription>
       </CardHeader>
 
@@ -114,28 +111,21 @@ const DocumentLibraryCopilotPanel: React.FC<DocumentLibraryCopilotPanelProps> = 
             {/* AI Agents Section */}
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
-                <Sparkles className="h-4 w-4 text-teal-600" />
-                <span className="text-sm font-medium text-teal-900">AI Agents</span>
+                <Sparkles className="h-4 w-4 text-purple-600" />
+                <span className="text-sm font-medium text-purple-900">AI Agents</span>
               </div>
               
-              <DocumentGenerationAgent
+              <ThirdPartyGenerationAgent
                 isActive={activeAgents.generation}
                 formData={formData}
                 onFormUpdate={onFormUpdate}
-                onGeneratedDocumentApply={onGeneratedDocumentApply}
+                onGeneratedThirdPartyApply={onGeneratedThirdPartyApply}
               />
               
-              <DocumentClassificationAgent
-                isActive={activeAgents.classification}
-                onClassificationResult={(result) => {
-                  onFormUpdate({ ...formData, lastClassification: result });
-                }}
-              />
-              
-              <DocumentSearchAgent
-                isActive={activeAgents.search}
-                onSearchResult={(results) => {
-                  onFormUpdate({ ...formData, lastSearchResults: results });
+              <ComplianceMonitoringAgent
+                isActive={activeAgents.monitoring}
+                onComplianceUpdate={(update) => {
+                  onFormUpdate({ ...formData, lastComplianceUpdate: update });
                 }}
               />
             </div>
@@ -145,8 +135,8 @@ const DocumentLibraryCopilotPanel: React.FC<DocumentLibraryCopilotPanelProps> = 
             {/* Chat Section */}
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
-                <MessageSquare className="h-4 w-4 text-teal-600" />
-                <span className="text-sm font-medium text-teal-900">Chat Assistant</span>
+                <MessageSquare className="h-4 w-4 text-purple-600" />
+                <span className="text-sm font-medium text-purple-900">Chat Assistant</span>
               </div>
               
               <div className="space-y-3">
@@ -154,7 +144,7 @@ const DocumentLibraryCopilotPanel: React.FC<DocumentLibraryCopilotPanelProps> = 
                   <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[80%] p-3 rounded-lg text-xs ${
                       message.type === 'user' 
-                        ? 'bg-teal-600 text-white' 
+                        ? 'bg-purple-600 text-white' 
                         : 'bg-gray-100 text-gray-900'
                     }`}>
                       {message.content}
@@ -180,7 +170,7 @@ const DocumentLibraryCopilotPanel: React.FC<DocumentLibraryCopilotPanelProps> = 
         <div className="border-t p-4 space-y-3">
           <div className="flex space-x-2">
             <Input
-              placeholder="Ask about document generation, classification, compliance..."
+              placeholder="Ask about vendor management, compliance monitoring, risk assessment..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
@@ -200,8 +190,7 @@ const DocumentLibraryCopilotPanel: React.FC<DocumentLibraryCopilotPanelProps> = 
               <span>Active Agents:</span>
               <div className="flex space-x-1">
                 {activeAgents.generation && <Badge variant="outline" className="text-xs">Generation</Badge>}
-                {activeAgents.classification && <Badge variant="outline" className="text-xs">Classification</Badge>}
-                {activeAgents.search && <Badge variant="outline" className="text-xs">AI Search</Badge>}
+                {activeAgents.monitoring && <Badge variant="outline" className="text-xs">Monitoring</Badge>}
               </div>
             </div>
           </div>
@@ -211,4 +200,4 @@ const DocumentLibraryCopilotPanel: React.FC<DocumentLibraryCopilotPanelProps> = 
   );
 };
 
-export default DocumentLibraryCopilotPanel;
+export default ThirdPartyCopilotPanel;
