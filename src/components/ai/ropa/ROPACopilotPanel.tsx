@@ -16,11 +16,13 @@ import {
   Brain,
   Database,
   Shield,
-  CheckCircle
+  CheckCircle,
+  Wand2
 } from 'lucide-react';
 import ROPATriageAgent from './ROPATriageAgent';
 import DataClassificationAgent from './DataClassificationAgent';
 import ComplianceAssessmentAgent from './ComplianceAssessmentAgent';
+import ROPAGenerationAgent from './ROPAGenerationAgent';
 
 interface ROPACopilotPanelProps {
   isOpen: boolean;
@@ -28,6 +30,7 @@ interface ROPACopilotPanelProps {
   formData: any;
   onFormUpdate: (updates: any) => void;
   onArrayFieldChange: (field: string, value: string, checked: boolean) => void;
+  onGeneratedROPAApply: (generatedROPA: any) => void;
   currentTab: string;
 }
 
@@ -37,6 +40,7 @@ const ROPACopilotPanel: React.FC<ROPACopilotPanelProps> = ({
   formData,
   onFormUpdate,
   onArrayFieldChange,
+  onGeneratedROPAApply,
   currentTab
 }) => {
   const [chatMessages, setChatMessages] = useState<any[]>([
@@ -53,6 +57,7 @@ const ROPACopilotPanel: React.FC<ROPACopilotPanelProps> = ({
   // Determine which agents should be active based on current tab and form data
   const getActiveAgents = () => {
     const agents = {
+      generation: true, // Always available for complete ROPA generation
       triage: currentTab === 'general' || !formData.name,
       dataClassification: currentTab === 'data' || (formData.name && !formData.personalDataCategories?.length),
       compliance: currentTab === 'principles' || Object.keys(formData).length > 5
@@ -136,6 +141,13 @@ const ROPACopilotPanel: React.FC<ROPACopilotPanelProps> = ({
                 <Sparkles className="h-4 w-4 text-blue-600" />
                 <span className="text-sm font-medium text-blue-900">AI Agents</span>
               </div>
+              
+              <ROPAGenerationAgent
+                isActive={activeAgents.generation}
+                formData={formData}
+                onFormUpdate={onFormUpdate}
+                onGeneratedROPAApply={onGeneratedROPAApply}
+              />
               
               <ROPATriageAgent
                 isActive={activeAgents.triage}
@@ -224,6 +236,7 @@ const ROPACopilotPanel: React.FC<ROPACopilotPanelProps> = ({
             <div className="flex items-center justify-between">
               <span>Active Agents:</span>
               <div className="flex space-x-1">
+                {activeAgents.generation && <Badge variant="outline" className="text-xs">Generation</Badge>}
                 {activeAgents.triage && <Badge variant="outline" className="text-xs">Triage</Badge>}
                 {activeAgents.dataClassification && <Badge variant="outline" className="text-xs">Data</Badge>}
                 {activeAgents.compliance && <Badge variant="outline" className="text-xs">Compliance</Badge>}

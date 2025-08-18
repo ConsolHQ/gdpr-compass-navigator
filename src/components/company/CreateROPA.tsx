@@ -64,6 +64,14 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
     dataProtectionPrinciples: {} as any
   });
 
+  const handleGeneratedROPAApply = (generatedROPA: any) => {
+    setFormData(generatedROPA);
+    // Optionally switch to a specific tab after applying
+    if (generatedROPA.name) {
+      setCurrentTab('purpose'); // Move to next relevant tab
+    }
+  };
+
   const handleArrayFieldChange = (field: keyof typeof formData, value: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
@@ -390,6 +398,7 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
         formData={formData}
         onFormUpdate={setFormData}
         onArrayFieldChange={handleArrayFieldChange}
+        onGeneratedROPAApply={handleGeneratedROPAApply}
         currentTab={currentTab}
       />
     </div>
