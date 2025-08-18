@@ -21,6 +21,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/company/settings" element={<CompanySettings />} />
+          <Route path="/company/settings/ai-integration" element={<CompanySettings defaultTab="ai-integration" />} />
           <Route path="/company/settings/im-systems" element={<IMSystems />} />
           <Route path="/company/ropa/outstanding" element={<OutstandingItems />} />
           <Route path="/company/ai-assist/automation-center" element={<AutomationCenter />} />

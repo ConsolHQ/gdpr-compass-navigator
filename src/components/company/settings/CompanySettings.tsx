@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Building, Users, Database, Book, BarChart, Settings, Globe, MapPin, Bot, Key, Eye, EyeOff } from 'lucide-react';
 
-const CompanySettings = () => {
+const CompanySettings = ({ defaultTab = "organization" }: { defaultTab?: string }) => {
   const [showApiKeys, setShowApiKeys] = React.useState({
     openai: false,
     perplexity: false,
@@ -49,7 +49,7 @@ const CompanySettings = () => {
         <p className="text-gray-600 mt-2">Configure your company's GDPR compliance settings</p>
       </div>
 
-      <Tabs defaultValue="organization" className="space-y-6">
+      <Tabs defaultValue={defaultTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="organization">Organization</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>

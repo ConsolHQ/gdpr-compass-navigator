@@ -22,6 +22,7 @@ import MetadataSettings from '@/components/company/settings/MetadataSettings';
 import DataDictionary from '@/components/company/settings/DataDictionary';
 import IMSystems from '@/components/company/settings/IMSystems';
 import ReportsSettings from '@/components/company/settings/ReportsSettings';
+import CompanySettings from '@/components/company/settings/CompanySettings';
 import PartnerSettings from '@/components/partner/PartnerSettings';
 import CreateDSR from '@/components/company/CreateDSR';
 import CreateThirdParty from '@/components/company/CreateThirdParty';
@@ -224,6 +225,8 @@ const Index = () => {
         return { title: 'Organisation Settings', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Organisation' }] };
       case '/company/settings/reports':
         return { title: 'Reports & Analytics', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Reports' }] };
+      case '/company/settings/ai-integration':
+        return { title: 'AI Integration', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'AI Integration' }] };
       default:
         return { title: 'Dashboard', breadcrumbs: [] };
     }
@@ -287,6 +290,8 @@ const Index = () => {
         return <OrganizationSettings />;
       case '/company/settings/reports':
         return <ReportsSettings />;
+      case '/company/settings/ai-integration':
+        return <CompanySettings defaultTab="ai-integration" />;
       
       default:
         // Default to dashboard based on user role and context

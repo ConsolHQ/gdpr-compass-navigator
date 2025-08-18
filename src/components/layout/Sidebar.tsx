@@ -83,8 +83,8 @@ const companyMenuItems: SidebarItem[] = [
       { id: 'ai-insights', label: 'AI Insights', icon: Target, href: '/company/ai-assist/insights' },
     ]
   },
-  { 
-    id: 'settings', 
+  {
+    id: 'settings',
     label: 'Settings', 
     icon: Settings, 
     href: '/company/settings',
@@ -94,6 +94,7 @@ const companyMenuItems: SidebarItem[] = [
       { id: 'im-systems', label: 'IM Systems', icon: Database, href: '/company/settings/im-systems' },
       { id: 'users', label: 'Users', icon: Users, href: '/company/settings/users' },
       { id: 'organisation', label: 'Organisation Setup', icon: Settings, href: '/company/settings/organisation' },
+      { id: 'ai-integration', label: 'AI Integration', icon: Bot, href: '/company/settings/ai-integration' },
       { id: 'reports', label: 'Reports', icon: BarChart, href: '/company/settings/reports' },
     ]
   },
