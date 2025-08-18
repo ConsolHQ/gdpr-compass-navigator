@@ -20,6 +20,10 @@ import {
   ChevronUp,
   Building,
   Unlock,
+  Sparkles,
+  Bot,
+  Zap,
+  Target,
 } from 'lucide-react';
 
 interface SidebarItem {
@@ -68,6 +72,17 @@ const companyMenuItems: SidebarItem[] = [
   { id: 'breaches', label: 'Data Breaches', icon: AlertTriangle, href: '/company/breaches' },
   { id: 'vendors', label: 'Third Parties', icon: Link, href: '/company/vendors' },
   { id: 'documents', label: 'Document Library', icon: Book, href: '/company/documents' },
+  { 
+    id: 'ai-assist', 
+    label: 'AI Assist', 
+    icon: Sparkles, 
+    href: '/company/ai-assist',
+    submenu: [
+      { id: 'automation-center', label: 'Automation Center', icon: Bot, href: '/company/ai-assist/automation-center' },
+      { id: 'workflow-builder', label: 'Workflow Builder', icon: Zap, href: '/company/ai-assist/workflow-builder' },
+      { id: 'ai-insights', label: 'AI Insights', icon: Target, href: '/company/ai-assist/insights' },
+    ]
+  },
   { 
     id: 'settings', 
     label: 'Settings', 
