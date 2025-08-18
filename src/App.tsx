@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import OutstandingItems from "./pages/OutstandingItems";
 import IMSystems from "./components/company/settings/IMSystems";
 import { AutomationCenter } from "./components/ai/AutomationCenter";
+import CompanySettings from "./components/company/settings/CompanySettings";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/company/settings" element={<CompanySettings />} />
           <Route path="/company/settings/im-systems" element={<IMSystems />} />
           <Route path="/company/ropa/outstanding" element={<OutstandingItems />} />
           <Route path="/company/ai-assist/automation-center" element={<AutomationCenter />} />
