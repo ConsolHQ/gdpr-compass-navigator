@@ -13,7 +13,9 @@ import {
   Globe,
   Clock,
   Lock,
-  FileCheck
+  FileCheck,
+  Bot,
+  Sparkles
 } from 'lucide-react';
 import GeneralInfoTab from './create-ropa/GeneralInfoTab';
 import PurposeTab from './create-ropa/PurposeTab';
@@ -23,9 +25,11 @@ import ContextTab from './create-ropa/ContextTab';
 import RetentionTab from './create-ropa/RetentionTab';
 import SecurityTab from './create-ropa/SecurityTab';
 import DataProtectionPrinciplesTab from './create-ropa/DataProtectionPrinciplesTab';
+import { ROPACopilotPanel } from '../ai/ropa';
 
 const CreateROPA = ({ onBack }: { onBack: () => void }) => {
   const [showDPIADialog, setShowDPIADialog] = useState(false);
+  const [showAIAssist, setShowAIAssist] = useState(false);
   const [currentTab, setCurrentTab] = useState('general');
   const [formData, setFormData] = useState({
     name: '',
@@ -170,6 +174,17 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
             <h1 className="text-3xl font-bold text-gray-900">Create New ROPA</h1>
             <p className="text-gray-600">Record of Processing Activities</p>
           </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowAIAssist(!showAIAssist)}
+            className="flex items-center space-x-2"
+          >
+            <Bot className="h-4 w-4" />
+            <span>AI Assist</span>
+            {showAIAssist && <Sparkles className="h-3 w-3 text-blue-600" />}
+          </Button>
         </div>
       </div>
 
@@ -367,6 +382,16 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ROPA AI Assistant Panel */}
+      <ROPACopilotPanel
+        isOpen={showAIAssist}
+        onClose={() => setShowAIAssist(false)}
+        formData={formData}
+        onFormUpdate={setFormData}
+        onArrayFieldChange={handleArrayFieldChange}
+        currentTab={currentTab}
+      />
     </div>
   );
 };
