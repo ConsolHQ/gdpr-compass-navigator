@@ -28,6 +28,7 @@ import {
   Filter,
   Bot
 } from 'lucide-react';
+import { DataBreachCopilotPanel } from '@/components/ai/data-breach';
 
 interface DataBreachesProps {
   onNavigate?: (path: string) => void;
@@ -39,6 +40,7 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
+  const [formData, setFormData] = useState({});
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
     title: true,
@@ -731,28 +733,18 @@ const DataBreaches: React.FC<DataBreachesProps> = ({ onNavigate }) => {
           </CardContent>
         </Card>
       )}
-      {/* Note: AI Copilot Panel would be added here once breach-specific AI agents are created */}
-      {isCopilotOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <Card className="w-full max-w-lg">
-            <CardHeader>
-              <CardTitle>Data Breach AI Assistant</CardTitle>
-              <CardDescription>
-                AI assistance for data breach management is coming soon!
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                variant="outline" 
-                onClick={() => setIsCopilotOpen(false)}
-                className="w-full"
-              >
-                Close
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+
+      {/* AI Copilot Panel */}
+      <DataBreachCopilotPanel
+        isOpen={isCopilotOpen}
+        onClose={() => setIsCopilotOpen(false)}
+        formData={formData}
+        onFormUpdate={setFormData}
+        onGeneratedBreachApply={(generatedData) => {
+          setFormData(prev => ({ ...prev, ...generatedData }));
+          setIsCopilotOpen(false);
+        }}
+      />
     </div>
   );
 };
