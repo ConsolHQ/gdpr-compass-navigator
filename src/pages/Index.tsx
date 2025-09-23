@@ -1,380 +1,111 @@
-
-import React, { useState } from 'react';
-import LoginForm from '@/components/auth/LoginForm';
-import SignUpForm from '@/components/auth/SignUpForm';
-import EmailVerification from '@/components/auth/EmailVerification';
-import OrganizationSetup from '@/components/onboarding/OrganizationSetup';
-import Header from '@/components/layout/Header';
-import Sidebar from '@/components/layout/Sidebar';
-import PartnerDashboard from '@/components/dashboard/PartnerDashboard';
-import CompanyDashboard from '@/components/dashboard/CompanyDashboard';
-import ROPA from '@/components/company/ROPA';
-import DPIA from '@/components/company/DPIA';
-import LIA from '@/components/company/LIA';
-import DSR from '@/components/company/DSR';
-import DataBreaches from '@/components/company/DataBreaches';
-import IncidentReporting from '@/components/company/IncidentReporting';
-import ThirdParties from '@/components/company/ThirdParties';
-import DocumentLibrary from '@/components/company/DocumentLibrary';
-import OrganizationSettings from '@/components/company/settings/OrganizationSettings';
-import UserManagement from '@/components/company/settings/UserManagement';
-import MetadataSettings from '@/components/company/settings/MetadataSettings';
-import DataDictionary from '@/components/company/settings/DataDictionary';
-import IMSystems from '@/components/company/settings/IMSystems';
-import ReportsSettings from '@/components/company/settings/ReportsSettings';
-import CompanySettings from '@/components/company/settings/CompanySettings';
-import AIIntegrationSettings from '@/components/company/settings/AIIntegrationSettings';
-import PartnerSettings from '@/components/partner/PartnerSettings';
-import CreateDSR from '@/components/company/CreateDSR';
-import CreateThirdParty from '@/components/company/CreateThirdParty';
-import CreateDocument from '@/components/company/CreateDocument';
-import CreateLIA from '@/components/company/CreateLIA';
-import CreateDPIA from '@/components/company/CreateDPIA';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'partner' | 'company';
-  avatar?: string;
-}
-
-interface Organization {
-  id: string;
-  name: string;
-  industry: string;
-  country: string;
-}
-
-interface CompanyAccess {
-  id: string;
-  name: string;
-  hasAccess: boolean;
-}
-
-type AppState = 'login' | 'signup' | 'verification' | 'onboarding' | 'dashboard';
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Building2, Users, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-  const [appState, setAppState] = useState<AppState>('login');
-  const [user, setUser] = useState<User | null>(null);
-  const [organization, setOrganization] = useState<Organization | null>(null);
-  const [currentPath, setCurrentPath] = useState('/dashboard');
-  const [pendingUserData, setPendingUserData] = useState<any>(null);
-  
-  // For partners: track which companies they have access to and current active company
-  const [partnerCompanies, setPartnerCompanies] = useState<CompanyAccess[]>([]);
-  const [activeCompany, setActiveCompany] = useState<CompanyAccess | null>(null);
+  const navigate = useNavigate();
 
-  // Mock authentication
-  const handleLogin = (email: string, password: string) => {
-    console.log('Login attempt:', { email, password });
-    // Mock user data
-    const mockUser: User = {
-      id: '1',
-      name: 'John Doe',
-      email: email,
-      role: email.includes('partner') ? 'partner' : 'company',
-    };
-    
-    setUser(mockUser);
-    
-    if (mockUser.role === 'partner') {
-      // Mock companies the partner has access to
-      const mockCompanies: CompanyAccess[] = [
-        { id: '1', name: 'TechCorp Ltd', hasAccess: true },
-        { id: '2', name: 'DataFlow Inc', hasAccess: true },
-        { id: '3', name: 'SecureBank', hasAccess: false },
-        { id: '4', name: 'HealthSystem', hasAccess: true },
-      ];
-      setPartnerCompanies(mockCompanies);
-      setCurrentPath('/partner/dashboard');
-    } else {
-      setCurrentPath('/company/dashboard');
-    }
-    
-    setAppState('dashboard');
-  };
-
-  const handleSignUp = (signUpData: any) => {
-    console.log('Sign up attempt:', signUpData);
-    setPendingUserData(signUpData);
-    setAppState('verification');
-  };
-
-  const handleEmailVerification = (code: string) => {
-    console.log('Email verification with code:', code);
-    // Mock verification success
-    if (pendingUserData) {
-      const mockUser: User = {
-        id: '1',
-        name: `${pendingUserData.firstName} ${pendingUserData.lastName}`,
-        email: pendingUserData.email,
-        role: pendingUserData.accountType,
-      };
-      setUser(mockUser);
-      setAppState('onboarding');
-    }
-  };
-
-  const handleResendCode = () => {
-    console.log('Resending verification code to:', pendingUserData?.email);
-    // Mock resend code functionality
-  };
-
-  const handleOrganizationSetup = (orgData: any) => {
-    console.log('Organization setup:', orgData);
-    const mockOrg: Organization = {
-      id: '1',
-      name: orgData.name,
-      industry: orgData.industry,
-      country: orgData.country,
-    };
-    setOrganization(mockOrg);
-    setCurrentPath(user?.role === 'partner' ? '/partner/dashboard' : '/company/dashboard');
-    setAppState('dashboard');
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    setOrganization(null);
-    setPendingUserData(null);
-    setPartnerCompanies([]);
-    setActiveCompany(null);
-    setCurrentPath('/');
-    setAppState('login');
-  };
-
-  const handleNavigate = (path: string) => {
-    setCurrentPath(path);
-    console.log('Navigating to:', path);
-  };
-
-  const handleNavigateToCompany = (companyId: string) => {
-    console.log('Navigating to company:', companyId);
-    setCurrentPath(`/partner/companies/${companyId}`);
-  };
-
-  // Handle partner switching between company workspaces
-  const handleSwitchCompany = (company: CompanyAccess) => {
-    if (!company.hasAccess) {
-      console.log('Requesting access to company:', company.name);
-      // In real app, this would trigger an access request
-      return;
-    }
-    
-    setActiveCompany(company);
-    setCurrentPath('/company/dashboard');
-    console.log('Switched to company workspace:', company.name);
-  };
-
-  // Get page title and breadcrumbs based on current path
-  const getPageInfo = () => {
-    const pathSegments = currentPath.split('/').filter(Boolean);
-    
-    if (user?.role === 'partner' && !activeCompany && currentPath.startsWith('/partner')) {
-      switch (currentPath) {
-        case '/partner/dashboard':
-          return { title: 'Partner Dashboard', breadcrumbs: [] };
-        case '/partner/settings':
-          return { title: 'Partner Settings', breadcrumbs: [{ label: 'Dashboard', href: '/partner/dashboard' }, { label: 'Settings' }] };
-        default:
-          return { title: 'Partner Dashboard', breadcrumbs: [] };
-      }
-    }
-
-    // Company routes
-    switch (currentPath) {
-      case '/company/dashboard':
-        return { title: 'Dashboard', breadcrumbs: [] };
-      case '/company/ropa':
-        return { title: 'Register of Processing Activities', breadcrumbs: [] };
-      case '/company/assessments/dpia':
-        return { title: 'Data Protection Impact Assessment', breadcrumbs: [{ label: 'Assessments', href: '/company/assessments' }, { label: 'DPIA' }] };
-      case '/company/assessments/dpia/new':
-        return { title: 'Create DPIA', breadcrumbs: [{ label: 'Assessments', href: '/company/assessments' }, { label: 'DPIA', href: '/company/assessments/dpia' }, { label: 'Create' }] };
-      case '/company/assessments/lia':
-        return { title: 'Legitimate Interest Assessment', breadcrumbs: [{ label: 'Assessments', href: '/company/assessments' }, { label: 'LIA' }] };
-      case '/company/assessments/lia/new':
-        return { title: 'Create LIA', breadcrumbs: [{ label: 'Assessments', href: '/company/assessments' }, { label: 'LIA', href: '/company/assessments/lia' }, { label: 'Create' }] };
-      case '/company/dsr':
-        return { title: 'Data Subject Requests', breadcrumbs: [] };
-      case '/company/breaches':
-        return { title: 'Data Breaches', breadcrumbs: [] };
-      case '/company/breaches/report':
-        return { title: 'Report Incident', breadcrumbs: [{ label: 'Data Breaches', href: '/company/breaches' }, { label: 'Report Incident' }] };
-      case '/company/dsr/new':
-        return { title: 'New Data Subject Request', breadcrumbs: [{ label: 'Data Subject Requests', href: '/company/dsr' }, { label: 'New Request' }] };
-      case '/company/vendors/new':
-        return { title: 'Add Third Party', breadcrumbs: [{ label: 'Third Party Management', href: '/company/vendors' }, { label: 'Add Third Party' }] };
-      case '/company/documents/new':
-        return { title: 'Add Document', breadcrumbs: [{ label: 'Document Library', href: '/company/documents' }, { label: 'Add Document' }] };
-      case '/company/vendors':
-        return { title: 'Third Party Management', breadcrumbs: [] };
-      case '/company/documents':
-        return { title: 'Document Library', breadcrumbs: [] };
-      case '/company/settings':
-        return { title: 'Company Settings', breadcrumbs: [] };
-      case '/company/settings/metadata':
-        return { title: 'Metadata Management', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Metadata' }] };
-      case '/company/settings/data-dictionary':
-        return { title: 'Data Dictionary', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Data Dictionary' }] };
-      case '/company/settings/im-systems':
-        return { title: 'IM Systems', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'IM Systems' }] };
-      case '/company/settings/users':
-        return { title: 'User Management', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Users' }] };
-      case '/company/settings/organisation':
-        return { title: 'Organisation Settings', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Organisation' }] };
-      case '/company/settings/reports':
-        return { title: 'Reports & Analytics', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'Reports' }] };
-      case '/company/settings/ai-integration':
-        return { title: 'AI Integration', breadcrumbs: [{ label: 'Settings', href: '/company/settings' }, { label: 'AI Integration' }] };
-      default:
-        return { title: 'Dashboard', breadcrumbs: [] };
-    }
-  };
-
-  // Function to render the correct screen based on currentPath
-  const renderCurrentScreen = () => {
-    if (!user) return null;
-
-    // If partner hasn't selected a company workspace yet, show partner dashboard
-    if (user.role === 'partner' && !activeCompany && currentPath.startsWith('/partner')) {
-      switch (currentPath) {
-        case '/partner/dashboard':
-          return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
-        case '/partner/settings':
-          return <PartnerSettings />;
-        default:
-          return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
-      }
-    }
-
-    // Company routes (used by both company users and partners in company workspace)
-    switch (currentPath) {
-      case '/company/dashboard':
-        return <CompanyDashboard onNavigate={handleNavigate} />;
-      case '/company/ropa':
-        return <ROPA />;
-      case '/company/assessments/dpia':
-        return <DPIA onNavigate={handleNavigate} />;
-      case '/company/assessments/dpia/new':
-        return <CreateDPIA onBack={() => handleNavigate('/company/assessments/dpia')} />;
-      case '/company/assessments/lia':
-        return <LIA onNavigate={handleNavigate} />;
-      case '/company/assessments/lia/new':
-        return <CreateLIA onBack={() => handleNavigate('/company/assessments/lia')} />;
-      case '/company/dsr':
-        return <DSR />;
-      case '/company/breaches':
-        return <DataBreaches onNavigate={handleNavigate} />;
-      case '/company/breaches/report':
-        return <IncidentReporting />;
-      case '/company/dsr/new':
-        return <CreateDSR onBack={() => handleNavigate('/company/dsr')} />;
-      case '/company/vendors':
-        return <ThirdParties onNavigate={handleNavigate} />;
-      case '/company/vendors/new':
-        return <CreateThirdParty onBack={() => handleNavigate('/company/vendors')} />;
-      case '/company/documents':
-        return <DocumentLibrary onNavigate={handleNavigate} />;
-      case '/company/documents/new':
-        return <CreateDocument onBack={() => handleNavigate('/company/documents')} />;
-      case '/company/settings/metadata':
-        return <MetadataSettings />;
-      case '/company/settings/data-dictionary':
-        return <DataDictionary />;
-      case '/company/settings/im-systems':
-        return <IMSystems />;
-      case '/company/settings/users':
-        return <UserManagement />;
-      case '/company/settings/organisation':
-        return <OrganizationSettings />;
-      case '/company/settings/reports':
-        return <ReportsSettings />;
-      case '/company/settings/ai-integration':
-        return <AIIntegrationSettings />;
-      
-      default:
-        // Default to dashboard based on user role and context
-        if (user.role === 'partner') {
-          if (activeCompany) {
-            return <CompanyDashboard onNavigate={handleNavigate} />;
-          } else {
-            return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
-          }
-        } else {
-          return <CompanyDashboard onNavigate={handleNavigate} />;
-        }
-    }
-  };
-
-  // Auth states
-  if (appState === 'login') {
-    return (
-      <LoginForm
-        onLogin={handleLogin}
-        onForgotPassword={() => console.log('Forgot password')}
-        onSignUp={() => setAppState('signup')}
-      />
-    );
-  }
-
-  if (appState === 'signup') {
-    return (
-      <SignUpForm
-        onSignUp={handleSignUp}
-        onLogin={() => setAppState('login')}
-      />
-    );
-  }
-
-  if (appState === 'verification') {
-    return (
-      <EmailVerification
-        email={pendingUserData?.email || ''}
-        onVerify={handleEmailVerification}
-        onResendCode={handleResendCode}
-        onBack={() => setAppState('signup')}
-      />
-    );
-  }
-
-  if (appState === 'onboarding') {
-    return (
-      <OrganizationSetup
-        onNext={handleOrganizationSetup}
-        userType={user?.role || 'company'}
-      />
-    );
-  }
-
-  // Main app layout
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {user && (
-        <Sidebar
-          userRole={user.role}
-          onNavigate={handleNavigate}
-          currentPath={currentPath}
-          partnerCompanies={partnerCompanies}
-          activeCompany={activeCompany}
-          onSwitchCompany={handleSwitchCompany}
-        />
-      )}
-      
-      <div className="flex-1 flex flex-col">
-        <Header 
-          user={user || undefined} 
-          onLogout={handleLogout}
-          activeCompany={activeCompany}
-          title={getPageInfo().title}
-          breadcrumbs={getPageInfo().breadcrumbs}
-          onNavigate={handleNavigate}
-        />
-        
-        <main className="flex-1 overflow-auto">
-          {renderCurrentScreen()}
-        </main>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4">GDPR Compliance Platform</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Comprehensive GDPR compliance management for companies and partner organizations
+          </p>
+        </div>
+
+        <div className="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
+          {/* Partner Account Option */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/partner')}>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-3">
+                <Building2 className="h-8 w-8 text-primary" />
+                <span>Partner Account</span>
+              </CardTitle>
+              <CardDescription className="text-base">
+                Manage multiple client companies with multi-workspace support
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center space-x-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                  <span>Multi-workspace management</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                  <span>Client company isolation</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                  <span>Team collaboration tools</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                  <span>Task management system</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                  <span>Workspace-scoped metadata</span>
+                </li>
+              </ul>
+              <div className="flex items-center justify-between pt-4">
+                <span className="text-sm text-muted-foreground">For consultants & agencies</span>
+                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Company Account Option */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/company')}>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-3">
+                <Users className="h-8 w-8 text-primary" />
+                <span>Company Account</span>
+              </CardTitle>
+              <CardDescription className="text-base">
+                Direct company access for single organization compliance
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center space-x-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                  <span>ROPA management</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                  <span>DPIA assessments</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                  <span>DSR handling</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                  <span>Breach notifications</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                  <span>AI-powered assistance</span>
+                </li>
+              </ul>
+              <div className="flex items-center justify-between pt-4">
+                <span className="text-sm text-muted-foreground">For individual companies</span>
+                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="text-center mt-12">
+          <p className="text-muted-foreground">
+            Choose your account type to get started with GDPR compliance management
+          </p>
+        </div>
       </div>
     </div>
   );
