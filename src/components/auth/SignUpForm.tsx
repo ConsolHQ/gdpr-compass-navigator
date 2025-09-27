@@ -55,6 +55,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
   const [verificationEmail, setVerificationEmail] = useState('');
   const [verificationLoading, setVerificationLoading] = useState(false);
   const [verificationError, setVerificationError] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
   const [pendingUserData, setPendingUserData] = useState<{
     email: string;
     password: string;
@@ -71,11 +72,23 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
     setVerificationError('');
 
     try {
-      // Verify the OTP - this will create the user account
-      const { data, error } = await supabase.auth.verifyOtp({
+      // Verify the custom code
+      if (code !== verificationCode) {
+        throw new Error("Invalid verification code");
+      }
+
+      // Create the user account with Supabase
+      const { data, error } = await supabase.auth.signUp({
         email: pendingUserData.email,
-        token: code,
-        type: 'email'
+        password: pendingUserData.password,
+        options: {
+          data: {
+            first_name: pendingUserData.firstName,
+            last_name: pendingUserData.lastName,
+            account_type: pendingUserData.accountType,
+            company_name: pendingUserData.companyName || null
+          }
+        }
       });
 
       if (error) throw error;
@@ -96,31 +109,32 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
 
   const handleResendCode = async () => {
     if (!pendingUserData) return;
-
+    
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: pendingUserData.email,
-        options: {
-          shouldCreateUser: true,
-          data: {
-            first_name: pendingUserData.firstName,
-            last_name: pendingUserData.lastName,
-            account_type: pendingUserData.accountType,
-            company_name: pendingUserData.companyName || null
-          }
+      // Generate new 6-digit code
+      const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+      setVerificationCode(newCode);
+
+      // Send via Resend
+      const { error } = await supabase.functions.invoke('send-verification-code', {
+        body: {
+          email: pendingUserData.email,
+          code: newCode,
+          firstName: pendingUserData.firstName,
+          lastName: pendingUserData.lastName
         }
       });
 
       if (error) throw error;
 
       toast({
-        title: "Code resent!",
-        description: "Please check your email for the new verification code.",
+        title: "Verification code resent!",
+        description: "Please check your email for the new code.",
       });
     } catch (error) {
       toast({
         title: "Failed to resend code",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        description: error instanceof Error ? error.message : "Please try again",
         variant: "destructive",
       });
     }
@@ -172,18 +186,18 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
         accountType: validatedData.accountType,
         companyName: validatedData.companyName
       });
-      
-      // Send OTP for email verification
-      const { error } = await supabase.auth.signInWithOtp({
-        email: validatedData.email,
-        options: {
-          shouldCreateUser: true,
-          data: {
-            first_name: validatedData.firstName,
-            last_name: validatedData.lastName,
-            account_type: validatedData.accountType,
-            company_name: validatedData.companyName || null
-          }
+
+      // Generate 6-digit verification code
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      setVerificationCode(code);
+
+      // Send verification code via Resend
+      const { error } = await supabase.functions.invoke('send-verification-code', {
+        body: {
+          email: validatedData.email,
+          code: code,
+          firstName: validatedData.firstName,
+          lastName: validatedData.lastName
         }
       });
 
@@ -194,7 +208,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
       setShowVerification(true);
       toast({
         title: "Verification code sent!",
-        description: "Please check your email for the 6-digit verification code.",
+        description: "Please check your email for the 6-digit code.",
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
