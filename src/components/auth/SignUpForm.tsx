@@ -71,7 +71,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
     setVerificationError('');
 
     try {
-      // Verify the OTP
+      // Verify the OTP - this will create the user account
       const { data, error } = await supabase.auth.verifyOtp({
         email: pendingUserData.email,
         token: code,
@@ -81,29 +81,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
       if (error) throw error;
 
       if (data.user) {
-        // Now sign up the user with password
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email: pendingUserData.email,
-          password: pendingUserData.password,
-          options: {
-            data: {
-              first_name: pendingUserData.firstName,
-              last_name: pendingUserData.lastName,
-              account_type: pendingUserData.accountType,
-              company_name: pendingUserData.companyName || null
-            }
-          }
+        toast({
+          title: "Account created successfully!",
+          description: "You can now sign in to your account.",
         });
-
-        if (signUpError) throw signUpError;
-
-        if (signUpData.user) {
-          toast({
-            title: "Account created successfully!",
-            description: "You can now sign in to your account.",
-          });
-          onSignUp(signUpData.user.id, pendingUserData.accountType);
-        }
+        onSignUp(data.user.id, pendingUserData.accountType);
       }
     } catch (error) {
       setVerificationError(error instanceof Error ? error.message : "Verification failed");
