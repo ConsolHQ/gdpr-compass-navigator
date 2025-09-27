@@ -9,6 +9,7 @@ import { Eye, EyeOff, Mail, Lock, User, Building } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { z } from 'zod';
+import EmailVerification from './EmailVerification';
 
 const signUpSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(50, "First name must be less than 50 characters"),
@@ -50,6 +51,118 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showVerification, setShowVerification] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
+  const [verificationLoading, setVerificationLoading] = useState(false);
+  const [verificationError, setVerificationError] = useState('');
+  const [pendingUserData, setPendingUserData] = useState<{
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    accountType: 'company' | 'partner';
+    companyName?: string;
+  } | null>(null);
+
+  const handleVerifyEmail = async (code: string) => {
+    if (!pendingUserData) return;
+    
+    setVerificationLoading(true);
+    setVerificationError('');
+
+    try {
+      // Verify the OTP
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: pendingUserData.email,
+        token: code,
+        type: 'email'
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        // Now sign up the user with password
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: pendingUserData.email,
+          password: pendingUserData.password,
+          options: {
+            data: {
+              first_name: pendingUserData.firstName,
+              last_name: pendingUserData.lastName,
+              account_type: pendingUserData.accountType,
+              company_name: pendingUserData.companyName || null
+            }
+          }
+        });
+
+        if (signUpError) throw signUpError;
+
+        if (signUpData.user) {
+          toast({
+            title: "Account created successfully!",
+            description: "You can now sign in to your account.",
+          });
+          onSignUp(signUpData.user.id, pendingUserData.accountType);
+        }
+      }
+    } catch (error) {
+      setVerificationError(error instanceof Error ? error.message : "Verification failed");
+    } finally {
+      setVerificationLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!pendingUserData) return;
+
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: pendingUserData.email,
+        options: {
+          shouldCreateUser: true,
+          data: {
+            first_name: pendingUserData.firstName,
+            last_name: pendingUserData.lastName,
+            account_type: pendingUserData.accountType,
+            company_name: pendingUserData.companyName || null
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Code resent!",
+        description: "Please check your email for the new verification code.",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to resend code",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBackToSignUp = () => {
+    setShowVerification(false);
+    setPendingUserData(null);
+    setVerificationEmail('');
+    setVerificationError('');
+  };
+
+  if (showVerification) {
+    return (
+      <EmailVerification
+        email={verificationEmail}
+        onVerify={handleVerifyEmail}
+        onResendCode={handleResendCode}
+        onBack={handleBackToSignUp}
+        loading={verificationLoading}
+        error={verificationError}
+      />
+    );
+  }
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -68,12 +181,21 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
       // Validate form data
       const validatedData = signUpSchema.parse(formData);
       
-      // Sign up user with Supabase
-      const { data, error } = await supabase.auth.signUp({
+      // Store the user data for after verification
+      setPendingUserData({
         email: validatedData.email,
         password: validatedData.password,
+        firstName: validatedData.firstName,
+        lastName: validatedData.lastName,
+        accountType: validatedData.accountType,
+        companyName: validatedData.companyName
+      });
+      
+      // Send OTP for email verification
+      const { error } = await supabase.auth.signInWithOtp({
+        email: validatedData.email,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          shouldCreateUser: true,
           data: {
             first_name: validatedData.firstName,
             last_name: validatedData.lastName,
@@ -85,13 +207,13 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
 
       if (error) throw error;
 
-      if (data.user) {
-        toast({
-          title: "Account created successfully!",
-          description: "Please check your email to verify your account before signing in.",
-        });
-        onSignUp(data.user.id, validatedData.accountType);
-      }
+      // Show verification screen
+      setVerificationEmail(validatedData.email);
+      setShowVerification(true);
+      toast({
+        title: "Verification code sent!",
+        description: "Please check your email for the 6-digit verification code.",
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         const fieldErrors: Record<string, string> = {};
