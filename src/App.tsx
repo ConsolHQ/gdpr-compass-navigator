@@ -10,6 +10,7 @@ import IMSystems from "./components/company/settings/IMSystems";
 import { AutomationCenter } from "./components/ai/AutomationCenter";
 import CompanySettings from "./components/company/settings/CompanySettings";
 import AIIntegrationSettings from "./components/company/settings/AIIntegrationSettings";
+import PartnerMain from "./pages/PartnerMain";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/partner" element={<PartnerMain />} />
           <Route path="/company/settings" element={<CompanySettings />} />
           <Route path="/company/settings/ai-integration" element={<AIIntegrationSettings />} />
           <Route path="/company/settings/im-systems" element={<IMSystems />} />

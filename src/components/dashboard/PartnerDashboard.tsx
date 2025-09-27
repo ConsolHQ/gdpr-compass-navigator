@@ -1,91 +1,163 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Users, Building, AlertTriangle, CheckCircle, Plus, BarChart } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Plus, Building2, Users, Calendar, AlertTriangle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PartnerDashboardProps {
   onNavigateToCompany?: (companyId: string) => void;
 }
 
 const PartnerDashboard = ({ onNavigateToCompany }: PartnerDashboardProps) => {
-  const stats = [
-    { label: 'Total Companies', value: '12', icon: Building, color: 'text-blue-600' },
-    { label: 'Active Users', value: '48', icon: Users, color: 'text-green-600' },
-    { label: 'Pending Tasks', value: '23', icon: AlertTriangle, color: 'text-orange-600' },
-    { label: 'Completed Tasks', value: '156', icon: CheckCircle, color: 'text-emerald-600' },
-  ];
+  const [workspaces, setWorkspaces] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    totalWorkspaces: 0,
+    activeUsers: 0,
+    pendingTasks: 0,
+    recentActivities: 0
+  });
 
-  const recentCompanies = [
-    { name: 'TechCorp Ltd', users: 8, status: 'Active', lastActivity: '2 hours ago' },
-    { name: 'DataFlow Inc', users: 12, status: 'Active', lastActivity: '5 hours ago' },
-    { name: 'SecureBank', users: 15, status: 'Setup', lastActivity: '1 day ago' },
-    { name: 'HealthSystem', users: 6, status: 'Active', lastActivity: '3 days ago' },
-  ];
+  useEffect(() => {
+    fetchWorkspaces();
+    fetchStats();
+  }, []);
 
-  const recentActivities = [
-    { company: 'TechCorp Ltd', action: 'ROPA updated', time: '30 min ago', type: 'update' },
-    { company: 'DataFlow Inc', action: 'New DPIA created', time: '2 hours ago', type: 'create' },
-    { company: 'SecureBank', action: 'User invited', time: '4 hours ago', type: 'invite' },
-    { company: 'HealthSystem', action: 'Data breach reported', time: '1 day ago', type: 'alert' },
+  const fetchWorkspaces = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('workspaces')
+        .select(`
+          *,
+          workspace_members(count),
+          tasks(count)
+        `)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(6);
+
+      if (error) throw error;
+      setWorkspaces(data || []);
+    } catch (error) {
+      console.error('Error fetching workspaces:', error);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const [workspacesResult, membersResult, tasksResult] = await Promise.all([
+        supabase.from('workspaces').select('id', { count: 'exact' }).eq('status', 'active'),
+        supabase.from('workspace_members').select('id', { count: 'exact' }),
+        supabase.from('tasks').select('id', { count: 'exact' }).eq('status', 'pending')
+      ]);
+
+      setStats({
+        totalWorkspaces: workspacesResult.count || 0,
+        activeUsers: membersResult.count || 0,
+        pendingTasks: tasksResult.count || 0,
+        recentActivities: 15 // Mock data for now
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
+  const statsCards = [
+    {
+      title: "Total Workspaces",
+      value: stats.totalWorkspaces,
+      description: "Active client companies",
+      icon: Building2,
+      color: "text-blue-600"
+    },
+    {
+      title: "Active Users",
+      value: stats.activeUsers,
+      description: "Across all workspaces",
+      icon: Users,
+      color: "text-green-600"
+    },
+    {
+      title: "Pending Tasks",
+      value: stats.pendingTasks,
+      description: "Require attention",
+      icon: Calendar,
+      color: "text-orange-600"
+    },
+    {
+      title: "Recent Activities",
+      value: stats.recentActivities,
+      description: "Last 7 days",
+      icon: AlertTriangle,
+      color: "text-purple-600"
+    }
   ];
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 p-6">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Partner Dashboard</h1>
-          <p className="text-gray-600 mt-2">Manage your client companies and GDPR compliance</p>
+          <h1 className="text-3xl font-bold tracking-tight">Partner Dashboard</h1>
+          <p className="text-muted-foreground">
+            Manage your client workspaces and GDPR compliance activities
+          </p>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
-          Add Company
+          Add Workspace
         </Button>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => {
-          const IconComponent = stat.icon;
-          return (
-            <Card key={stat.label}>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardDescription>{stat.label}</CardDescription>
-                  <IconComponent className={`h-5 w-5 ${stat.color}`} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-              </CardContent>
-            </Card>
-          );
-        })}
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {statsCards.map((stat, index) => (
+          <Card key={index}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+              <stat.icon className={`h-4 w-4 ${stat.color}`} />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stat.value}</div>
+              <p className="text-xs text-muted-foreground">{stat.description}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Companies */}
+      {/* Recent Workspaces */}
+      <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Recent Companies</CardTitle>
-            <CardDescription>Latest company activities and status</CardDescription>
+            <CardTitle>Recent Workspaces</CardTitle>
+            <CardDescription>Your latest client companies</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentCompanies.map((company) => (
-                <div key={company.name} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <h4 className="font-medium">{company.name}</h4>
-                    <p className="text-sm text-gray-600">{company.users} users • {company.lastActivity}</p>
+              {workspaces.map((workspace) => (
+                <div key={workspace.id} className="flex items-center space-x-4">
+                  <Avatar>
+                    <AvatarFallback>
+                      {workspace.company_name.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {workspace.company_name}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {workspace.sector || 'No sector specified'}
+                    </p>
                   </div>
-                  <Badge variant={company.status === 'Active' ? 'default' : 'secondary'}>
-                    {company.status}
-                  </Badge>
+                  <Badge variant="outline">{workspace.status}</Badge>
                 </div>
               ))}
+              {workspaces.length === 0 && (
+                <p className="text-sm text-muted-foreground">No workspaces found</p>
+              )}
             </div>
-            <Button variant="outline" className="w-full mt-4">
-              View All Companies
+            <Button variant="ghost" className="w-full mt-4">
+              View All Workspaces
             </Button>
           </CardContent>
         </Card>
@@ -94,25 +166,33 @@ const PartnerDashboard = ({ onNavigateToCompany }: PartnerDashboardProps) => {
         <Card>
           <CardHeader>
             <CardTitle>Recent Activities</CardTitle>
-            <CardDescription>Latest actions across all companies</CardDescription>
+            <CardDescription>Latest actions across all workspaces</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentActivities.map((activity, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <div className={`w-2 h-2 rounded-full mt-2 ${
-                    activity.type === 'alert' ? 'bg-red-500' : 
-                    activity.type === 'create' ? 'bg-green-500' : 'bg-blue-500'
-                  }`} />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{activity.company}</p>
-                    <p className="text-sm text-gray-600">{activity.action}</p>
-                    <p className="text-xs text-gray-500">{activity.time}</p>
-                  </div>
+              <div className="flex items-center space-x-4">
+                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                <div className="flex-1 space-y-1">
+                  <p className="text-sm font-medium">New ROPA created</p>
+                  <p className="text-sm text-muted-foreground">Acme Corp • 2 hours ago</p>
                 </div>
-              ))}
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                <div className="flex-1 space-y-1">
+                  <p className="text-sm font-medium">DPIA completed</p>
+                  <p className="text-sm text-muted-foreground">Tech Solutions • 4 hours ago</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
+                <div className="flex-1 space-y-1">
+                  <p className="text-sm font-medium">Task assigned</p>
+                  <p className="text-sm text-muted-foreground">Global Inc • 6 hours ago</p>
+                </div>
+              </div>
             </div>
-            <Button variant="outline" className="w-full mt-4">
+            <Button variant="ghost" className="w-full mt-4">
               View All Activities
             </Button>
           </CardContent>
