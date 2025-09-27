@@ -69,14 +69,14 @@ const Index = () => {
   const [activeCompany, setActiveCompany] = useState<CompanyAccess | null>(null);
 
   // Mock authentication
-  const handleLogin = (email: string, password: string) => {
-    console.log('Login attempt:', { email, password });
+  const handleLogin = (userId: string, accountType: 'company' | 'partner') => {
+    console.log('Login attempt:', { userId, accountType });
     // Mock user data
     const mockUser: User = {
-      id: '1',
-      name: 'John Doe',
-      email: email,
-      role: email.includes('partner') ? 'partner' : 'company',
+      id: userId,
+      name: 'User',
+      email: '',
+      role: accountType,
     };
     
     setUser(mockUser);
@@ -98,25 +98,17 @@ const Index = () => {
     setAppState('dashboard');
   };
 
-  const handleSignUp = (signUpData: any) => {
-    console.log('Sign up attempt:', signUpData);
-    setPendingUserData(signUpData);
+  const handleSignUp = (userId: string, accountType: 'company' | 'partner') => {
+    console.log('Sign up attempt:', { userId, accountType });
+    setPendingUserData({ userId, accountType });
     setAppState('verification');
   };
 
   const handleEmailVerification = (code: string) => {
     console.log('Email verification with code:', code);
-    // Mock verification success
-    if (pendingUserData) {
-      const mockUser: User = {
-        id: '1',
-        name: `${pendingUserData.firstName} ${pendingUserData.lastName}`,
-        email: pendingUserData.email,
-        role: pendingUserData.accountType,
-      };
-      setUser(mockUser);
-      setAppState('onboarding');
-    }
+    // Mock verification success - just move to login
+    setAppState('login');
+    setPendingUserData(null);
   };
 
   const handleResendCode = () => {
