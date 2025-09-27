@@ -26,7 +26,7 @@ const PartnerDashboard = ({ onNavigateToCompany }: PartnerDashboardProps) => {
 
   const fetchWorkspaces = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('workspaces')
         .select(`
           *,
@@ -47,9 +47,9 @@ const PartnerDashboard = ({ onNavigateToCompany }: PartnerDashboardProps) => {
   const fetchStats = async () => {
     try {
       const [workspacesResult, membersResult, tasksResult] = await Promise.all([
-        supabase.from('workspaces').select('id', { count: 'exact' }).eq('status', 'active'),
-        supabase.from('workspace_members').select('id', { count: 'exact' }),
-        supabase.from('tasks').select('id', { count: 'exact' }).eq('status', 'pending')
+        (supabase as any).from('workspaces').select('id', { count: 'exact' }).eq('status', 'active'),
+        (supabase as any).from('workspace_members').select('id', { count: 'exact' }),
+        (supabase as any).from('tasks').select('id', { count: 'exact' }).eq('status', 'pending')
       ]);
 
       setStats({

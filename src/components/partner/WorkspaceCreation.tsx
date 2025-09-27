@@ -61,7 +61,7 @@ export const WorkspaceCreation = ({ onWorkspaceCreated, onCancel }: WorkspaceCre
       // In a real app, this would come from the authenticated user's context
       const mockPartnerId = "00000000-0000-4000-8000-000000000001";
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('workspaces')
         .insert([{
           partner_id: mockPartnerId,
@@ -77,7 +77,7 @@ export const WorkspaceCreation = ({ onWorkspaceCreated, onCancel }: WorkspaceCre
         description: `${formData.company_name} workspace has been created successfully.`,
       });
 
-      onWorkspaceCreated?.(data.id);
+      onWorkspaceCreated?.(data?.id);
     } catch (error: any) {
       toast({
         title: "Error",

@@ -39,14 +39,18 @@ export const WorkspaceSwitcher = ({
 
   const fetchWorkspaces = async () => {
     try {
-      const { data, error } = await supabase
+      // For demo purposes, using a mock partner ID
+      const mockPartnerId = "00000000-0000-4000-8000-000000000001";
+      
+      const { data: workspaces, error } = await (supabase as any)
         .from('workspaces')
         .select('id, name, company_name, status, sector')
         .eq('status', 'active')
+        .eq('partner_id', mockPartnerId)
         .order('company_name');
 
       if (error) throw error;
-      setWorkspaces(data || []);
+      setWorkspaces(workspaces || []);
     } catch (error) {
       console.error('Error fetching workspaces:', error);
     } finally {

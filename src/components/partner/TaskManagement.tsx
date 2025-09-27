@@ -43,7 +43,7 @@ const TaskManagement = ({ workspaceId }: TaskManagementProps) => {
 
   const fetchTasks = async () => {
     try {
-      let query = supabase
+      let query = (supabase as any)
         .from('tasks')
         .select(`
           *,
@@ -75,7 +75,7 @@ const TaskManagement = ({ workspaceId }: TaskManagementProps) => {
 
   const updateTaskStatus = async (taskId: string, newStatus: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('tasks')
         .update({ 
           status: newStatus,
