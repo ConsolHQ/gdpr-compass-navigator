@@ -7,6 +7,9 @@ import OrganizationSetup from '@/components/onboarding/OrganizationSetup';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import PartnerDashboard from '@/components/dashboard/PartnerDashboard';
+import PartnerSettings from '@/components/partner/PartnerSettings';
+import { WorkspaceCreation } from '@/components/partner/WorkspaceCreation';
+import TaskManagement from '@/components/partner/TaskManagement';
 import CompanyDashboard from '@/components/dashboard/CompanyDashboard';
 import ROPA from '@/components/company/ROPA';
 import DPIA from '@/components/company/DPIA';
@@ -18,13 +21,13 @@ import ThirdParties from '@/components/company/ThirdParties';
 import DocumentLibrary from '@/components/company/DocumentLibrary';
 import OrganizationSettings from '@/components/company/settings/OrganizationSettings';
 import UserManagement from '@/components/company/settings/UserManagement';
+import { WorkspaceProvider } from '@/contexts/WorkspaceContext';
 import MetadataSettings from '@/components/company/settings/MetadataSettings';
 import DataDictionary from '@/components/company/settings/DataDictionary';
 import IMSystems from '@/components/company/settings/IMSystems';
 import ReportsSettings from '@/components/company/settings/ReportsSettings';
 import CompanySettings from '@/components/company/settings/CompanySettings';
 import AIIntegrationSettings from '@/components/company/settings/AIIntegrationSettings';
-import PartnerSettings from '@/components/partner/PartnerSettings';
 import CreateDSR from '@/components/company/CreateDSR';
 import CreateThirdParty from '@/components/company/CreateThirdParty';
 import CreateDocument from '@/components/company/CreateDocument';
@@ -238,12 +241,9 @@ const Index = () => {
     if (!user) return null;
 
     // If partner hasn't selected a company workspace yet, show partner dashboard
-    if (user.role === 'partner' && !activeCompany && currentPath.startsWith('/partner')) {
+    if (user.role === 'partner' && !activeCompany) {
       switch (currentPath) {
         case '/partner/dashboard':
-          return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
-        case '/partner/settings':
-          return <PartnerSettings />;
         default:
           return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
       }
@@ -293,6 +293,23 @@ const Index = () => {
         return <ReportsSettings />;
       case '/company/settings/ai-integration':
         return <AIIntegrationSettings />;
+        
+      // Partner-specific routes
+      case '/partner/workspaces/create':
+        return (
+          <WorkspaceCreation
+            onWorkspaceCreated={(workspaceId) => {
+              // Find the workspace and set it as active
+              handleNavigateToCompany(workspaceId);
+              handleNavigate('/company/dashboard');
+            }}
+            onCancel={() => handleNavigate('/partner/dashboard')}
+          />
+        );
+      case '/partner/tasks':
+        return <TaskManagement workspaceId={activeCompany?.id} />;
+      case '/partner/settings':
+        return <PartnerSettings />;
       
       default:
         // Default to dashboard based on user role and context
