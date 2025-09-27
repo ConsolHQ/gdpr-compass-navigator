@@ -13,7 +13,7 @@ import { z } from 'zod';
 const signUpSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(50, "First name must be less than 50 characters"),
   lastName: z.string().trim().min(1, "Last name is required").max(50, "Last name must be less than 50 characters"),
-  email: z.string().trim().email("Please enter a valid email address").max(255, "Email must be less than 255 characters"),
+  email: z.string().trim().min(1, "Email is required").email("Please enter a valid email address").max(255, "Email must be less than 255 characters"),
   password: z.string().min(8, "Password must be at least 8 characters long").max(100, "Password must be less than 100 characters"),
   confirmPassword: z.string(),
   accountType: z.enum(['company', 'partner'], { required_error: "Please select an account type" }),
