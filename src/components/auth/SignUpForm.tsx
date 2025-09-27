@@ -77,7 +77,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
         throw new Error("Invalid verification code");
       }
 
-      // Create the user account with Supabase
+      // Create the user account with Supabase (disable email confirmation since we handle it ourselves)
       const { data, error } = await supabase.auth.signUp({
         email: pendingUserData.email,
         password: pendingUserData.password,
@@ -87,7 +87,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
             last_name: pendingUserData.lastName,
             account_type: pendingUserData.accountType,
             company_name: pendingUserData.companyName || null
-          }
+          },
+          emailRedirectTo: undefined // Disable automatic email confirmation
         }
       });
 
