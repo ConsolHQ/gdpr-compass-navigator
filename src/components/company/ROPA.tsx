@@ -32,11 +32,13 @@ import {
   X,
   Trash2,
   CheckSquare,
-  Upload
+  Upload,
+  Bot
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CreateROPA from './CreateROPA';
 import ROPATemplateImport from './ROPATemplateImport';
+import { ROPACopilotPanel } from '@/components/ai/ropa';
 
 const ROPATemplates = () => {
   const templates = [
@@ -107,6 +109,7 @@ const ROPA = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showImportTemplate, setShowImportTemplate] = useState(false);
+  const [showAIAssist, setShowAIAssist] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
@@ -405,6 +408,10 @@ const ROPA = () => {
           <p className="text-gray-600 mt-1">{processedEntries.length} processing activities</p>
         </div>
         <div className="flex items-center space-x-2">
+          <Button variant="outline" onClick={() => setShowAIAssist(true)}>
+            <Bot className="mr-2 h-4 w-4" />
+            AI Assist
+          </Button>
           <Button
             variant="outline"
             onClick={() => navigate('/company/ropa/outstanding')}
@@ -1152,6 +1159,15 @@ const ROPA = () => {
         </Card>
       )}
 
+      <ROPACopilotPanel
+        isOpen={showAIAssist}
+        onClose={() => setShowAIAssist(false)}
+        formData={{}}
+        onFormUpdate={() => {}}
+        onArrayFieldChange={() => {}}
+        onGeneratedROPAApply={() => {}}
+        currentTab="general"
+      />
     </div>
   );
 };

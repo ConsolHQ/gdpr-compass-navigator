@@ -25,11 +25,14 @@ import {
   X,
   Archive,
   Copy,
-  Download
+  Download,
+  Bot
 } from 'lucide-react';
+import { DSRCopilotPanel } from '@/components/ai/dsr';
 
 const DSR = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showAIAssist, setShowAIAssist] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
@@ -231,10 +234,16 @@ const DSR = () => {
         <div>
           <p className="text-gray-600 mt-1">{processedRequests.length} data subject requests</p>
         </div>
-        <Button onClick={() => setShowCreateForm(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          New DSR
-        </Button>
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" onClick={() => setShowAIAssist(true)}>
+            <Bot className="mr-2 h-4 w-4" />
+            AI Assist
+          </Button>
+          <Button onClick={() => setShowCreateForm(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            New DSR
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -641,6 +650,14 @@ const DSR = () => {
           <CreateDSR onBack={() => setShowCreateForm(false)} />
         </div>
       )}
+      
+      <DSRCopilotPanel
+        isOpen={showAIAssist}
+        onClose={() => setShowAIAssist(false)}
+        formData={{}}
+        onFormUpdate={() => {}}
+        onGeneratedDSRApply={() => {}}
+      />
     </div>
   );
 };

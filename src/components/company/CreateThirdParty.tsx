@@ -10,9 +10,10 @@ import { Switch } from '@/components/ui/switch';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { CalendarIcon, Building, ArrowLeft, Save, Send, Upload, FileText, X } from 'lucide-react';
+import { CalendarIcon, Building, ArrowLeft, Save, Send, Upload, FileText, X, Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMetadata } from '@/hooks/useMetadata';
+import { ThirdPartyCopilotPanel } from '@/components/ai/third-party';
 
 interface CreateThirdPartyProps {
   onBack?: () => void;
@@ -20,6 +21,7 @@ interface CreateThirdPartyProps {
 
 const CreateThirdParty = ({ onBack }: CreateThirdPartyProps) => {
   const { getMetadataItems } = useMetadata();
+  const [showAIAssist, setShowAIAssist] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -95,6 +97,10 @@ const CreateThirdParty = ({ onBack }: CreateThirdPartyProps) => {
           </div>
         </div>
         <div className="flex space-x-2">
+          <Button variant="outline" onClick={() => setShowAIAssist(true)}>
+            <Bot className="mr-2 h-4 w-4" />
+            AI Assist
+          </Button>
           <Button variant="outline" onClick={() => handleSubmit('save')}>
             <Save className="h-4 w-4 mr-2" />
             Save Draft
@@ -455,6 +461,14 @@ const CreateThirdParty = ({ onBack }: CreateThirdPartyProps) => {
           </CardContent>
         </Card>
       </div>
+      
+      <ThirdPartyCopilotPanel
+        isOpen={showAIAssist}
+        onClose={() => setShowAIAssist(false)}
+        formData={formData}
+        onFormUpdate={(updates) => setFormData(prev => ({ ...prev, ...updates }))}
+        onGeneratedThirdPartyApply={(data) => setFormData(prev => ({ ...prev, ...data }))}
+      />
     </div>
   );
 };
