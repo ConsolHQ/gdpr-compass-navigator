@@ -1,237 +1,212 @@
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Calendar, User, Building, Users } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
+
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Plus, CheckCircle, Clock, AlertTriangle, Filter } from 'lucide-react';
 
 interface Task {
   id: string;
-  title: string;
-  description?: string;
-  module_type?: string;
-  assignee_type: 'workspace' | 'individual';
-  due_date?: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
-  workspace: {
-    company_name: string;
-  };
-  assigned_to?: {
-    partner_member: {
-      name: string;
-      email: string;
-    };
-  };
+  name: string;
+  module: string;
+  assignedCompanies: string[];
+  status: 'pending' | 'in-progress' | 'completed';
+  dueDate: string;
+  priority: 'low' | 'medium' | 'high';
 }
 
-interface TaskManagementProps {
-  workspaceId?: string;
-}
+const mockTasks: Task[] = [
+  {
+    id: '1',
+    name: 'ROPA Assessment',
+    module: 'ROPA',
+    assignedCompanies: ['ACME Corporation', 'Global Healthcare Inc'],
+    status: 'pending',
+    dueDate: '2025-07-15',
+    priority: 'high',
+  },
+  {
+    id: '2',
+    name: 'DPIA Review',
+    module: 'DPIA',
+    assignedCompanies: ['FinTech Solutions'],
+    status: 'in-progress',
+    dueDate: '2025-07-01',
+    priority: 'medium',
+  },
+  {
+    id: '3',
+    name: 'Vendor Assessment',
+    module: 'Third-Party Management',
+    assignedCompanies: ['ACME Corporation', 'FinTech Solutions'],
+    status: 'completed',
+    dueDate: '2025-06-20',
+    priority: 'low',
+  },
+];
 
-const TaskManagement = ({ workspaceId }: TaskManagementProps) => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+const TaskManagement = () => {
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const [tasks, setTasks] = useState<Task[]>(mockTasks);
 
-  useEffect(() => {
-    fetchTasks();
-  }, [workspaceId, statusFilter]);
-
-  const fetchTasks = async () => {
-    try {
-      let query = (supabase as any)
-        .from('tasks')
-        .select(`
-          *,
-          workspace:workspaces(company_name),
-          assigned_to:workspace_members(
-            partner_member:partner_members(name, email)
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (workspaceId) {
-        query = query.eq('workspace_id', workspaceId);
-      }
-
-      if (statusFilter !== 'all') {
-        query = query.eq('status', statusFilter);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      setTasks(data || []);
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
-    } finally {
-      setLoading(false);
-    }
+  const handleSelectTask = (taskId: string) => {
+    setSelectedTasks(prev => 
+      prev.includes(taskId) 
+        ? prev.filter(id => id !== taskId)
+        : [...prev, taskId]
+    );
   };
 
-  const updateTaskStatus = async (taskId: string, newStatus: string) => {
-    try {
-      const { error } = await (supabase as any)
-        .from('tasks')
-        .update({ 
-          status: newStatus,
-          completed_at: newStatus === 'completed' ? new Date().toISOString() : null
-        })
-        .eq('id', taskId);
-
-      if (error) throw error;
-      fetchTasks();
-    } catch (error) {
-      console.error('Error updating task status:', error);
-    }
+  const handleSelectAll = () => {
+    setSelectedTasks(
+      selectedTasks.length === tasks.length 
+        ? [] 
+        : tasks.map(task => task.id)
+    );
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'urgent': return 'bg-red-100 text-red-800 border-red-200';
-      case 'high': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+  const handleBulkComplete = () => {
+    setTasks(prev => 
+      prev.map(task => 
+        selectedTasks.includes(task.id) 
+          ? { ...task, status: 'completed' as const }
+          : task
+      )
+    );
+    setSelectedTasks([]);
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'in-progress':
+        return <Clock className="h-4 w-4 text-yellow-600" />;
+      default:
+        return <AlertTriangle className="h-4 w-4 text-red-600" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800 border-green-200';
-      case 'in_progress': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'cancelled': return 'bg-gray-100 text-gray-800 border-gray-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'in-progress':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-red-100 text-red-800';
     }
   };
 
-  const getModuleIcon = (moduleType?: string) => {
-    switch (moduleType) {
-      case 'ropa': return '📋';
-      case 'dpia': return '🔍';
-      case 'dsr': return '📤';
-      case 'breach': return '🚨';
-      case 'vendor': return '🏢';
-      case 'lia': return '⚖️';
-      default: return '📄';
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return 'bg-red-100 text-red-800';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-green-100 text-green-800';
     }
   };
-
-  if (loading) {
-    return <div className="p-6">Loading tasks...</div>;
-  }
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Task Management</h1>
-          <p className="text-muted-foreground">
-            Manage GDPR compliance tasks across workspaces
-          </p>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Task Management</CardTitle>
+            <CardDescription>Manage GDPR compliance tasks across client companies</CardDescription>
+          </div>
+          <div className="flex space-x-2">
+            {selectedTasks.length > 0 && (
+              <Button onClick={handleBulkComplete} variant="outline">
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Complete Selected ({selectedTasks.length})
+              </Button>
+            )}
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Task
+            </Button>
+          </div>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Create Task
-        </Button>
-      </div>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center space-x-2 mb-4">
+          <Button variant="outline" size="sm">
+            <Filter className="mr-2 h-4 w-4" />
+            Filter
+          </Button>
+          <Badge variant="outline">{tasks.length} total tasks</Badge>
+        </div>
 
-      <Tabs defaultValue="all" value={statusFilter} onValueChange={setStatusFilter}>
-        <TabsList>
-          <TabsTrigger value="all">All Tasks</TabsTrigger>
-          <TabsTrigger value="pending">Pending</TabsTrigger>
-          <TabsTrigger value="in_progress">In Progress</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={statusFilter} className="space-y-4 mt-6">
-          {tasks.length === 0 ? (
-            <Card>
-              <CardContent className="flex items-center justify-center h-32">
-                <p className="text-muted-foreground">No tasks found</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4">
-              {tasks.map((task) => (
-                <Card key={task.id}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-lg">
-                            {getModuleIcon(task.module_type)}
-                          </span>
-                          <CardTitle className="text-lg">{task.title}</CardTitle>
-                          <Badge className={getPriorityColor(task.priority)}>
-                            {task.priority}
-                          </Badge>
-                        </div>
-                        <CardDescription>
-                          {task.description || 'No description provided'}
-                        </CardDescription>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge className={getStatusColor(task.status)}>
-                          {task.status.replace('_', ' ')}
-                        </Badge>
-                        <Select 
-                          value={task.status} 
-                          onValueChange={(value) => updateTaskStatus(task.id, value)}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="in_progress">In Progress</SelectItem>
-                            <SelectItem value="completed">Completed</SelectItem>
-                            <SelectItem value="cancelled">Cancelled</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-1">
-                          <Building className="h-4 w-4" />
-                          <span>{task.workspace?.company_name}</span>
-                        </div>
-                        {task.assigned_to && (
-                          <div className="flex items-center space-x-1">
-                            <User className="h-4 w-4" />
-                            <span>{task.assigned_to.partner_member?.name}</span>
-                          </div>
-                        )}
-                        {task.assignee_type === 'workspace' && (
-                          <div className="flex items-center space-x-1">
-                            <Users className="h-4 w-4" />
-                            <span>Workspace Team</span>
-                          </div>
-                        )}
-                      </div>
-                      {task.due_date && (
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="h-4 w-4" />
-                          <span>Due {format(new Date(task.due_date), 'MMM dd, yyyy')}</span>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-    </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={selectedTasks.length === tasks.length}
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
+              <TableHead>Task Name</TableHead>
+              <TableHead>Module</TableHead>
+              <TableHead>Assigned Companies</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Priority</TableHead>
+              <TableHead>Due Date</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tasks.map((task) => (
+              <TableRow key={task.id}>
+                <TableCell>
+                  <Checkbox
+                    checked={selectedTasks.includes(task.id)}
+                    onCheckedChange={() => handleSelectTask(task.id)}
+                  />
+                </TableCell>
+                <TableCell className="font-medium">{task.name}</TableCell>
+                <TableCell>
+                  <Badge variant="outline">{task.module}</Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="max-w-48">
+                    {task.assignedCompanies.map((company, index) => (
+                      <Badge key={index} variant="secondary" className="mr-1 mb-1">
+                        {company}
+                      </Badge>
+                    ))}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center space-x-2">
+                    {getStatusIcon(task.status)}
+                    <Badge className={getStatusColor(task.status)}>
+                      {task.status}
+                    </Badge>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge className={getPriorityColor(task.priority)}>
+                    {task.priority}
+                  </Badge>
+                </TableCell>
+                <TableCell>{task.dueDate}</TableCell>
+                <TableCell>
+                  <Button variant="outline" size="sm">
+                    View
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -6,230 +6,44 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Eye, EyeOff, Mail, Lock, User, Building } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
-import { z } from 'zod';
-import EmailVerification from './EmailVerification';
-
-const signUpSchema = z.object({
-  firstName: z.string().trim().min(1, "First name is required").max(50, "First name must be less than 50 characters"),
-  lastName: z.string().trim().min(1, "Last name is required").max(50, "Last name must be less than 50 characters"),
-  email: z.string().trim().min(1, "Email is required").email("Please enter a valid email address").max(255, "Email must be less than 255 characters"),
-  password: z.string().min(8, "Password must be at least 8 characters long").max(100, "Password must be less than 100 characters"),
-  confirmPassword: z.string(),
-  accountType: z.enum(['company', 'partner'], { required_error: "Please select an account type" }),
-  companyName: z.string().trim().max(100, "Company name must be less than 100 characters").optional()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-}).refine((data) => {
-  if (data.accountType === 'company' && (!data.companyName || data.companyName.trim() === '')) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Company name is required for company accounts",
-  path: ["companyName"],
-});
 
 interface SignUpFormProps {
-  onSignUp: (userId: string, accountType: 'company' | 'partner') => void;
+  onSignUp: (data: SignUpData) => void;
   onLogin: () => void;
+  loading?: boolean;
+  error?: string;
 }
 
-const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
-  const [formData, setFormData] = useState({
+interface SignUpData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  accountType: 'partner' | 'company';
+}
+
+const SignUpForm = ({ onSignUp, onLogin, loading, error }: SignUpFormProps) => {
+  const [formData, setFormData] = useState<SignUpData>({
     firstName: '',
     lastName: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    accountType: '' as 'company' | 'partner' | '',
-    companyName: ''
+    accountType: 'company',
   });
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showVerification, setShowVerification] = useState(false);
-  const [verificationEmail, setVerificationEmail] = useState('');
-  const [verificationLoading, setVerificationLoading] = useState(false);
-  const [verificationError, setVerificationError] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
-  const [pendingUserData, setPendingUserData] = useState<{
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    accountType: 'company' | 'partner';
-    companyName?: string;
-  } | null>(null);
 
-  const handleVerifyEmail = async (code: string) => {
-    if (!pendingUserData) return;
-    
-    setVerificationLoading(true);
-    setVerificationError('');
-
-    try {
-      // Verify the custom code
-      if (code !== verificationCode) {
-        throw new Error("Invalid verification code");
-      }
-
-      // Create the user account with Supabase (disable email confirmation since we handle it ourselves)
-      const { data, error } = await supabase.auth.signUp({
-        email: pendingUserData.email,
-        password: pendingUserData.password,
-        options: {
-          data: {
-            first_name: pendingUserData.firstName,
-            last_name: pendingUserData.lastName,
-            account_type: pendingUserData.accountType,
-            company_name: pendingUserData.companyName || null
-          },
-          emailRedirectTo: undefined // Disable automatic email confirmation
-        }
-      });
-
-      if (error) throw error;
-
-      if (data.user) {
-        toast({
-          title: "Account created successfully!",
-          description: "You can now sign in to your account.",
-        });
-        onSignUp(data.user.id, pendingUserData.accountType);
-      }
-    } catch (error) {
-      setVerificationError(error instanceof Error ? error.message : "Verification failed");
-    } finally {
-      setVerificationLoading(false);
-    }
-  };
-
-  const handleResendCode = async () => {
-    if (!pendingUserData) return;
-    
-    try {
-      // Generate new 6-digit code
-      const newCode = Math.floor(100000 + Math.random() * 900000).toString();
-      setVerificationCode(newCode);
-
-      // Send via Resend
-      const { error } = await supabase.functions.invoke('send-verification-code', {
-        body: {
-          email: pendingUserData.email,
-          code: newCode,
-          firstName: pendingUserData.firstName,
-          lastName: pendingUserData.lastName
-        }
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Verification code resent!",
-        description: "Please check your email for the new code.",
-      });
-    } catch (error) {
-      toast({
-        title: "Failed to resend code",
-        description: error instanceof Error ? error.message : "Please try again",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleBackToSignUp = () => {
-    setShowVerification(false);
-    setPendingUserData(null);
-    setVerificationEmail('');
-    setVerificationError('');
-  };
-
-  if (showVerification) {
-    return (
-      <EmailVerification
-        email={verificationEmail}
-        onVerify={handleVerifyEmail}
-        onResendCode={handleResendCode}
-        onBack={handleBackToSignUp}
-        loading={verificationLoading}
-        error={verificationError}
-      />
-    );
-  }
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error for this field when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setErrors({});
-
-    try {
-      // Validate form data
-      const validatedData = signUpSchema.parse(formData);
-      
-      // Store the user data for after verification
-      setPendingUserData({
-        email: validatedData.email,
-        password: validatedData.password,
-        firstName: validatedData.firstName,
-        lastName: validatedData.lastName,
-        accountType: validatedData.accountType,
-        companyName: validatedData.companyName
-      });
-
-      // Generate 6-digit verification code
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      setVerificationCode(code);
-
-      // Send verification code via Resend
-      const { error } = await supabase.functions.invoke('send-verification-code', {
-        body: {
-          email: validatedData.email,
-          code: code,
-          firstName: validatedData.firstName,
-          lastName: validatedData.lastName
-        }
-      });
-
-      if (error) throw error;
-
-      // Show verification screen
-      setVerificationEmail(validatedData.email);
-      setShowVerification(true);
-      toast({
-        title: "Verification code sent!",
-        description: "Please check your email for the 6-digit code.",
-      });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const fieldErrors: Record<string, string> = {};
-        error.errors.forEach((err) => {
-          if (err.path[0]) {
-            fieldErrors[err.path[0] as string] = err.message;
-          }
-        });
-        setErrors(fieldErrors);
-      } else {
-        toast({
-          title: "Sign up failed",
-          description: error instanceof Error ? error.message : "An unexpected error occurred",
-          variant: "destructive",
-        });
-      }
-    } finally {
-      setLoading(false);
+    if (formData.password !== confirmPassword) {
+      return;
     }
+    onSignUp(formData);
+  };
+
+  const updateFormData = (field: keyof SignUpData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -242,36 +56,35 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
         
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
             {/* Account Type Selection */}
             <div className="space-y-3">
               <Label>I am signing up as:</Label>
               <RadioGroup
                 value={formData.accountType}
-                onValueChange={(value) => handleInputChange('accountType', value)}
+                onValueChange={(value) => updateFormData('accountType', value as 'partner' | 'company')}
                 className="grid grid-cols-2 gap-4"
               >
                 <div className="flex items-center space-x-2 border rounded-lg p-3 cursor-pointer hover:bg-slate-50">
                   <RadioGroupItem value="company" id="company" />
                   <Label htmlFor="company" className="cursor-pointer flex items-center">
                     <Building className="h-4 w-4 mr-2" />
-                    <div>
-                      <div className="font-medium">Company</div>
-                      <div className="text-xs text-muted-foreground">Direct compliance management</div>
-                    </div>
+                    Company
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2 border rounded-lg p-3 cursor-pointer hover:bg-slate-50">
                   <RadioGroupItem value="partner" id="partner" />
                   <Label htmlFor="partner" className="cursor-pointer flex items-center">
                     <User className="h-4 w-4 mr-2" />
-                    <div>
-                      <div className="font-medium">Partner</div>
-                      <div className="text-xs text-muted-foreground">Manage multiple clients</div>
-                    </div>
+                    Partner
                   </Label>
                 </div>
               </RadioGroup>
-              {errors.accountType && <p className="text-sm text-red-500">{errors.accountType}</p>}
             </div>
             
             <div className="grid grid-cols-2 gap-4">
@@ -283,11 +96,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
                     id="firstName"
                     placeholder="John"
                     value={formData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    onChange={(e) => updateFormData('firstName', e.target.value)}
                     className="pl-10"
+                    required
                   />
                 </div>
-                {errors.firstName && <p className="text-sm text-red-500">{errors.firstName}</p>}
               </div>
               
               <div className="space-y-2">
@@ -296,29 +109,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
                   id="lastName"
                   placeholder="Doe"
                   value={formData.lastName}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  onChange={(e) => updateFormData('lastName', e.target.value)}
+                  required
                 />
-                {errors.lastName && <p className="text-sm text-red-500">{errors.lastName}</p>}
               </div>
             </div>
-
-            {/* Company Name (for company accounts) */}
-            {formData.accountType === 'company' && (
-              <div className="space-y-2">
-                <Label htmlFor="companyName">Company Name</Label>
-                <div className="relative">
-                  <Building className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                  <Input
-                    id="companyName"
-                    placeholder="Your Company Name"
-                    value={formData.companyName}
-                    onChange={(e) => handleInputChange('companyName', e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                {errors.companyName && <p className="text-sm text-red-500">{errors.companyName}</p>}
-              </div>
-            )}
             
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
@@ -329,11 +124,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
                   type="email"
                   placeholder="your.email@company.com"
                   value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  onChange={(e) => updateFormData('email', e.target.value)}
                   className="pl-10"
+                  required
                 />
               </div>
-              {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
             </div>
             
             <div className="space-y-2">
@@ -343,10 +138,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Create a strong password (min. 8 characters)"
+                  placeholder="Create a strong password"
                   value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  onChange={(e) => updateFormData('password', e.target.value)}
                   className="pl-10 pr-10"
+                  required
                 />
                 <Button
                   type="button"
@@ -358,7 +154,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
-              {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
             </div>
             
             <div className="space-y-2">
@@ -369,9 +164,10 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirm your password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   className="pl-10 pr-10"
+                  required
                 />
                 <Button
                   type="button"
@@ -383,15 +179,20 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp, onLogin }) => {
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
-              {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword}</p>}
             </div>
+            
+            {formData.password !== confirmPassword && confirmPassword && (
+              <Alert variant="destructive">
+                <AlertDescription>Passwords do not match</AlertDescription>
+              </Alert>
+            )}
           </CardContent>
           
           <CardFooter className="flex flex-col space-y-3">
             <Button 
               type="submit" 
               className="w-full" 
-              disabled={loading}
+              disabled={loading || formData.password !== confirmPassword}
             >
               {loading ? 'Creating Account...' : 'Create Account'}
             </Button>

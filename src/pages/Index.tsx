@@ -7,9 +7,6 @@ import OrganizationSetup from '@/components/onboarding/OrganizationSetup';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import PartnerDashboard from '@/components/dashboard/PartnerDashboard';
-import PartnerSettings from '@/components/partner/PartnerSettings';
-import { WorkspaceCreation } from '@/components/partner/WorkspaceCreation';
-import TaskManagement from '@/components/partner/TaskManagement';
 import CompanyDashboard from '@/components/dashboard/CompanyDashboard';
 import ROPA from '@/components/company/ROPA';
 import DPIA from '@/components/company/DPIA';
@@ -21,13 +18,13 @@ import ThirdParties from '@/components/company/ThirdParties';
 import DocumentLibrary from '@/components/company/DocumentLibrary';
 import OrganizationSettings from '@/components/company/settings/OrganizationSettings';
 import UserManagement from '@/components/company/settings/UserManagement';
-import { WorkspaceProvider } from '@/contexts/WorkspaceContext';
 import MetadataSettings from '@/components/company/settings/MetadataSettings';
 import DataDictionary from '@/components/company/settings/DataDictionary';
 import IMSystems from '@/components/company/settings/IMSystems';
 import ReportsSettings from '@/components/company/settings/ReportsSettings';
 import CompanySettings from '@/components/company/settings/CompanySettings';
 import AIIntegrationSettings from '@/components/company/settings/AIIntegrationSettings';
+import PartnerSettings from '@/components/partner/PartnerSettings';
 import CreateDSR from '@/components/company/CreateDSR';
 import CreateThirdParty from '@/components/company/CreateThirdParty';
 import CreateDocument from '@/components/company/CreateDocument';
@@ -58,36 +55,25 @@ interface CompanyAccess {
 type AppState = 'login' | 'signup' | 'verification' | 'onboarding' | 'dashboard';
 
 const Index = () => {
-  // Skip authentication - start with mock partner user
-  const [appState, setAppState] = useState<AppState>('dashboard');
-  const [user, setUser] = useState<User | null>({
-    id: 'demo-partner-1',
-    name: 'Demo Partner',
-    email: 'demo@partner.com',
-    role: 'partner',
-  });
+  const [appState, setAppState] = useState<AppState>('login');
+  const [user, setUser] = useState<User | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
-  const [currentPath, setCurrentPath] = useState('/partner/dashboard');
+  const [currentPath, setCurrentPath] = useState('/dashboard');
   const [pendingUserData, setPendingUserData] = useState<any>(null);
   
   // For partners: track which companies they have access to and current active company
-  const [partnerCompanies, setPartnerCompanies] = useState<CompanyAccess[]>([
-    { id: '1', name: 'TechCorp Ltd', hasAccess: true },
-    { id: '2', name: 'DataFlow Inc', hasAccess: true },
-    { id: '3', name: 'SecureBank', hasAccess: false },
-    { id: '4', name: 'HealthSystem', hasAccess: true },
-  ]);
+  const [partnerCompanies, setPartnerCompanies] = useState<CompanyAccess[]>([]);
   const [activeCompany, setActiveCompany] = useState<CompanyAccess | null>(null);
 
   // Mock authentication
-  const handleLogin = (userId: string, accountType: 'company' | 'partner') => {
-    console.log('Login attempt:', { userId, accountType });
+  const handleLogin = (email: string, password: string) => {
+    console.log('Login attempt:', { email, password });
     // Mock user data
     const mockUser: User = {
-      id: userId,
-      name: 'User',
-      email: '',
-      role: accountType,
+      id: '1',
+      name: 'John Doe',
+      email: email,
+      role: email.includes('partner') ? 'partner' : 'company',
     };
     
     setUser(mockUser);
@@ -109,17 +95,25 @@ const Index = () => {
     setAppState('dashboard');
   };
 
-  const handleSignUp = (userId: string, accountType: 'company' | 'partner') => {
-    console.log('Sign up attempt:', { userId, accountType });
-    setPendingUserData({ userId, accountType });
+  const handleSignUp = (signUpData: any) => {
+    console.log('Sign up attempt:', signUpData);
+    setPendingUserData(signUpData);
     setAppState('verification');
   };
 
   const handleEmailVerification = (code: string) => {
     console.log('Email verification with code:', code);
-    // Mock verification success - just move to login
-    setAppState('login');
-    setPendingUserData(null);
+    // Mock verification success
+    if (pendingUserData) {
+      const mockUser: User = {
+        id: '1',
+        name: `${pendingUserData.firstName} ${pendingUserData.lastName}`,
+        email: pendingUserData.email,
+        role: pendingUserData.accountType,
+      };
+      setUser(mockUser);
+      setAppState('onboarding');
+    }
   };
 
   const handleResendCode = () => {
@@ -244,9 +238,12 @@ const Index = () => {
     if (!user) return null;
 
     // If partner hasn't selected a company workspace yet, show partner dashboard
-    if (user.role === 'partner' && !activeCompany) {
+    if (user.role === 'partner' && !activeCompany && currentPath.startsWith('/partner')) {
       switch (currentPath) {
         case '/partner/dashboard':
+          return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
+        case '/partner/settings':
+          return <PartnerSettings />;
         default:
           return <PartnerDashboard onNavigateToCompany={handleNavigateToCompany} />;
       }
@@ -296,23 +293,6 @@ const Index = () => {
         return <ReportsSettings />;
       case '/company/settings/ai-integration':
         return <AIIntegrationSettings />;
-        
-      // Partner-specific routes
-      case '/partner/workspaces/create':
-        return (
-          <WorkspaceCreation
-            onWorkspaceCreated={(workspaceId) => {
-              // Find the workspace and set it as active
-              handleNavigateToCompany(workspaceId);
-              handleNavigate('/company/dashboard');
-            }}
-            onCancel={() => handleNavigate('/partner/dashboard')}
-          />
-        );
-      case '/partner/tasks':
-        return <TaskManagement workspaceId={activeCompany?.id} />;
-      case '/partner/settings':
-        return <PartnerSettings />;
       
       default:
         // Default to dashboard based on user role and context

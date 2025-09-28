@@ -10,6 +10,7 @@ import IMSystems from "./components/company/settings/IMSystems";
 import { AutomationCenter } from "./components/ai/AutomationCenter";
 import CompanySettings from "./components/company/settings/CompanySettings";
 import AIIntegrationSettings from "./components/company/settings/AIIntegrationSettings";
+
 const queryClient = new QueryClient();
 
 const App = () => (
