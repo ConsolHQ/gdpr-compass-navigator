@@ -28,8 +28,7 @@ import {
   X,
   Filter,
   Bot
-} from 'lucide-react';
-import CreateThirdParty from './CreateThirdParty';
+ } from 'lucide-react';
 import { ThirdPartyCopilotPanel } from '@/components/ai/third-party';
 
 interface ThirdPartiesProps {
@@ -37,7 +36,6 @@ interface ThirdPartiesProps {
 }
 
 const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
-  const [showCreateForm, setShowCreateForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
@@ -277,7 +275,7 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
             <Bot className="mr-2 h-4 w-4" />
             AI Assist
           </Button>
-          <Button onClick={() => setShowCreateForm(true)}>
+          <Button onClick={() => onNavigate?.('/company/third-parties/create')}>
             <Plus className="mr-2 h-4 w-4" />
             Add Third Party
           </Button>
@@ -618,12 +616,6 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
         </Card>
       )}
 
-      {/* Create Form */}
-      {showCreateForm && (
-        <CreateThirdParty 
-          onBack={() => setShowCreateForm(false)} 
-        />
-      )}
 
       {/* AI Copilot Panel */}
       <ThirdPartyCopilotPanel
