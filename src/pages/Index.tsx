@@ -58,14 +58,25 @@ interface CompanyAccess {
 type AppState = 'login' | 'signup' | 'verification' | 'onboarding' | 'dashboard';
 
 const Index = () => {
-  const [appState, setAppState] = useState<AppState>('login');
-  const [user, setUser] = useState<User | null>(null);
+  // Skip authentication - start with mock partner user
+  const [appState, setAppState] = useState<AppState>('dashboard');
+  const [user, setUser] = useState<User | null>({
+    id: 'demo-partner-1',
+    name: 'Demo Partner',
+    email: 'demo@partner.com',
+    role: 'partner',
+  });
   const [organization, setOrganization] = useState<Organization | null>(null);
-  const [currentPath, setCurrentPath] = useState('/dashboard');
+  const [currentPath, setCurrentPath] = useState('/partner/dashboard');
   const [pendingUserData, setPendingUserData] = useState<any>(null);
   
   // For partners: track which companies they have access to and current active company
-  const [partnerCompanies, setPartnerCompanies] = useState<CompanyAccess[]>([]);
+  const [partnerCompanies, setPartnerCompanies] = useState<CompanyAccess[]>([
+    { id: '1', name: 'TechCorp Ltd', hasAccess: true },
+    { id: '2', name: 'DataFlow Inc', hasAccess: true },
+    { id: '3', name: 'SecureBank', hasAccess: false },
+    { id: '4', name: 'HealthSystem', hasAccess: true },
+  ]);
   const [activeCompany, setActiveCompany] = useState<CompanyAccess | null>(null);
 
   // Mock authentication
