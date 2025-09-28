@@ -275,7 +275,7 @@ const ThirdParties = ({ onNavigate }: ThirdPartiesProps) => {
             <Bot className="mr-2 h-4 w-4" />
             AI Assist
           </Button>
-          <Button onClick={() => onNavigate?.('/company/third-parties/create')}>
+          <Button onClick={() => onNavigate?.('/company/vendors/new')}>
             <Plus className="mr-2 h-4 w-4" />
             Add Third Party
           </Button>
