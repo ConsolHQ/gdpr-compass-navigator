@@ -15,7 +15,8 @@ import {
   Lock,
   FileCheck,
   Bot,
-  Sparkles
+  Sparkles,
+  Plus
 } from 'lucide-react';
 import GeneralInfoTab from './create-ropa/GeneralInfoTab';
 import PurposeTab from './create-ropa/PurposeTab';
@@ -25,6 +26,7 @@ import ContextTab from './create-ropa/ContextTab';
 import RetentionTab from './create-ropa/RetentionTab';
 import SecurityTab from './create-ropa/SecurityTab';
 import DataProtectionPrinciplesTab from './create-ropa/DataProtectionPrinciplesTab';
+import CustomTab from './create-ropa/CustomTab';
 import { ROPACopilotPanel } from '../ai/ropa';
 
 const CreateROPA = ({ onBack }: { onBack: () => void }) => {
@@ -61,7 +63,8 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
     justificationText: '',
     legislation: '',
     securityMeasures: [] as any[],
-    dataProtectionPrinciples: {} as any
+    dataProtectionPrinciples: {} as any,
+    customFields: [] as any[]
   });
 
   const handleGeneratedROPAApply = (generatedROPA: any) => {
@@ -139,7 +142,7 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
 
   const tabs = [
     'general', 'purpose', 'data', 'dpiacheck', 
-    'context', 'retention', 'security', 'principles'
+    'context', 'retention', 'security', 'principles', 'custom'
   ];
 
   const getTabName = (tab: string) => {
@@ -151,7 +154,8 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
       context: 'Context',
       retention: 'Retention',
       security: 'Security',
-      principles: 'Data Protection Principles'
+      principles: 'Data Protection Principles',
+      custom: 'Custom Fields'
     };
     return names[tab as keyof typeof names];
   };
@@ -197,7 +201,7 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
       </div>
 
       <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-9">
           <TabsTrigger value="general" className="flex items-center space-x-2">
             <Building className="h-4 w-4" />
             <span>General</span>
@@ -229,6 +233,10 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
           <TabsTrigger value="principles" className="flex items-center space-x-2">
             <FileCheck className="h-4 w-4" />
             <span>Principles</span>
+          </TabsTrigger>
+          <TabsTrigger value="custom" className="flex items-center space-x-2">
+            <Plus className="h-4 w-4" />
+            <span>Custom</span>
           </TabsTrigger>
         </TabsList>
 
@@ -360,6 +368,15 @@ const CreateROPA = ({ onBack }: { onBack: () => void }) => {
 
         <TabsContent value="principles">
           <DataProtectionPrinciplesTab
+            formData={formData}
+            setFormData={setFormData}
+            onBack={handleBack}
+            onNext={handleNext}
+          />
+        </TabsContent>
+
+        <TabsContent value="custom">
+          <CustomTab
             formData={formData}
             setFormData={setFormData}
             onBack={handleBack}

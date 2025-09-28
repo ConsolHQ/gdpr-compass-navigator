@@ -4,20 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface DataProtectionPrinciplesTabProps {
   formData: any;
   setFormData: (data: any) => void;
   onBack: () => void;
-  onCreateROPA: () => void;
+  onNext: () => void;
 }
 
 const DataProtectionPrinciplesTab = ({ 
   formData, 
   setFormData, 
   onBack, 
-  onCreateROPA 
+  onNext 
 }: DataProtectionPrinciplesTabProps) => {
   const principles = [
     { 
@@ -117,21 +117,16 @@ const DataProtectionPrinciplesTab = ({
           </div>
         ))}
 
-        {/* Action buttons at the bottom */}
+        {/* Navigation buttons */}
         <div className="flex justify-between pt-6">
           <Button variant="outline" onClick={onBack}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
-          <div className="flex space-x-2">
-            <Button variant="outline">
-              <Save className="mr-2 h-4 w-4" />
-              Save Draft
-            </Button>
-            <Button className="bg-teal-600 hover:bg-teal-700" onClick={onCreateROPA}>
-              Create ROPA
-            </Button>
-          </div>
+          <Button onClick={onNext} className="bg-teal-600 hover:bg-teal-700">
+            Next: Custom Fields
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
         </div>
       </CardContent>
     </Card>
