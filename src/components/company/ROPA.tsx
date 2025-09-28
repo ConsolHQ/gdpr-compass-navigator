@@ -408,10 +408,6 @@ const ROPA = () => {
           <p className="text-gray-600 mt-1">{processedEntries.length} processing activities</p>
         </div>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" onClick={() => setShowAIAssist(true)}>
-            <Bot className="mr-2 h-4 w-4" />
-            AI Assist
-          </Button>
           <Button
             variant="outline"
             onClick={() => navigate('/company/ropa/outstanding')}
@@ -421,6 +417,10 @@ const ROPA = () => {
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
               2
             </span>
+          </Button>
+          <Button variant="outline" onClick={() => setShowAIAssist(true)}>
+            <Bot className="mr-2 h-4 w-4" />
+            AI Assist
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
