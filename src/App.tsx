@@ -27,6 +27,8 @@ const App = () => (
           <Route path="/company/settings/im-systems" element={<IMSystems />} />
           <Route path="/company/ropa" element={<Index />} />
           <Route path="/company/ropa/outstanding" element={<OutstandingItems />} />
+          <Route path="/company/lia/outstanding" element={<OutstandingItems />} />
+          <Route path="/company/dpia/outstanding" element={<OutstandingItems />} />
           <Route path="/company/third-parties/create" element={<CreateThirdPartyPage />} />
           <Route path="/company/ai-assist/automation-center" element={<AutomationCenter />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
