@@ -29,8 +29,10 @@ import {
   Download,
   CheckSquare,
   Upload,
-  FileText
+  FileText,
+  Bot
 } from 'lucide-react';
+import { DPIACopilotPanel } from '@/components/ai/dpia';
 
 interface DPIAProps {
   onNavigate?: (path: string) => void;
@@ -52,6 +54,7 @@ const DPIA = ({ onNavigate }: DPIAProps) => {
     dataTypes: true,
   });
   const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>({});
+  const [showAIAssist, setShowAIAssist] = useState(false);
   
   const dpiaAssessments = [
     {
@@ -241,6 +244,10 @@ const DPIA = ({ onNavigate }: DPIAProps) => {
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
               4
             </span>
+          </Button>
+          <Button variant="outline" onClick={() => setShowAIAssist(true)}>
+            <Bot className="mr-2 h-4 w-4" />
+            AI Assist
           </Button>
           <Button onClick={() => onNavigate?.('/company/assessments/dpia/new')}>
             <Plus className="mr-2 h-4 w-4" />
@@ -685,6 +692,15 @@ const DPIA = ({ onNavigate }: DPIAProps) => {
           </CardContent>
         </Card>
       )}
+
+      {/* AI Assist Panel */}
+      <DPIACopilotPanel 
+        isOpen={showAIAssist}
+        onClose={() => setShowAIAssist(false)}
+        formData={{}}
+        onFormUpdate={() => {}}
+        onGeneratedDPIAApply={() => {}}
+      />
     </div>
   );
 };

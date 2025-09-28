@@ -35,7 +35,8 @@ import {
   Copy,
   Download,
   X,
-  CheckSquare
+  CheckSquare,
+  Bot
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -45,6 +46,7 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { LIACopilotPanel } from '@/components/ai/lia';
 
 // Mock data for LIA
 const mockLIAs = [
@@ -93,6 +95,7 @@ const LIA = ({ onNavigate }: LIAProps) => {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
   const [columnFilters, setColumnFilters] = useState<{[key: string]: string[]}>({});
+  const [showAIAssist, setShowAIAssist] = useState(false);
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -249,6 +252,10 @@ const LIA = ({ onNavigate }: LIAProps) => {
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
               3
             </span>
+          </Button>
+          <Button variant="outline" onClick={() => setShowAIAssist(true)}>
+            <Bot className="mr-2 h-4 w-4" />
+            AI Assist
           </Button>
           <Button onClick={() => onNavigate?.('/company/assessments/lia/new')} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
@@ -626,6 +633,15 @@ const LIA = ({ onNavigate }: LIAProps) => {
           )}
         </CardContent>
       </Card>
+
+      {/* AI Assist Panel */}
+      <LIACopilotPanel 
+        isOpen={showAIAssist}
+        onClose={() => setShowAIAssist(false)}
+        formData={{}}
+        onFormUpdate={() => {}}
+        onGeneratedLIAApply={() => {}}
+      />
     </div>
   );
 };
