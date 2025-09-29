@@ -416,54 +416,9 @@ const ROPA = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-gray-600 mt-1">{processedEntries.length} processing activities</p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/company/ropa/outstanding')}
-            className="relative"
-          >
-            <CheckSquare className="h-4 w-4" />
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              2
-            </span>
-          </Button>
-          <Button variant="outline" onClick={() => setShowAIAssist(true)}>
-            <Bot className="mr-2 h-4 w-4" />
-            AI Assist
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="bg-teal-600 hover:bg-teal-700">
-                <Plus className="mr-2 h-4 w-4" />
-                Create New ROPA
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setShowCreateForm(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Create New
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowTemplates(true)}>
-                <FileText className="mr-2 h-4 w-4" />
-                Create from Template
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button variant="outline" onClick={() => setShowImportWizard(true)}>
-            <Upload className="mr-2 h-4 w-4" />
-            Import ROPA
-          </Button>
-        </div>
-      </div>
-
-      {/* Toolbar */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
+      {/* Header with all controls in one row */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -513,41 +468,81 @@ const ROPA = () => {
           )}
         </div>
 
-        {/* Bulk Actions */}
-        {selectedRows.length > 0 && (
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">{selectedRows.length} selected</span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Bulk Actions
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>
-                  <Archive className="mr-2 h-4 w-4" />
-                  Archive
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Copy className="mr-2 h-4 w-4" />
-                  Duplicate
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Merge className="mr-2 h-4 w-4" />
-                  Merge
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Download className="mr-2 h-4 w-4" />
-                  Export
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Task
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Bulk Actions */}
+          {selectedRows.length > 0 && (
+            <>
+              <span className="text-sm text-gray-600">{selectedRows.length} selected</span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    Bulk Actions
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>
+                    <Archive className="mr-2 h-4 w-4" />
+                    Archive
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Duplicate
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Merge className="mr-2 h-4 w-4" />
+                    Merge
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Download className="mr-2 h-4 w-4" />
+                    Export
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Task
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
+
+          {/* Action Buttons */}
+          <Button
+            variant="outline"
+            onClick={() => navigate('/company/ropa/outstanding')}
+            className="relative"
+          >
+            <CheckSquare className="h-4 w-4" />
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              2
+            </span>
+          </Button>
+          <Button variant="outline" onClick={() => setShowAIAssist(true)}>
+            <Bot className="mr-2 h-4 w-4" />
+            AI Assist
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="bg-teal-600 hover:bg-teal-700">
+                <Plus className="mr-2 h-4 w-4" />
+                Create New ROPA
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setShowCreateForm(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create New
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setShowTemplates(true)}>
+                <FileText className="mr-2 h-4 w-4" />
+                Create from Template
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button variant="outline" onClick={() => setShowImportWizard(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Import ROPA
+          </Button>
+        </div>
       </div>
 
       {/* Enhanced Table */}
