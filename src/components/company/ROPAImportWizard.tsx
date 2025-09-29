@@ -396,7 +396,9 @@ export const ROPAImportWizard = ({ onBack, onImportComplete }: ROPAImportWizardP
   };
 
   const handleAcceptAllSuggestions = () => {
-    toast.success("All suggestions accepted");
+    // Apply all auto-detected mappings and proceed to validation
+    toast.success("All suggestions accepted. Running validation...");
+    handleValidation();
   };
 
   const handleImportConfirm = () => {
