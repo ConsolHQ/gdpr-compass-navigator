@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as XLSX from 'xlsx';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -93,38 +94,80 @@ export const ROPAImportWizard = ({ onBack, onImportComplete }: ROPAImportWizardP
   };
 
   const parseFile = (file: File) => {
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
     const reader = new FileReader();
     
     reader.onload = (e) => {
-      const text = e.target?.result as string;
-      const lines = text.split('\n').filter(line => line.trim());
-      
-      if (lines.length === 0) {
-        toast.error("File is empty");
-        return;
+      try {
+        let parsedHeaders: string[] = [];
+        let data: any[] = [];
+
+        if (fileExtension === 'csv') {
+          // Parse CSV
+          const text = e.target?.result as string;
+          const lines = text.split('\n').filter(line => line.trim());
+          
+          if (lines.length === 0) {
+            toast.error("File is empty");
+            return;
+          }
+
+          // Parse headers
+          const headerLine = lines[0];
+          parsedHeaders = headerLine.split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
+
+          // Parse data (first 10 rows for preview)
+          data = lines.slice(1, 11).map(line => {
+            const values = line.split(',').map(v => v.trim().replace(/^["']|["']$/g, ''));
+            const row: any = {};
+            parsedHeaders.forEach((header, index) => {
+              row[header] = values[index] || '';
+            });
+            return row;
+          });
+        } else {
+          // Parse Excel
+          const arrayBuffer = e.target?.result as ArrayBuffer;
+          const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          
+          // Convert to JSON
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+          
+          if (jsonData.length === 0) {
+            toast.error("File is empty");
+            return;
+          }
+
+          // Extract headers
+          parsedHeaders = jsonData[0].map((h: any) => String(h || '').trim());
+          
+          // Extract data (first 10 rows)
+          data = jsonData.slice(1, 11).map(row => {
+            const rowData: any = {};
+            parsedHeaders.forEach((header, index) => {
+              rowData[header] = row[index] !== undefined ? String(row[index]) : '';
+            });
+            return rowData;
+          });
+        }
+
+        setHeaders(parsedHeaders);
+        setFileData(data);
+        setCurrentStep(2);
+        autoMapColumns(parsedHeaders, data);
+      } catch (error) {
+        console.error('Error parsing file:', error);
+        toast.error("Failed to parse file. Please check the file format.");
       }
-
-      // Parse headers
-      const headerLine = lines[0];
-      const parsedHeaders = headerLine.split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
-      setHeaders(parsedHeaders);
-
-      // Parse data (first 10 rows for preview)
-      const data = lines.slice(1, 11).map(line => {
-        const values = line.split(',').map(v => v.trim().replace(/^["']|["']$/g, ''));
-        const row: any = {};
-        parsedHeaders.forEach((header, index) => {
-          row[header] = values[index] || '';
-        });
-        return row;
-      });
-
-      setFileData(data);
-      setCurrentStep(2);
-      autoMapColumns(parsedHeaders, data);
     };
 
-    reader.readAsText(file);
+    if (fileExtension === 'csv') {
+      reader.readAsText(file);
+    } else {
+      reader.readAsArrayBuffer(file);
+    }
   };
 
   const detectDataType = (columnName: string, values: string[]): string => {
@@ -245,31 +288,105 @@ export const ROPAImportWizard = ({ onBack, onImportComplete }: ROPAImportWizardP
   const handleValidation = () => {
     const errors: ValidationError[] = [];
     
-    // Simulate validation
     fileData.forEach((row, index) => {
       columnMappings.forEach(mapping => {
         if (mapping.skip) return;
         
         const value = row[mapping.fileColumn];
         
-        // Email validation
-        if (mapping.suggestedType === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          errors.push({
-            row: index + 2, // +2 because index 0 is row 2 (after header)
-            column: mapping.fileColumn,
-            value,
-            error: "Invalid email format"
-          });
+        // Skip empty values
+        if (!value || value.trim() === '') return;
+        
+        // Boolean validation
+        if (mapping.suggestedType === 'boolean') {
+          const booleanValues = ['yes', 'no', 'true', 'false', 'y', 'n', '1', '0'];
+          if (!booleanValues.includes(value.toLowerCase())) {
+            errors.push({
+              row: index + 2,
+              column: mapping.fileColumn,
+              value,
+              error: "Invalid boolean value (expected: yes/no, true/false, 1/0)"
+            });
+          }
         }
-
+        
+        // Email validation
+        if (mapping.suggestedType === 'email') {
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            errors.push({
+              row: index + 2,
+              column: mapping.fileColumn,
+              value,
+              error: "Invalid email format"
+            });
+          }
+        }
+        
+        // URL validation
+        if (mapping.suggestedType === 'url') {
+          try {
+            new URL(value);
+            if (!/^https?:\/\/.+/.test(value)) {
+              throw new Error('Invalid protocol');
+            }
+          } catch {
+            errors.push({
+              row: index + 2,
+              column: mapping.fileColumn,
+              value,
+              error: "Invalid URL format (must start with http:// or https://)"
+            });
+          }
+        }
+        
+        // Phone validation
+        if (mapping.suggestedType === 'phone') {
+          const phoneRegex = /^[\d\s()+-]+$/;
+          if (!phoneRegex.test(value) || value.replace(/\D/g, '').length < 7) {
+            errors.push({
+              row: index + 2,
+              column: mapping.fileColumn,
+              value,
+              error: "Invalid phone number format"
+            });
+          }
+        }
+        
         // Date validation
-        if (mapping.suggestedType === 'date' && value && isNaN(Date.parse(value))) {
-          errors.push({
-            row: index + 2,
-            column: mapping.fileColumn,
-            value,
-            error: "Invalid date format"
-          });
+        if (mapping.suggestedType === 'date') {
+          if (isNaN(Date.parse(value))) {
+            errors.push({
+              row: index + 2,
+              column: mapping.fileColumn,
+              value,
+              error: "Invalid date format"
+            });
+          }
+        }
+        
+        // DateTime validation
+        if (mapping.suggestedType === 'datetime') {
+          const date = new Date(value);
+          if (isNaN(date.getTime()) || !/\d{2}:\d{2}/.test(value)) {
+            errors.push({
+              row: index + 2,
+              column: mapping.fileColumn,
+              value,
+              error: "Invalid date/time format (expected date with time)"
+            });
+          }
+        }
+        
+        // Number validation
+        if (mapping.suggestedType === 'number') {
+          if (isNaN(Number(value))) {
+            errors.push({
+              row: index + 2,
+              column: mapping.fileColumn,
+              value,
+              error: "Invalid number format"
+            });
+          }
         }
       });
     });
