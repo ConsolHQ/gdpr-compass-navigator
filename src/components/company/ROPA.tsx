@@ -39,6 +39,7 @@ import { useNavigate } from 'react-router-dom';
 import CreateROPA from './CreateROPA';
 import ROPATemplateImport from './ROPATemplateImport';
 import { ROPACopilotPanel } from '@/components/ai/ropa';
+import { ROPAImportWizard } from './ROPAImportWizard';
 
 const ROPATemplates = () => {
   const templates = [
@@ -109,6 +110,7 @@ const ROPA = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showImportTemplate, setShowImportTemplate] = useState(false);
+  const [showImportWizard, setShowImportWizard] = useState(false);
   const [showAIAssist, setShowAIAssist] = useState(false);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -383,6 +385,18 @@ const ROPA = () => {
     );
   }
 
+  if (showImportWizard) {
+    return (
+      <ROPAImportWizard
+        onBack={() => setShowImportWizard(false)}
+        onImportComplete={(data) => {
+          console.log('Import completed:', data);
+          setShowImportWizard(false);
+        }}
+      />
+    );
+  }
+
   if (showTemplates) {
     return (
       <div className="space-y-6">
@@ -440,6 +454,10 @@ const ROPA = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button variant="outline" onClick={() => setShowImportWizard(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Import ROPA
+          </Button>
         </div>
       </div>
 
