@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -47,6 +47,8 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { LIACopilotPanel } from '@/components/ai/lia';
+import { LoadingState } from '@/components/ui/loading-state';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Mock data for LIA
 const mockLIAs = [
@@ -96,6 +98,7 @@ const LIA = ({ onNavigate }: LIAProps) => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
   const [columnFilters, setColumnFilters] = useState<{[key: string]: string[]}>({});
   const [showAIAssist, setShowAIAssist] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -235,8 +238,49 @@ const LIA = ({ onNavigate }: LIAProps) => {
     { key: 'reviewer', label: 'Reviewer', sortable: true },
   ];
 
+  // Simulate data loading
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="p-6 space-y-6 animate-fade-in">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-64" />
+          <div className="flex space-x-2">
+            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-32" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-4 w-24" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-16" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-64 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>

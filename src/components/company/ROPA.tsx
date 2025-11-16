@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,6 +40,8 @@ import CreateROPA from './CreateROPA';
 import ROPATemplateImport from './ROPATemplateImport';
 import { ROPACopilotPanel } from '@/components/ai/ropa';
 import { ROPAImportWizard } from './ROPAImportWizard';
+import { LoadingState } from '@/components/ui/loading-state';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ROPATemplates = () => {
   const templates = [
@@ -112,6 +114,7 @@ const ROPA = () => {
   const [showImportTemplate, setShowImportTemplate] = useState(false);
   const [showImportWizard, setShowImportWizard] = useState(false);
   const [showAIAssist, setShowAIAssist] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
@@ -414,8 +417,49 @@ const ROPA = () => {
     );
   }
 
+  // Simulate data loading
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="p-6 space-y-6 animate-fade-in">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-10 w-64" />
+            <Skeleton className="h-10 w-10" />
+          </div>
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-32" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {[...Array(5)].map((_, i) => (
+            <Card key={i}>
+              <CardContent className="pt-6">
+                <Skeleton className="h-16 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-64 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 animate-fade-in">
       {/* Header with all controls in one row */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
