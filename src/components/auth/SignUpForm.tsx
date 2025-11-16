@@ -47,17 +47,17 @@ const SignUpForm = ({ onSignUp, onLogin, loading, error }: SignUpFormProps) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-surface via-background to-surface-secondary p-4 animate-fade-in">
+      <Card className="w-full max-w-md shadow-lg hover:shadow-xl transition-all duration-base">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-slate-900">Create Account</CardTitle>
+          <CardTitle className="text-2xl font-bold text-foreground">Create Account</CardTitle>
           <CardDescription>Get started with GDPR Compliance</CardDescription>
         </CardHeader>
         
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="animate-scale-in">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -70,17 +70,17 @@ const SignUpForm = ({ onSignUp, onLogin, loading, error }: SignUpFormProps) => {
                 onValueChange={(value) => updateFormData('accountType', value as 'partner' | 'company')}
                 className="grid grid-cols-2 gap-4"
               >
-                <div className="flex items-center space-x-2 border rounded-lg p-3 cursor-pointer hover:bg-slate-50">
+                <div className="flex items-center space-x-2 border border-border rounded-lg p-3 cursor-pointer transition-all duration-fast hover:bg-surface/50 hover:border-primary/50">
                   <RadioGroupItem value="company" id="company" />
                   <Label htmlFor="company" className="cursor-pointer flex items-center">
-                    <Building className="h-4 w-4 mr-2" />
+                    <Building className="h-4 w-4 mr-2 transition-colors duration-fast" />
                     Company
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 border rounded-lg p-3 cursor-pointer hover:bg-slate-50">
+                <div className="flex items-center space-x-2 border border-border rounded-lg p-3 cursor-pointer transition-all duration-fast hover:bg-surface/50 hover:border-primary/50">
                   <RadioGroupItem value="partner" id="partner" />
                   <Label htmlFor="partner" className="cursor-pointer flex items-center">
-                    <User className="h-4 w-4 mr-2" />
+                    <User className="h-4 w-4 mr-2 transition-colors duration-fast" />
                     Partner
                   </Label>
                 </div>
@@ -91,7 +91,7 @@ const SignUpForm = ({ onSignUp, onLogin, loading, error }: SignUpFormProps) => {
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground transition-colors duration-fast" />
                   <Input
                     id="firstName"
                     placeholder="John"
@@ -118,7 +118,7 @@ const SignUpForm = ({ onSignUp, onLogin, loading, error }: SignUpFormProps) => {
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground transition-colors duration-fast" />
                 <Input
                   id="email"
                   type="email"
@@ -134,7 +134,7 @@ const SignUpForm = ({ onSignUp, onLogin, loading, error }: SignUpFormProps) => {
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground transition-colors duration-fast" />
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -148,7 +148,7 @@ const SignUpForm = ({ onSignUp, onLogin, loading, error }: SignUpFormProps) => {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent transition-all duration-fast"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -159,7 +159,7 @@ const SignUpForm = ({ onSignUp, onLogin, loading, error }: SignUpFormProps) => {
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground transition-colors duration-fast" />
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
@@ -173,7 +173,7 @@ const SignUpForm = ({ onSignUp, onLogin, loading, error }: SignUpFormProps) => {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent transition-all duration-fast"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -182,7 +182,7 @@ const SignUpForm = ({ onSignUp, onLogin, loading, error }: SignUpFormProps) => {
             </div>
             
             {formData.password !== confirmPassword && confirmPassword && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="animate-scale-in">
                 <AlertDescription>Passwords do not match</AlertDescription>
               </Alert>
             )}
@@ -191,18 +191,18 @@ const SignUpForm = ({ onSignUp, onLogin, loading, error }: SignUpFormProps) => {
           <CardFooter className="flex flex-col space-y-3">
             <Button 
               type="submit" 
-              className="w-full" 
+              className="w-full transition-all duration-base hover:scale-105" 
               disabled={loading || formData.password !== confirmPassword}
             >
               {loading ? 'Creating Account...' : 'Create Account'}
             </Button>
             
-            <div className="text-center text-sm text-slate-600">
+            <div className="text-center text-sm text-muted-foreground">
               Already have an account?{' '}
               <Button
                 type="button"
                 variant="link"
-                className="p-0 h-auto text-blue-600 hover:text-blue-800"
+                className="p-0 h-auto text-primary hover:text-primary/80 transition-colors duration-fast"
                 onClick={onLogin}
               >
                 Sign in here

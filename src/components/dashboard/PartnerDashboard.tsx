@@ -31,13 +31,13 @@ const PartnerDashboard = ({ onNavigateToCompany }: PartnerDashboardProps) => {
   ];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Partner Dashboard</h1>
-          <p className="text-gray-600 mt-2">Manage your client companies and GDPR compliance</p>
+          <h1 className="text-3xl font-bold text-foreground">Partner Dashboard</h1>
+          <p className="text-muted-foreground mt-2">Manage your client companies and GDPR compliance</p>
         </div>
-        <Button>
+        <Button className="transition-all duration-base hover:scale-105">
           <Plus className="mr-2 h-4 w-4" />
           Add Company
         </Button>
@@ -45,18 +45,22 @@ const PartnerDashboard = ({ onNavigateToCompany }: PartnerDashboardProps) => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => {
+        {stats.map((stat, index) => {
           const IconComponent = stat.icon;
           return (
-            <Card key={stat.label}>
+            <Card 
+              key={stat.label} 
+              className="transition-all duration-base hover:shadow-lg hover:-translate-y-1 cursor-pointer group"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardDescription>{stat.label}</CardDescription>
-                  <IconComponent className={`h-5 w-5 ${stat.color}`} />
+                  <CardDescription className="transition-colors duration-fast group-hover:text-primary">{stat.label}</CardDescription>
+                  <IconComponent className={`h-5 w-5 ${stat.color} transition-transform duration-base group-hover:scale-110`} />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
+                <div className="text-2xl font-bold text-foreground">{stat.value}</div>
               </CardContent>
             </Card>
           );
@@ -71,20 +75,20 @@ const PartnerDashboard = ({ onNavigateToCompany }: PartnerDashboardProps) => {
             <CardDescription>Latest company activities and status</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {recentCompanies.map((company) => (
-                <div key={company.name} className="flex items-center justify-between p-3 border rounded-lg">
+                <div key={company.name} className="flex items-center justify-between p-4 border border-border rounded-lg bg-surface/30 transition-all duration-base hover:shadow-md hover:border-primary/30 hover:bg-surface/60 cursor-pointer group">
                   <div>
-                    <h4 className="font-medium">{company.name}</h4>
-                    <p className="text-sm text-gray-600">{company.users} users • {company.lastActivity}</p>
+                    <h4 className="font-medium text-foreground transition-colors duration-fast group-hover:text-primary">{company.name}</h4>
+                    <p className="text-sm text-muted-foreground mt-1">{company.users} users • {company.lastActivity}</p>
                   </div>
-                  <Badge variant={company.status === 'Active' ? 'default' : 'secondary'}>
+                  <Badge variant={company.status === 'Active' ? 'default' : 'secondary'} className="transition-all duration-fast">
                     {company.status}
                   </Badge>
                 </div>
               ))}
             </div>
-            <Button variant="outline" className="w-full mt-4">
+            <Button variant="outline" className="w-full mt-4 transition-all duration-base hover:bg-primary/5">
               View All Companies
             </Button>
           </CardContent>
@@ -97,22 +101,24 @@ const PartnerDashboard = ({ onNavigateToCompany }: PartnerDashboardProps) => {
             <CardDescription>Latest actions across all companies</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {recentActivities.map((activity, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <div className={`w-2 h-2 rounded-full mt-2 ${
-                    activity.type === 'alert' ? 'bg-red-500' : 
-                    activity.type === 'create' ? 'bg-green-500' : 'bg-blue-500'
+                <div key={index} className="flex items-start space-x-3 p-4 border border-border rounded-lg bg-surface/30 transition-all duration-base hover:shadow-md hover:border-primary/20 hover:bg-surface/60 cursor-pointer">
+                  <div className={`w-2 h-2 rounded-full mt-2 transition-transform duration-base hover:scale-125 ${
+                    activity.type === 'alert' ? 'bg-destructive' : 
+                    activity.type === 'create' ? 'bg-success' : 
+                    activity.type === 'update' ? 'bg-primary' :
+                    'bg-neutral-400'
                   }`} />
                   <div className="flex-1">
-                    <p className="text-sm font-medium">{activity.company}</p>
-                    <p className="text-sm text-gray-600">{activity.action}</p>
-                    <p className="text-xs text-gray-500">{activity.time}</p>
+                    <p className="text-sm font-medium text-foreground">{activity.company}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{activity.action}</p>
+                    <p className="text-xs text-muted-foreground/70 mt-1">{activity.time}</p>
                   </div>
                 </div>
               ))}
             </div>
-            <Button variant="outline" className="w-full mt-4">
+            <Button variant="outline" className="w-full mt-4 transition-all duration-base hover:bg-primary/5">
               View All Activities
             </Button>
           </CardContent>
