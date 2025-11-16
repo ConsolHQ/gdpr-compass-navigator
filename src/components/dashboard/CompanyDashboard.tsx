@@ -27,14 +27,14 @@ const CompanyDashboard = ({ onNavigate }: CompanyDashboardProps) => {
   const complianceScore = 78;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{complianceScore}%</div>
-            <div className="text-sm text-gray-600">Compliance Score</div>
+          <div className="text-center p-4 rounded-lg bg-primary/5 border border-primary/10 transition-all duration-base hover:shadow-md">
+            <div className="text-2xl font-bold text-primary">{complianceScore}%</div>
+            <div className="text-sm text-muted-foreground">Compliance Score</div>
           </div>
-          <Button>Quick Actions</Button>
+          <Button className="transition-all duration-base hover:scale-105">Quick Actions</Button>
         </div>
       </div>
 
@@ -46,16 +46,20 @@ const CompanyDashboard = ({ onNavigate }: CompanyDashboardProps) => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {complianceStats.map((stat) => {
+            {complianceStats.map((stat, index) => {
               const IconComponent = stat.icon;
               return (
-                <div key={stat.label} className="space-y-3">
+                <div 
+                  key={stat.label} 
+                  className="space-y-3 p-4 rounded-lg bg-surface/50 border border-border/50 transition-all duration-base hover:shadow-md hover:border-primary/20 hover:-translate-y-0.5"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <IconComponent className="h-4 w-4 text-gray-600" />
-                      <span className="text-sm font-medium">{stat.label}</span>
+                      <IconComponent className="h-4 w-4 text-primary/70 transition-colors duration-base" />
+                      <span className="text-sm font-medium text-foreground">{stat.label}</span>
                     </div>
-                    <span className="text-sm text-gray-600">{stat.value}/{stat.total}</span>
+                    <span className="text-sm text-muted-foreground font-semibold">{stat.value}/{stat.total}</span>
                   </div>
                   <Progress value={stat.progress} className="h-2" />
                 </div>
@@ -73,18 +77,18 @@ const CompanyDashboard = ({ onNavigate }: CompanyDashboardProps) => {
             <CardDescription>Tasks requiring immediate attention</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {recentTasks.map((task, index) => (
-                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg bg-surface/30 transition-all duration-base hover:shadow-md hover:border-primary/30 hover:bg-surface/60 cursor-pointer group">
                   <div className="flex-1">
-                    <h4 className="font-medium">{task.title}</h4>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <Badge variant="outline" className="text-xs">{task.type}</Badge>
-                      <span className="text-xs text-gray-600">Due: {task.dueDate}</span>
+                    <h4 className="font-medium text-foreground transition-colors duration-fast group-hover:text-primary">{task.title}</h4>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <Badge variant="outline" className="text-xs transition-colors duration-fast">{task.type}</Badge>
+                      <span className="text-xs text-muted-foreground">Due: {task.dueDate}</span>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Badge variant={task.priority === 'High' ? 'destructive' : task.priority === 'Medium' ? 'default' : 'secondary'}>
+                    <Badge variant={task.priority === 'High' ? 'destructive' : task.priority === 'Medium' ? 'default' : 'secondary'} className="transition-all duration-fast">
                       {task.priority}
                     </Badge>
                     {task.status === 'pending' ? (
@@ -103,27 +107,27 @@ const CompanyDashboard = ({ onNavigate }: CompanyDashboardProps) => {
         </Card>
 
         {/* Quick Actions */}
-        <Card>
+        <Card className="transition-all duration-base hover:shadow-lg">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Common GDPR compliance tasks</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="h-20 flex flex-col">
-                <FileText className="h-6 w-6 mb-2" />
+              <Button variant="outline" className="h-20 flex flex-col transition-all duration-base hover:scale-105 hover:border-primary/50 hover:bg-primary/5 group">
+                <FileText className="h-6 w-6 mb-2 transition-colors duration-fast group-hover:text-primary" />
                 <span className="text-sm">New ROPA</span>
               </Button>
-              <Button variant="outline" className="h-20 flex flex-col">
-                <Shield className="h-6 w-6 mb-2" />
+              <Button variant="outline" className="h-20 flex flex-col transition-all duration-base hover:scale-105 hover:border-primary/50 hover:bg-primary/5 group">
+                <Shield className="h-6 w-6 mb-2 transition-colors duration-fast group-hover:text-primary" />
                 <span className="text-sm">New DPIA</span>
               </Button>
-              <Button variant="outline" className="h-20 flex flex-col">
-                <Users className="h-6 w-6 mb-2" />
+              <Button variant="outline" className="h-20 flex flex-col transition-all duration-base hover:scale-105 hover:border-primary/50 hover:bg-primary/5 group">
+                <Users className="h-6 w-6 mb-2 transition-colors duration-fast group-hover:text-primary" />
                 <span className="text-sm">Process DSR</span>
               </Button>
-              <Button variant="outline" className="h-20 flex flex-col">
-                <AlertTriangle className="h-6 w-6 mb-2" />
+              <Button variant="outline" className="h-20 flex flex-col transition-all duration-base hover:scale-105 hover:border-primary/50 hover:bg-primary/5 group">
+                <AlertTriangle className="h-6 w-6 mb-2 transition-colors duration-fast group-hover:text-primary" />
                 <span className="text-sm">Report Breach</span>
               </Button>
             </div>
