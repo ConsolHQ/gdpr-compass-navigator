@@ -44,7 +44,7 @@ const Header = ({ user, onLogout, activeCompany, title, breadcrumbs, onNavigate 
   if (!user) return null;
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <header className="bg-background border-b border-border px-6 py-4 shadow-sm">
       <div className="flex items-center justify-between">
         <div className="flex flex-col space-y-2">
           {breadcrumbs && breadcrumbs.length > 0 && (
@@ -72,38 +72,38 @@ const Header = ({ user, onLogout, activeCompany, title, breadcrumbs, onNavigate 
             </Breadcrumb>
           )}
           <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-semibold text-gray-900">
+            <h1 className="text-xl font-semibold text-foreground">
               {title || 'Dashboard'}
             </h1>
             {user.role === 'partner' && activeCompany && (
-              <div className="flex items-center text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                <Building className="h-4 w-4 mr-2" />
-                <span>Working on: {activeCompany.name}</span>
+              <div className="flex items-center text-sm text-foreground bg-accent px-3 py-1.5 rounded-full border border-border shadow-sm">
+                <Building className="h-4 w-4 mr-2 text-primary" />
+                <span className="font-medium">Working on: {activeCompany.name}</span>
               </div>
             )}
           </div>
         </div>
 
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="sm" className="hover:bg-accent transition-all duration-base">
+            <Bell className="h-5 w-5 text-foreground" />
           </Button>
           
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-8 w-8">
+          <div className="flex items-center space-x-3 px-3 py-1 rounded-lg hover:bg-accent transition-all duration-base">
+            <Avatar className="h-9 w-9 ring-2 ring-primary/20">
               <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback>
+              <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                 {user.name.split(' ').map(n => n[0]).join('')}
               </AvatarFallback>
             </Avatar>
             
             <div className="hidden md:block">
-              <div className="text-sm font-medium text-gray-900">{user.name}</div>
-              <div className="text-xs text-gray-500 capitalize">{user.role}</div>
+              <div className="text-sm font-semibold text-foreground">{user.name}</div>
+              <div className="text-xs text-muted-foreground capitalize">{user.role}</div>
             </div>
           </div>
 
-          <Button variant="ghost" size="sm" onClick={onLogout}>
+          <Button variant="ghost" size="sm" onClick={onLogout} className="hover:bg-destructive/10 hover:text-destructive transition-all duration-base">
             <LogOut className="h-5 w-5" />
           </Button>
         </div>

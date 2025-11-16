@@ -130,10 +130,11 @@ const Sidebar = ({
     const hasSubmenu = item.submenu && item.submenu.length > 0;
     const isExpanded = isSubmenuExpanded(item.id);
     const itemClasses = cn(
-      "w-full justify-start text-left hover:bg-slate-700 transition-colors",
-      currentPath === item.href && "bg-slate-700 text-blue-400",
-      isCollapsed && "px-2",
-      isSubmenuItem && "pl-8 text-sm"
+      "w-full justify-start text-left transition-all duration-base",
+      "hover:bg-sidebar-accent hover:shadow-sm rounded-md",
+      currentPath === item.href && "bg-sidebar-accent-hover text-primary font-medium shadow-sm border-l-2 border-primary",
+      isCollapsed && "px-2 justify-center",
+      isSubmenuItem && "pl-8 text-sm py-2"
     );
 
     return (
@@ -146,14 +147,14 @@ const Sidebar = ({
           <item.icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
           {!isCollapsed && (
             <>
-              <span className="flex-1">{item.label}</span>
+              <span className="flex-1 font-medium">{item.label}</span>
               {item.badge && (
-                <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-2">
+                <span className="bg-destructive text-destructive-foreground text-xs font-semibold rounded-full px-2 py-0.5 ml-2 shadow-sm">
                   {item.badge}
                 </span>
               )}
               {hasSubmenu && (
-                isExpanded ? <ChevronUp className="h-4 w-4 ml-2" /> : <ChevronDown className="h-4 w-4 ml-2" />
+                isExpanded ? <ChevronUp className="h-4 w-4 ml-2 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 ml-2 text-muted-foreground" />
               )}
             </>
           )}
@@ -161,7 +162,7 @@ const Sidebar = ({
         
         {/* Render submenu items */}
         {hasSubmenu && isExpanded && !isCollapsed && (
-          <div className="ml-4 space-y-1">
+          <div className="ml-4 mt-1 space-y-1 border-l-2 border-border pl-2">
             {item.submenu!.map(subItem => renderMenuItem(subItem, true))}
           </div>
         )}
@@ -171,11 +172,11 @@ const Sidebar = ({
 
   return (
     <div className={cn(
-      "bg-slate-900 text-white transition-all duration-300 flex flex-col",
+      "bg-sidebar text-sidebar-foreground transition-all duration-smooth flex flex-col shadow-xl border-r border-sidebar-border",
       isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
-      <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+      <div className="p-4 border-b border-sidebar-border flex items-center justify-between bg-sidebar/95 backdrop-blur-sm">
         {!isCollapsed && (
           <div className="flex flex-col flex-1">
             {userRole === 'partner' && activeCompany ? (
@@ -183,17 +184,17 @@ const Sidebar = ({
                 <Button
                   variant="ghost"
                   onClick={() => setShowCompanyDropdown(!showCompanyDropdown)}
-                  className="w-full justify-between text-left hover:bg-slate-700 p-2"
+                  className="w-full justify-between text-left hover:bg-sidebar-accent transition-all duration-base p-2 rounded-md"
                 >
                   <div className="flex items-center">
-                    <Building className="h-4 w-4 mr-2" />
+                    <Building className="h-5 w-5 mr-2 text-primary" />
                     <span className="font-semibold text-sm truncate">{activeCompany.name}</span>
                   </div>
-                  <ChevronDown className="h-4 w-4" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </Button>
                 
                 {showCompanyDropdown && (
-                  <div className="absolute top-full left-0 right-0 bg-slate-800 border border-slate-600 rounded-md mt-1 py-1 z-50">
+                  <div className="absolute top-full left-0 right-0 bg-card border border-border rounded-md mt-1 py-1 z-50 shadow-xl">
                     {partnerCompanies.map((company) => (
                       <Button
                         key={company.id}
@@ -202,13 +203,13 @@ const Sidebar = ({
                           if (onSwitchCompany) onSwitchCompany(company);
                           setShowCompanyDropdown(false);
                         }}
-                        className="w-full justify-start text-left hover:bg-slate-700 px-3 py-2 text-sm"
+                        className="w-full justify-start text-left hover:bg-accent transition-all duration-base px-3 py-2 text-sm rounded-sm"
                         disabled={!company.hasAccess}
                       >
                         <div className="flex items-center w-full">
-                          <Building className="h-4 w-4 mr-2" />
-                          <span className="flex-1 truncate">{company.name}</span>
-                          {!company.hasAccess && <Unlock className="h-4 w-4 ml-2 text-gray-400" />}
+                          <Building className="h-4 w-4 mr-2 text-primary" />
+                          <span className="flex-1 truncate font-medium">{company.name}</span>
+                          {!company.hasAccess && <Unlock className="h-4 w-4 ml-2 text-muted-foreground" />}
                         </div>
                       </Button>
                     ))}
@@ -216,7 +217,7 @@ const Sidebar = ({
                 )}
               </div>
             ) : (
-              <h2 className="font-semibold text-lg">
+              <h2 className="text-lg font-bold text-sidebar-foreground">
                 {userRole === 'partner' ? 'Partner Portal' : 'Company Portal'}
               </h2>
             )}
@@ -226,20 +227,20 @@ const Sidebar = ({
           variant="ghost"
           size="sm"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="text-white hover:bg-slate-700"
+          className="text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-base rounded-md"
         >
-          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
         </Button>
       </div>
 
       {/* Navigation Items */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {menuItems.map(item => renderMenuItem(item))}
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-slate-700">
-        <div className={cn("text-xs text-slate-400", isCollapsed && "text-center")}>
+      <div className="p-4 border-t border-sidebar-border bg-sidebar/95 backdrop-blur-sm">
+        <div className={cn("text-xs text-muted-foreground font-medium", isCollapsed && "text-center")}>
           {!isCollapsed ? "GDPR Compliance v1.0" : "v1.0"}
         </div>
       </div>
